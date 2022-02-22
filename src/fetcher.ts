@@ -31,7 +31,12 @@ export class Fetcher {
     /**************
     CONSTRUCTOR
     **************/
-    // TODO - Optional parameter, provider, in case dev wants to use their own provider
+
+    /**
+     * @param chainID The chainID for the Fetcher object, 1 for Ethereum Mainnet.
+     * @param provider Optional parameter to provide a custom Provider object.
+     * If no provider argument is given, Fetcher object will use the default provider as per ethers.js.
+     */
     constructor(chainID: number, provider?: providers.Provider) {
         this.chainID = chainID;
         typeof(provider) == 'undefined' ? this.provider = getDefaultProvider(getNetwork(chainID)) : this.provider = provider;
@@ -42,64 +47,115 @@ export class Fetcher {
     METHODS - SOLACECOVERPRODUCT EXTERNAL VIEW FUNCTION WRAPPERS
     *************************************************************/
     
-    // TO-DO Decode from hex to usable number
+    /**
+     * TO-DO Decide if need to decode return value from BN hex.
+     * @returns The active cover limit in **USD** to 18 decimal places. In other words, the total cover that has been sold at the current time.
+     */
     public async activeCoverLimit(): Promise<BN> {
         return (await this.solaceCoverProduct.activeCoverLimit())
     }
 
-    // TO-DO Decode from hex to usable number
+    /**
+     * TO-DO Decide if need to decode return value from BN hex.
+     * @returns The amount of available remaining capacity for new cover.
+     */
     public async availableCoverCapacity(): Promise<BN> {
         return (await this.solaceCoverProduct.availableCoverCapacity())
     }
 
-    // TO-DO Decode from hex to usable number
+    /**
+     * TO-DO Decide if need to decode return value from BN hex.
+     * @returns The maximum amount of cover that can be sold in **USD** to 18 decimals places.
+     */
     public async maxCover(): Promise<BN> {
         return (await this.solaceCoverProduct.maxCover())
     }
-    
+
+    /**
+     * @returns The policy count (amount of policies that have been purchased, includes inactive policies).
+     */
     public async policyCount(): Promise<BN> {
         return (await this.solaceCoverProduct.policyCount())
     }
 
-    // TO-DO Decode from hex to usable number
+    /**
+     * TO-DO Decide if need to decode return value from BN hex.
+     * @param policyholder The policyholder address.
+     * @returns The policyholder's account balance in **USD**.
+     */
     public async accountBalanceOf(policyholder: string): Promise<BN> {
         invariant(utils.isAddress(policyholder), 'not an Ethereum address')
         return (await this.solaceCoverProduct.accountBalanceOf(policyholder))
     }
 
-    // TO-DO Decode from hex to usable number
+    /**
+     * TO-DO Decide if need to decode return value from BN hex.
+     * @param policyID The policy ID.
+     * @returns The cover limit for the given policy ID.
+     */
     public async coverLimitOf(policyID: number): Promise<BN> {
         return (await this.solaceCoverProduct.coverLimitOf(policyID))
     }
 
-    // TO-DO Decode from hex to usable number
+    /**
+     * TO-DO Decide if need to decode return value from BN hex.
+     * @param coverLimit Cover limit.
+     * @returns The minimum required account balance for a given cover limit. Equals the maximum chargeable fee for one epoch.
+     */
     public async minRequiredAccountBalance(coverLimit: BN): Promise<BN> {
         return (await this.solaceCoverProduct.minRequiredAccountBalance(coverLimit))
     }
 
+    /**
+     * TO-DO Decide if need to decode return value from BN hex.
+     * @param policyID The policy ID.
+     * @returns True if policy is active. False if policy is inactive, or does not exist.
+     */
     public async policyStatus(policyID: number): Promise<boolean> {
         return (await this.solaceCoverProduct.policyStatus(policyID))
     }
 
+    /**
+     * TO-DO Decide if need to decode return value from BN hex.
+     * @param policyholder The policyholder address.
+     * @returns policyID The policy ID.
+     */
     public async policyOf(policyholder: string): Promise<BN> {
         invariant(utils.isAddress(policyholder), 'not an Ethereum address')
         return (await this.solaceCoverProduct.policyOf(policyholder))
     }
 
+    /**
+     * TO-DO Decide if need to decode return value from BN hex.
+     * @param policyholder The policyholder address.
+     * @returns The reward points for the policyholder.
+     */
     public async rewardPointsOf(policyholder: string): Promise<BN> {
         invariant(utils.isAddress(policyholder), 'not an Ethereum address')
         return (await this.solaceCoverProduct.rewardPointsOf(policyholder))
     }
 
+    /**
+     * @param policyholder The policyholder address.
+     * @returns True if the policyholder has previously used a valid referral code, false if not.
+     */
     public async isReferralCodeUsed(policyholder: string): Promise<boolean> {
         invariant(utils.isAddress(policyholder), 'not an Ethereum address')
         return (await this.solaceCoverProduct.isReferralCodeUsed(policyholder))
     }
 
+    /**
+     * @param referralCode The referral code.
+     * @returns The referrer address, returns 0 address if invalid referral code.
+     */
     public async getReferrerFromReferralCode(referralCode: utils.BytesLike): Promise<string> {
         return (await this.solaceCoverProduct.getReferrerFromReferralCode(referralCode))
     }
 
+    /**
+     * @param referralCode The referral code.
+     * @returns True if valid referral code, false otherwise.
+     */
     public async isReferralCodeValid(referralCode: utils.BytesLike): Promise<boolean> {
         return (await this.solaceCoverProduct.isReferralCodeValid(referralCode))
     }    
@@ -108,6 +164,10 @@ export class Fetcher {
     METHODS - OFF-CHAIN API CALLS
     ******************************/
 
+    /**
+     * @param address Ethereum address.
+     * @returns DeFi protocol balances (in ETH and USD) for the address. See documentation for sample response object.
+     */
     public async getSolaceRiskBalances(address: string): Promise<SolaceRiskBalance[] | undefined | unknown > {
         return await axios({
             url: `https://risk-data.solace.fi/balances?account=${address}&chain_id=${this.chainID}`, 
@@ -124,6 +184,11 @@ export class Fetcher {
         })
     }    
 
+    /**
+     * @param address Ethereum address.
+     * @param positions DeFi protocol balances for the address, returned by getSolaceRiskBalances() object.
+     * @returns Risk scores for the address's DeFi portfolio. See documentation for sample response object.
+     */
     public async getSolaceRiskScores (
         address: string,
         positions: SolaceRiskBalance[]

@@ -1,7 +1,7 @@
 import { BigNumber as BN, Contract, providers, Wallet, utils } from 'ethers'
 import SolaceCoverProduct from "./abis/SolaceCoverProduct.json"
 import invariant from 'tiny-invariant'
-import { SOLACE_COVER_PRODUCT_ADDRESS } from './constants'
+import { SOLACE_COVER_PRODUCT_ADDRESS, ZERO_ADDRESS } from './constants'
 
 /*
  * Contains methods for accessing policyholder mutator functions in SolaceCoverProduct.sol.
@@ -50,7 +50,15 @@ export class Policyholder {
         amount: BN,
         referralCode: utils.BytesLike
     ): Promise<BN> {
-        invariant(utils.isAddress(policyholder), 'not an Ethereum address')
+        invariant(utils.isAddress(policyholder), "not an Ethereum address")
+        invariant(policyholder == ZERO_ADDRESS, "cannot enter zero address policyholder")
+        invariant(coverLimit.gt(0), "cannot enter zero cover limit")
+
+        // require(!policyStatus(policyID), "policy already activated");
+        // require(_canPurchaseNewCover(0, coverLimit_), "insufficient capacity for new cover");
+        // require(IERC20(_getAsset()).balanceOf(msg.sender) >= amount_, "insufficient caller balance for deposit");
+        // require(amount_ + accountBalanceOf(policyholder_) > _minRequiredAccountBalance(coverLimit_), "insufficient deposit for minimum required account balance");
+
         return (await this.solaceCoverProduct.activatePolicy(policyholder, coverLimit, amount, referralCode))
     }
 
@@ -64,6 +72,7 @@ export class Policyholder {
         newCoverLimit: BN,
         referralCode: utils.BytesLike
     ) {
+        invariant(newCoverLimit.gt(0), "cannot enter zero cover limit")
         await this.solaceCoverProduct.updateCoverLimit(newCoverLimit, referralCode)
     }
 
@@ -76,7 +85,8 @@ export class Policyholder {
         policyholder: string,
         amount: BN
     ) {
-        invariant(utils.isAddress(policyholder), 'not an Ethereum address')
+        invariant(utils.isAddress(policyholder), "not an Ethereum address")
+        invariant(policyholder == ZERO_ADDRESS, "cannot enter zero address policyholder")
         await this.solaceCoverProduct.deposit(policyholder, amount)
     }
 

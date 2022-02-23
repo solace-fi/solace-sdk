@@ -4,7 +4,7 @@ import SolaceCoverProduct from "./abis/SolaceCoverProduct.json"
 import invariant from 'tiny-invariant'
 import axios, { AxiosResponse } from "axios"
 import { SOLACE_COVER_PRODUCT_ADDRESS } from './constants'
-import { SolaceRiskBalance, SolaceRiskScore } from './types/api'
+import { SolaceRiskBalance, SolaceRiskScore } from './types'
 
 /*
  * Contains methods for accessing external view functions in SolaceCoverProduct.sol

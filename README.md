@@ -3,6 +3,14 @@ The Solace SDK exists to make it easy for developers to integrate Solace into ex
 
 This SDK is in alpha testing and may contain bugs or change significantly between patch versions. If you have questions about how to use the SDK, please reach out in the Discord. Pull requests welcome!
 
+### Installation
+
+`npm install`
+
+### Testing
+
+`yarn test`
+
 ### Intended Usage
 
 Setup and obtain active cover limit of Solace Cover Product on Ethereum mainnet

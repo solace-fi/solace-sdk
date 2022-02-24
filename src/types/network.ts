@@ -10,3 +10,5 @@ export type Network = {
   chainId: number,
   supportedTxTypes: number[]
 }
+
+export type ChainId = 1 | 4

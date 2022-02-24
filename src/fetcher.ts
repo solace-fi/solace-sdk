@@ -4,7 +4,7 @@ import SolaceCoverProduct from "./abis/SolaceCoverProduct.json"
 import invariant from 'tiny-invariant'
 import axios, { AxiosResponse } from "axios"
 import { SOLACE_COVER_PRODUCT_ADDRESS } from './constants'
-import { SolaceRiskBalance, SolaceRiskScore } from './types'
+import { ChainId, SolaceRiskBalance, SolaceRiskScore } from './types'
 
 /*
  * Contains methods for accessing external view functions in SolaceCoverProduct.sol
@@ -24,7 +24,7 @@ export class Fetcher {
     /**************
     PROPERTIES
     **************/
-    chainID: number;
+    chainID: ChainId;
     provider: providers.Provider;
     solaceCoverProduct: Contract;
 
@@ -37,7 +37,7 @@ export class Fetcher {
      * @param provider Optional parameter to provide a custom Provider object.
      * If no provider argument is given, Fetcher object will use the default provider as per ethers.js.
      */
-    constructor(chainID: number, provider?: providers.Provider) {
+    constructor(chainID: ChainId, provider?: providers.Provider) {
         this.chainID = chainID;
         typeof(provider) == 'undefined' ? this.provider = getDefaultProvider(getNetwork(chainID)) : this.provider = provider;
         this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProduct, this.provider)

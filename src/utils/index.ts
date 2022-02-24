@@ -23,16 +23,18 @@ export const getGasSettings = (chainId: number, connector: string, gasValue: num
 
   const gasLimitObj = gasLimit ? { gasLimit } : {}
 
+  const nonHumanGasValue = gasValue * Math.pow(10, 9)
+
   if(foundWallet.supportedTxTypes.includes(2) && foundNetwork.supportedTxTypes.includes(2)){
     return {
-      maxFeePerGas: gasValue,
+      maxFeePerGas: nonHumanGasValue,
       type: 2,
       ...gasLimitObj
     }
   }
 
   return {
-    gasPrice: gasValue,
+    gasPrice: nonHumanGasValue,
     ...gasLimitObj
   }
 }

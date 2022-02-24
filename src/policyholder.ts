@@ -2,6 +2,7 @@ import { BigNumber as BN, Contract, providers, Wallet, utils } from 'ethers'
 import SolaceCoverProduct from "./abis/SolaceCoverProduct.json"
 import invariant from 'tiny-invariant'
 import { SOLACE_COVER_PRODUCT_ADDRESS, ZERO_ADDRESS } from './constants'
+import { GasConfiguration } from './types';
 
 /*
  * Contains methods for accessing policyholder mutator functions in SolaceCoverProduct.sol.
@@ -48,7 +49,8 @@ export class Policyholder {
         policyholder: string,
         coverLimit: BN,
         amount: BN,
-        referralCode: utils.BytesLike
+        referralCode: utils.BytesLike,
+        gasConfig?: GasConfiguration
     ): Promise<BN> {
         invariant(utils.isAddress(policyholder), "not an Ethereum address")
         invariant(policyholder == ZERO_ADDRESS, "cannot enter zero address policyholder")
@@ -59,7 +61,7 @@ export class Policyholder {
         // require(IERC20(_getAsset()).balanceOf(msg.sender) >= amount_, "insufficient caller balance for deposit");
         // require(amount_ + accountBalanceOf(policyholder_) > _minRequiredAccountBalance(coverLimit_), "insufficient deposit for minimum required account balance");
 
-        return (await this.solaceCoverProduct.activatePolicy(policyholder, coverLimit, amount, referralCode))
+        return (await this.solaceCoverProduct.activatePolicy(policyholder, coverLimit, amount, referralCode, {...gasConfig}))
     }
 
     /**
@@ -70,10 +72,11 @@ export class Policyholder {
      */
     public async updateCoverLimit(
         newCoverLimit: BN,
-        referralCode: utils.BytesLike
+        referralCode: utils.BytesLike,
+        gasConfig?: GasConfiguration
     ) {
         invariant(newCoverLimit.gt(0), "cannot enter zero cover limit")
-        await this.solaceCoverProduct.updateCoverLimit(newCoverLimit, referralCode)
+        await this.solaceCoverProduct.updateCoverLimit(newCoverLimit, referralCode, {...gasConfig})
     }
 
     /**
@@ -83,11 +86,12 @@ export class Policyholder {
      */
     public async deposit(
         policyholder: string,
-        amount: BN
+        amount: BN,
+        gasConfig?: GasConfiguration
     ) {
         invariant(utils.isAddress(policyholder), "not an Ethereum address")
         invariant(policyholder == ZERO_ADDRESS, "cannot enter zero address policyholder")
-        await this.solaceCoverProduct.deposit(policyholder, amount)
+        await this.solaceCoverProduct.deposit(policyholder, amount, {...gasConfig})
     }
 
     /**
@@ -95,16 +99,16 @@ export class Policyholder {
      * If cooldown has passed, the user will withdraw their entire account balance. 
      * If cooldown has not started, or has not passed, the user will not be able to withdraw their entire account. A minimum required account balance (one epoch's fee) will be left in the user's account.
      */
-    public async withdraw() {
-        await this.solaceCoverProduct.withdraw()
+    public async withdraw(gasConfig?: GasConfiguration) {
+        await this.solaceCoverProduct.withdraw({...gasConfig})
     }
 
     /**
      * Deactivate a user's policy.
      * This will set a user's cover limit to 0, and begin the cooldown timer. Read comments for [`cooldownPeriod()`](#cooldownperiod) for more information on the cooldown mechanic.
      */
-    public async deactivatePolicy() {
-        await this.solaceCoverProduct.deactivatePolicy()
+    public async deactivatePolicy(gasConfig?: GasConfiguration) {
+        await this.solaceCoverProduct.deactivatePolicy({...gasConfig})
     }
 
     /**

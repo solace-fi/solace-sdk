@@ -5,3 +5,8 @@ export type NetworkConfig = {
       pollingInterval: number
     }
   }
+
+export type Network = {
+  chainId: number,
+  supportedTxTypes: number[]
+}

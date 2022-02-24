@@ -51,17 +51,12 @@ export class Policyholder {
         amount: BN,
         referralCode: utils.BytesLike,
         gasConfig?: GasConfiguration
-    ): Promise<BN> {
+    ): Promise<providers.TransactionResponse> {
         invariant(utils.isAddress(policyholder), "not an Ethereum address")
         invariant(policyholder != ZERO_ADDRESS, "cannot enter zero address policyholder")
         invariant(coverLimit.gt(0), "cannot enter zero cover limit")
-
-        // require(!policyStatus(policyID), "policy already activated");
-        // require(_canPurchaseNewCover(0, coverLimit_), "insufficient capacity for new cover");
-        // require(IERC20(_getAsset()).balanceOf(msg.sender) >= amount_, "insufficient caller balance for deposit");
-        // require(amount_ + accountBalanceOf(policyholder_) > _minRequiredAccountBalance(coverLimit_), "insufficient deposit for minimum required account balance");
-
-        return (await this.solaceCoverProduct.activatePolicy(policyholder, coverLimit, amount, referralCode, {...gasConfig}))
+        const tx: providers.TransactionResponse = await this.solaceCoverProduct.activatePolicy(policyholder, coverLimit, amount, referralCode, {...gasConfig})
+        return tx
     }
 
     /**
@@ -74,9 +69,10 @@ export class Policyholder {
         newCoverLimit: BN,
         referralCode: utils.BytesLike,
         gasConfig?: GasConfiguration
-    ) {
+    ): Promise<providers.TransactionResponse> {
         invariant(newCoverLimit.gt(0), "cannot enter zero cover limit")
-        await this.solaceCoverProduct.updateCoverLimit(newCoverLimit, referralCode, {...gasConfig})
+        const tx: providers.TransactionResponse = await this.solaceCoverProduct.updateCoverLimit(newCoverLimit, referralCode, {...gasConfig})
+        return tx
     }
 
     /**
@@ -88,10 +84,11 @@ export class Policyholder {
         policyholder: string,
         amount: BN,
         gasConfig?: GasConfiguration
-    ) {
+    ): Promise<providers.TransactionResponse> {
         invariant(utils.isAddress(policyholder), "not an Ethereum address")
         invariant(policyholder != ZERO_ADDRESS, "cannot enter zero address policyholder")
-        await this.solaceCoverProduct.deposit(policyholder, amount, {...gasConfig})
+        const tx: providers.TransactionResponse = await this.solaceCoverProduct.deposit(policyholder, amount, {...gasConfig})
+        return tx
     }
 
     /**
@@ -99,16 +96,18 @@ export class Policyholder {
      * If cooldown has passed, the user will withdraw their entire account balance. 
      * If cooldown has not started, or has not passed, the user will not be able to withdraw their entire account. A minimum required account balance (one epoch's fee) will be left in the user's account.
      */
-    public async withdraw(gasConfig?: GasConfiguration) {
-        await this.solaceCoverProduct.withdraw({...gasConfig})
+    public async withdraw(gasConfig?: GasConfiguration): Promise<providers.TransactionResponse> {
+        const tx: providers.TransactionResponse = await this.solaceCoverProduct.withdraw({...gasConfig})
+        return tx
     }
 
     /**
      * Deactivate a user's policy.
      * This will set a user's cover limit to 0, and begin the cooldown timer. Read comments for [`cooldownPeriod()`](#cooldownperiod) for more information on the cooldown mechanic.
      */
-    public async deactivatePolicy(gasConfig?: GasConfiguration) {
-        await this.solaceCoverProduct.deactivatePolicy({...gasConfig})
+    public async deactivatePolicy(gasConfig?: GasConfiguration): Promise<providers.TransactionResponse> {
+        const tx: providers.TransactionResponse = await this.solaceCoverProduct.deactivatePolicy({...gasConfig})
+        return tx
     }
 
     /**

@@ -90,7 +90,7 @@ export class Policyholder {
         gasConfig?: GasConfiguration
     ) {
         invariant(utils.isAddress(policyholder), "not an Ethereum address")
-        invariant(policyholder == ZERO_ADDRESS, "cannot enter zero address policyholder")
+        invariant(policyholder != ZERO_ADDRESS, "cannot enter zero address policyholder")
         await this.solaceCoverProduct.deposit(policyholder, amount, {...gasConfig})
     }
 

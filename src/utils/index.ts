@@ -16,10 +16,13 @@ export const getSigner = async (network: NetworkConfig, connector: string, accou
     return signer
 }
 
-export const getGasSettings = (chainId: number, connector: string, gasValue: number, gasLimit?: number): GasConfiguration => {
+export const getGasSettings = (chainId: number, connector: string, gasValue?: number, gasLimit?: number): GasConfiguration => {
+  
   const foundWallet = WALLETS.find((w) => w.id.toLowerCase() == connector)
   const foundNetwork = NETWORKS.find((n) => n.chainId == chainId)
   if (!foundWallet || !foundNetwork) return {}
+
+  if (foundNetwork.isTestnet || !gasValue) return {}
 
   const gasLimitObj = gasLimit ? { gasLimit } : {}
 

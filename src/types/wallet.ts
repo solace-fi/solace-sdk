@@ -5,5 +5,3 @@ export type Wallet = {
     supportedTxTypes: number[],
     getConnector(network: NetworkConfig, args?: any): any
 }
-
-export type Connector = 'metamask' | 'walletlink' | 'walletconnect'

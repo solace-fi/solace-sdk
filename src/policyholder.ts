@@ -2,7 +2,7 @@ import { BigNumber as BN, Contract, providers, Wallet, utils } from 'ethers'
 import SolaceCoverProduct from "./abis/SolaceCoverProduct.json"
 import invariant from 'tiny-invariant'
 import { SOLACE_COVER_PRODUCT_ADDRESS, ZERO_ADDRESS } from './constants'
-import { ChainId, GasConfiguration } from './types';
+import { GasConfiguration } from './types';
 
 /*
  * Contains methods for accessing policyholder mutator functions in SolaceCoverProduct.sol.
@@ -13,7 +13,7 @@ export class Policyholder {
     /**************
     PROPERTIES
     **************/
-    chainID: ChainId;
+    chainID: number;
     signer: Wallet | providers.JsonRpcSigner;
     solaceCoverProduct: Contract;
 
@@ -27,7 +27,7 @@ export class Policyholder {
      * @param signer Signer object - https://docs.ethers.io/v5/api/signer/
      * Either a Wallet (custom script with provided private key) or JsonRpcSigner (for Metamask integration) entity can be provided.
      */
-    constructor(chainID: ChainId, signer: Wallet | providers.JsonRpcSigner) {
+    constructor(chainID: number, signer: Wallet | providers.JsonRpcSigner) {
         this.chainID = chainID;
         this.signer = signer;
         this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProduct, signer)

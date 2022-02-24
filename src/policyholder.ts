@@ -53,7 +53,7 @@ export class Policyholder {
         gasConfig?: GasConfiguration
     ): Promise<BN> {
         invariant(utils.isAddress(policyholder), "not an Ethereum address")
-        invariant(policyholder == ZERO_ADDRESS, "cannot enter zero address policyholder")
+        invariant(policyholder != ZERO_ADDRESS, "cannot enter zero address policyholder")
         invariant(coverLimit.gt(0), "cannot enter zero cover limit")
 
         // require(!policyStatus(policyID), "policy already activated");

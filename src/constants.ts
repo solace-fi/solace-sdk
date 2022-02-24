@@ -23,7 +23,7 @@ export const DAI_ADDRESS: { [chainID : number]: string } = {
 
 export const SOLACE_COVER_PRODUCT_ADDRESS: { [chainID: number]: string } = {
     [1]: "0x501ACEbe29eabc346779BcB5Fd62Eaf6Bfb5320E",
-    [4]: "0x501ace2146981263604F7F5C4d0600583ebA8eF6"
+    [4]: "0x501AcE125346445b04A7c414C55a3d18d51Bf547"
 }
 
 export const NETWORKS: Network[] = [

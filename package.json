@@ -26,8 +26,6 @@
   "dependencies": {
     "@web3-react/abstract-connector": "^6.0.7",
     "@web3-react/injected-connector": "^6.0.7",
-    "@web3-react/ledger-connector": "^6.1.9",
-    "@web3-react/trezor-connector": "^6.1.9",
     "@web3-react/walletconnect-connector": "^6.2.10",
     "@web3-react/walletlink-connector": "^6.2.12",
     "axios": "^0.26.0",

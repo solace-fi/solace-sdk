@@ -1,6 +1,6 @@
 import { InjectedConnector } from "@web3-react/injected-connector";
-import { LedgerConnector } from "@web3-react/ledger-connector";
-import { TrezorConnector } from "@web3-react/trezor-connector";
+// import { LedgerConnector } from "@web3-react/ledger-connector";
+// import { TrezorConnector } from "@web3-react/trezor-connector";
 import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 import { WalletLinkConnector } from "@web3-react/walletlink-connector";
 import { BigNumber as BN } from "ethers";
@@ -61,33 +61,34 @@ export const WALLETS: Wallet[] = [
               })
         }
     },
+    // {
+    //     id: 'ledger',
+    //     supportedTxTypes: [0, 2],
+    //     getConnector(network: NetworkConfig, args?: any) {
+    //         return new LedgerConnector({
+    //             chainId: network.chainId,
+    //             url: network.rpc.httpsUrl,
+    //             pollingInterval: network.rpc.pollingInterval,
+    //             baseDerivationPath: args.baseDerivationPath ?? undefined,
+    //           })
+    //     }
+    // }, {
+    //     id: 'trezor',
+    //     supportedTxTypes: [0],
+    //     getConnector(network: NetworkConfig, args?: any) {
+    //         return new TrezorConnector({
+    //             chainId: network.chainId,
+    //             url: network.rpc.httpsUrl,
+    //             pollingInterval: network.rpc.pollingInterval,
+    //             manifestEmail: '',
+    //             manifestAppUrl: '',
+    //             config: {
+    //               networkId: network.chainId,
+    //             },
+    //           })
+    //     }
+    // }, 
     {
-        id: 'ledger',
-        supportedTxTypes: [0, 2],
-        getConnector(network: NetworkConfig, args?: any) {
-            return new LedgerConnector({
-                chainId: network.chainId,
-                url: network.rpc.httpsUrl,
-                pollingInterval: network.rpc.pollingInterval,
-                baseDerivationPath: args.baseDerivationPath ?? undefined,
-              })
-        }
-    }, {
-        id: 'trezor',
-        supportedTxTypes: [0],
-        getConnector(network: NetworkConfig, args?: any) {
-            return new TrezorConnector({
-                chainId: network.chainId,
-                url: network.rpc.httpsUrl,
-                pollingInterval: network.rpc.pollingInterval,
-                manifestEmail: '',
-                manifestAppUrl: '',
-                config: {
-                  networkId: network.chainId,
-                },
-              })
-        }
-    }, {
         id: 'walletconnect',
         supportedTxTypes: [0],
         getConnector(network: NetworkConfig, args?: any) {

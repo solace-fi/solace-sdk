@@ -1,7 +1,7 @@
 import { getProvider, getSigner } from './ethers';
 import { getGasPrice, getGasSettings } from './gas';
 
-export {
+export const solaceUtils = {
   getProvider,
   getSigner,
   getGasPrice,

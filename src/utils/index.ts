@@ -2,6 +2,7 @@ import { providers } from 'ethers'
 import { GasArgs, GasConfiguration, OptionalSignerArgs } from '../types'
 import { NETWORKS, WALLETS } from '..'
 import { AbstractConnector } from '@web3-react/abstract-connector'
+import { formatUnits } from 'ethers/lib/utils'
 
 export const getProvider = (rpcUrl: string): providers.JsonRpcProvider => {
     return new providers.JsonRpcProvider(rpcUrl)
@@ -20,17 +21,19 @@ export const getSigner = async (signerArgs?: OptionalSignerArgs): Promise<provid
     return signer
 }
 
-export const getGasSettings = (chainId: number, gasArgs?: GasArgs): GasConfiguration => {
+export const getGasSettings = async (chainId: number, abstract: providers.JsonRpcProvider | providers.JsonRpcSigner, gasArgs?: GasArgs): Promise<GasConfiguration> => {
   
   let foundWallet = WALLETS[0]
   if (gasArgs && gasArgs.connector) foundWallet = WALLETS.find((w) => w.id.toLowerCase() == gasArgs.connector) ?? WALLETS[0]
   const foundNetwork = NETWORKS.find((n) => n.chainId == chainId)
   if (!foundWallet || !foundNetwork) return {}
-  if (foundNetwork.isTestnet || !(gasArgs && gasArgs.gasValue)) return {}
+  if (foundNetwork.isTestnet) return {}
 
+  const bnGasVal = await abstract.getGasPrice()
+  const gasString = formatUnits(bnGasVal, 'gwei')
 
   const gasLimitObj: { gasLimit?: number } = gasArgs && gasArgs.gasLimit ? { gasLimit: gasArgs.gasLimit } : {}
-  const nonHumanGasValue = Math.floor(gasArgs.gasValue * Math.pow(10, 9))
+  const nonHumanGasValue = Math.floor(parseFloat(gasString) * Math.pow(10, 9))
 
   if(foundWallet.supportedTxTypes.includes(2) && foundNetwork.supportedTxTypes.includes(2)){
     return {

@@ -20,6 +20,5 @@ export type GasConfiguration =
 
 export type GasArgs = {
   connector?: string
-  gasValue?: number
   gasLimit?: number
 }

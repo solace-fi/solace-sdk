@@ -1,3 +1,4 @@
+import { AbstractConnector } from "@web3-react/abstract-connector";
 import { InjectedConnector } from "@web3-react/injected-connector";
 // import { LedgerConnector } from "@web3-react/ledger-connector";
 // import { TrezorConnector } from "@web3-react/trezor-connector";
@@ -59,16 +60,16 @@ export const WALLETS: Wallet[] = [
     {
         id: 'metamask',
         supportedTxTypes: [0, 2],
-        getConnector(network: NetworkConfig, args?: any) {
+        getConnector(): AbstractConnector {
             return new InjectedConnector({
                 supportedChainIds: NETWORKS.map((network) => network.chainId),
-              })
+            })
         }
     },
     // {
     //     id: 'ledger',
     //     supportedTxTypes: [0, 2],
-    //     getConnector(network: NetworkConfig, args?: any) {
+    //     getConnector(network: NetworkConfig) {
     //         return new LedgerConnector({
     //             chainId: network.chainId,
     //             url: network.rpc.httpsUrl,
@@ -79,7 +80,7 @@ export const WALLETS: Wallet[] = [
     // }, {
     //     id: 'trezor',
     //     supportedTxTypes: [0],
-    //     getConnector(network: NetworkConfig, args?: any) {
+    //     getConnector(network: NetworkConfig) {
     //         return new TrezorConnector({
     //             chainId: network.chainId,
     //             url: network.rpc.httpsUrl,
@@ -95,7 +96,7 @@ export const WALLETS: Wallet[] = [
     {
         id: 'walletconnect',
         supportedTxTypes: [0],
-        getConnector(network: NetworkConfig, args?: any) {
+        getConnector(network: NetworkConfig): AbstractConnector {
             return new WalletConnectConnector({
                 rpc: { [network.chainId]: network.rpc.httpsUrl },
                 bridge: 'https://bridge.walletconnect.org',
@@ -105,7 +106,7 @@ export const WALLETS: Wallet[] = [
     }, {
         id: 'walletlink',
         supportedTxTypes: [0],
-        getConnector(network: NetworkConfig, args?: any) {
+        getConnector(network: NetworkConfig): AbstractConnector {
             return new WalletLinkConnector({
                 url: network.rpc.httpsUrl,
                 appName: 'coinbase',

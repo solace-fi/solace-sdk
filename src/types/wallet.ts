@@ -1,7 +1,7 @@
 import { AbstractConnector } from "@web3-react/abstract-connector";
 import { NetworkConfig } from ".";
 
-export type Wallet = {
+export type WalletConnector = {
     id: string
     supportedTxTypes: number[],
     getConnector(network?: NetworkConfig): AbstractConnector

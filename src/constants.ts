@@ -5,7 +5,7 @@ import { InjectedConnector } from "@web3-react/injected-connector";
 import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 import { WalletLinkConnector } from "@web3-react/walletlink-connector";
 import { BigNumber as BN } from "ethers";
-import { Network, NetworkConfig, Wallet } from "./types";
+import { Network, NetworkConfig, WalletConnector } from "./types";
 
 // exports for internal consumption
 export const ZERO = BN.from("0")
@@ -56,7 +56,7 @@ export const NETWORKS: Network[] = [
     }
 ]
 
-export const WALLETS: Wallet[] = [
+export const WALLETS: WalletConnector[] = [
     {
         id: 'metamask',
         supportedTxTypes: [0, 2],

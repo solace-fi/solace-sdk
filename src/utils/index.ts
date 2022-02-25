@@ -24,7 +24,7 @@ export const getSigner = async (signerArgs?: OptionalSignerArgs): Promise<provid
 export const getGasPrice = async (abstract: providers.JsonRpcProvider | providers.JsonRpcSigner): Promise<number> => {
   const bnGasVal = await abstract.getGasPrice()
   const gasString = formatUnits(bnGasVal, 'gwei')
-  return parseFloat(gasString)
+  return Math.ceil(parseFloat(gasString))
 }
 
 export const getGasSettings = (chainId: number, gasPrice: number, gasArgs?: GasArgs): GasConfiguration => {

@@ -21,4 +21,5 @@ export type GasConfiguration =
 export type GasArgs = {
   connector?: string
   gasLimit?: number
+  gasForTestnet?: boolean
 }

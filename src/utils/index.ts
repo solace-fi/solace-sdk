@@ -32,7 +32,7 @@ export const getGasSettings = (chainId: number, gasPrice: number, gasArgs?: GasA
   if (gasArgs && gasArgs.connector) foundWallet = WALLETS.find((w) => w.id.toLowerCase() == gasArgs.connector) ?? WALLETS[0]
   const foundNetwork = NETWORKS.find((n) => n.chainId == chainId)
   if (!foundWallet || !foundNetwork) return {}
-  if (foundNetwork.isTestnet) return {}
+  if (gasArgs && !gasArgs.gasForTestnet && foundNetwork.isTestnet) return {}
 
   const gasLimitObj: { gasLimit?: number } = gasArgs && gasArgs.gasLimit ? { gasLimit: gasArgs.gasLimit } : {}
   const nonHumanGasValue = Math.floor(gasPrice * Math.pow(10, 9))

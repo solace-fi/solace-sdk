@@ -58,7 +58,7 @@ import { solaceUtils, Policyholder, Wallet, providers } from "@solace-fi/sdk"
 // ethers.js 'providers' object and 'Wallet' class is exported from @solace-fi/sdk
 // https://docs.ethers.io/v5/api/signer/#Wallet-constructor for more info
 const provider = new providers.getDefaultProvider('mainnet')
-const signer = new Wallet(<PRIVATE_KEY>, <RPC_URL>)
+const signer = new Wallet(<PRIVATE_KEY>, provider)
 const policyholder = new Policyholder(1, signer)
 let tx = await policyholder.withdraw()
 ```

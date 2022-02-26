@@ -3,34 +3,47 @@ The Solace SDK exists to make it easy for developers to integrate Solace into ex
 
 This SDK is in alpha testing and may contain bugs or change significantly between patch versions. If you have questions about how to use the SDK, please reach out in the Discord. Pull requests welcome!
 
-### Installation
+### Install npm package
 
-`npm install`
+`npm i @solace-fi/sdk`
 
 ### Testing
 
 `yarn test`
 
-### Intended Usage
+### Basic Usage
 
-Setup and obtain active cover limit of Solace Cover Product on Ethereum mainnet
+Get active cover limit of Solace Cover Product on Ethereum mainnet
 ```
-import { Fetcher, Policyholder } from "@solace/sdk"
-const fetcher = new Fetcher(1) // Create new Fetcher-class object, connected to Ethereum mainnet (chainID = 1)
+import { Fetcher } from "@solace/sdk"
+
+// Create new Fetcher instance (contains blockchain read-only methods), connected to Ethereum mainnet (chainID = 1)
+const fetcher = new Fetcher(1)
+
+// Makes read-only call to SolaceCoverProduct.sol smart contract
 const activeCoverLimit = await fetcher.activeCoverLimit()
 ```
 
-Obtaining referral code for given Signer entity on Ethereum mainnet (https://docs.ethers.io/v5/api/signer/)
+Making a deposit() transaction to Solace Cover Product on Ethereum mainnet - see https://docs.solace.fi/docs/dev-docs/contracts/products/SolaceCoverProduct#deposit for further details
 ```
-const signer = new ethers.Wallet(<PRIVATE_KEY>, <PROVIDER>) // Provide Signer entity here
+import { solaceUtils, Policyholder } from "@solace/sdk"
+
+// Default to using Metamask connection, read documentation on how to customise RPC endpoint and other network settings
+const signer = await solaceUtils.getSigner()
+
+// Create new Policyholder instance (contains blockchain write methods), connected to Ethereum mainnet and Metamask
 const policyholder = new Policyholder(1, signer)
-const referralCode = policyholder.getReferralCode()
+
+// Makes call to deposit() function on deployed SolaceCoverProduct.sol with provided parameters
+// Read documentation on how to customize gas settings for the transactio
+let tx = await policyholder.deposit(<ADDRESS_STRING>, <DEPOSIT_AMOUNT_BIGNUMBER>)
 ```
 
-Withdrawing from Solace Cover Product account on Ethereum mainnet for a given Signer
+Obtaining SolaceCoverProduct referral code for Rinkeby for a selected Metamask account
 ```
-const signer = new ethers.Wallet(<PRIVATE_KEY>, <PROVIDER>) // Provide Signer entity here
-const policyholder = new Policyholder(1, signer)
-await policyholder.withdraw()
+import { solaceUtils, Policyholder } from "@solace/sdk"
+const signer = await solaceUtils.getSigner()
+const policyholder = new Policyholder(4, signer)
+const referralCode = policyholder.getReferralCode()
 ```
 

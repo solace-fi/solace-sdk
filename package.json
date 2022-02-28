@@ -1,8 +1,8 @@
 {
-  "name": "solace-sdk",
-  "version": "0.1.0",
+  "name": "@solace-fi/sdk",
+  "version": "0.2.3",
   "license": "MIT",
-  "repository": "",
+  "repository": "https://github.com/solace-fi/solace-sdk.git",
   "keywords": [
     "solace",
     "defi",
@@ -21,9 +21,14 @@
     "start": "tsdx watch",
     "build": "tsdx build",
     "test": "tsdx test --no-cache",
-    "lint": "tsdx lint src test"
+    "lint": "tsdx lint src test",
+    "prepare": "rm -r dist && npm run build"
   },
   "dependencies": {
+    "@web3-react/abstract-connector": "^6.0.7",
+    "@web3-react/injected-connector": "^6.0.7",
+    "@web3-react/walletconnect-connector": "^6.2.10",
+    "@web3-react/walletlink-connector": "^6.2.12",
     "axios": "^0.26.0",
     "ethers": "^5.5.4",
     "tiny-invariant": "^1.2.0"

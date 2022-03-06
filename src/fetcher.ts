@@ -3,8 +3,8 @@ const { getNetwork } = providers
 import SolaceCoverProduct from "./abis/SolaceCoverProduct.json"
 import invariant from 'tiny-invariant'
 import axios, { AxiosResponse } from "axios"
-import { SOLACE_COVER_PRODUCT_ADDRESS } from './constants'
-import { SolaceRiskBalance, SolaceRiskScore } from './types'
+import { SOLACE_COVER_PRODUCT_ADDRESS, NETWORKS } from './constants'
+import { SolaceRiskBalance, SolaceRiskScore, SolaceRiskSeries } from './types'
 
 /*
  * Contains methods for accessing external view functions in SolaceCoverProduct.sol
@@ -166,23 +166,56 @@ export class Fetcher {
 
     /**
      * @param address Ethereum address.
-     * @returns DeFi protocol balances (in ETH and USD) for the address. See documentation for sample response object.
+     * @returns DeFi protocol balances in USD for the address. See documentation for sample response object.
      */
-    public async getSolaceRiskBalances(address: string): Promise<SolaceRiskBalance[] | undefined | unknown > {
+    public async getSolaceRiskBalances_SingleChain(address: string): Promise<SolaceRiskBalance[] | undefined | unknown > {
         return await axios({
-            url: `https://risk-data.solace.fi/balances?account=${address}&chain_id=${this.chainID}`, 
-            method: 'GET',
+            url: 'https://risk-data.solace.fi/balances', 
+            method: 'POST',
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
             },
+            data: JSON.stringify({
+                chain_id: this.chainID,
+                account: address,
+            }),
         })
         .then((response: AxiosResponse<any, any>) => {return response.data})
         .catch((error: AxiosResponse<any, any>) => {
             console.error('Error getSolaceRiskBalances:', error)
             return undefined
         })
-    }    
+    }  
+
+    /**
+     * @param address Ethereum address.
+     * @param chains Array of chainIDs to obtain DeFi protocol balances for.
+     * @returns DeFi protocol balances in USD for the address for the selected chains. See documentation for sample response object.
+     */
+    public async getSolaceRiskBalances_MultiChain(address: string, chains: number[]): Promise<SolaceRiskBalance[] | undefined | unknown > {
+        // Input check for chainIds
+        const supportedChainIds = NETWORKS.map((network) => network.chainId);
+        chains.forEach(item => invariant(supportedChainIds.includes(item),"not a supported chainID"))
+
+        return await axios({
+            url: 'https://risk-data.solace.fi/balances', 
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            data: JSON.stringify({
+                chains: chains,
+                account: address,
+            }),
+        })
+        .then((response: AxiosResponse<any, any>) => {return response.data})
+        .catch((error: AxiosResponse<any, any>) => {
+            console.error('Error getSolaceRiskBalances:', error)
+            return undefined
+        })
+    }  
 
     /**
      * @param address Ethereum address.
@@ -211,4 +244,23 @@ export class Fetcher {
             return undefined
         })
     }
+
+    /**
+     * @returns Get Solace risk series data.
+     */
+     public async getSolaceRiskSeries(): Promise<SolaceRiskSeries | undefined | unknown > {
+        return await axios({
+            url: 'https://risk-data.solace.fi/series', 
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((response: AxiosResponse<any, any>) => {return response.data})
+        .catch((error: AxiosResponse<any, any>) => {
+            console.error('Error getSolaceRiskSeries', error)
+            return undefined
+        })
+    }    
 }

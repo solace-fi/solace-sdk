@@ -74,6 +74,12 @@ export const NETWORKS: Network[] = [
     }
 ]
 
+export const isNetworkSupported = (chainID: number): boolean => {
+    const supportedChainIds = NETWORKS.map((network) => network.chainId);
+    if ( supportedChainIds.includes(chainID) ) return true
+    else return false
+}
+
 export const WALLETS: WalletConnector[] = [
     {
         id: 'metamask',

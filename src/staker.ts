@@ -2,7 +2,7 @@ import { BigNumber as BN, Contract, providers, Wallet, utils } from 'ethers'
 import xsLocker from "./abis/xsLocker.json"
 import StakingRewards from "./abis/StakingRewards.json"
 import invariant from 'tiny-invariant'
-import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS, ZERO_ADDRESS } from './constants'
+import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS, ZERO_ADDRESS, isNetworkSupported } from './constants'
 import { GasConfiguration } from './types';
 
 /*
@@ -28,6 +28,7 @@ export class Staker {
      * @param providerOrSigner providerOrSigner object - either a Provider (https://docs.ethers.io/v5/api/providers/) or Signer (https://docs.ethers.io/v5/api/signer/)
      */
     constructor(chainID: number, providerOrSigner: Wallet | providers.JsonRpcSigner | providers.Provider) {
+        invariant(isNetworkSupported(chainID),"not a supported chainID")
         this.chainID = chainID;
         this.providerOrSigner = providerOrSigner;
         this.StakingRewards = new Contract(STAKING_REWARDS_ADDRESS[chainID], StakingRewards, providerOrSigner)

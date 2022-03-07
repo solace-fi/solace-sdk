@@ -3,7 +3,7 @@ const { getNetwork } = providers
 import SolaceCoverProduct from "./abis/SolaceCoverProduct.json"
 import invariant from 'tiny-invariant'
 import axios, { AxiosResponse } from "axios"
-import { SOLACE_COVER_PRODUCT_ADDRESS, NETWORKS } from './constants'
+import { SOLACE_COVER_PRODUCT_ADDRESS, isNetworkSupported } from './constants'
 import { SolaceRiskBalance, SolaceRiskScore, SolaceRiskSeries } from './types'
 
 /*
@@ -38,6 +38,7 @@ export class Fetcher {
      * If no provider argument is given, Fetcher object will use the default provider as per ethers.js.
      */
     constructor(chainID: number, provider?: providers.Provider) {
+        invariant(isNetworkSupported(chainID),"not a supported chainID")
         this.chainID = chainID;
         typeof(provider) == 'undefined' ? this.provider = getDefaultProvider(getNetwork(chainID)) : this.provider = provider;
         this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProduct, this.provider)
@@ -195,8 +196,7 @@ export class Fetcher {
      */
     public async getSolaceRiskBalances_MultiChain(address: string, chains: number[]): Promise<SolaceRiskBalance[] | undefined | unknown > {
         // Input check for chainIds
-        const supportedChainIds = NETWORKS.map((network) => network.chainId);
-        chains.forEach(item => invariant(supportedChainIds.includes(item),"not a supported chainID"))
+        chains.forEach(item => invariant(isNetworkSupported(item),"not a supported chainID"))
 
         return await axios({
             url: 'https://risk-data.solace.fi/balances', 

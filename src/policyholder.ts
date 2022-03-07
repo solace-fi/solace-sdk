@@ -1,7 +1,7 @@
 import { BigNumber as BN, Contract, providers, Wallet, utils } from 'ethers'
 import SolaceCoverProduct from "./abis/SolaceCoverProduct.json"
 import invariant from 'tiny-invariant'
-import { SOLACE_COVER_PRODUCT_ADDRESS, ZERO_ADDRESS } from './constants'
+import { SOLACE_COVER_PRODUCT_ADDRESS, ZERO_ADDRESS, isNetworkSupported } from './constants'
 import { GasConfiguration } from './types';
 
 /*
@@ -28,6 +28,7 @@ export class Policyholder {
      * Either a Wallet (custom script with provided private key) or JsonRpcSigner (for Metamask integration) entity can be provided.
      */
     constructor(chainID: number, signer: Wallet | providers.JsonRpcSigner) {
+        invariant(isNetworkSupported(chainID),"not a supported chainID")
         this.chainID = chainID;
         this.signer = signer;
         this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProduct, signer)

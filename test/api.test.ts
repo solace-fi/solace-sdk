@@ -1,7 +1,7 @@
 import { Fetcher } from "../src"
 
 describe("Fetcher API call", () => {
-    const fetcher = new Fetcher(1);
+    let fetcher = new Fetcher(1);
     const POLICYHOLDER_ADDRESS = "0xfb5cAAe76af8D3CE730f3D62c6442744853d43Ef" // Use first policy minted
     let positions_singlechain:any;
     let positions_multichain:any;
@@ -9,6 +9,12 @@ describe("Fetcher API call", () => {
     beforeEach(() => {
         // Avoid jest avoid timeout error
         jest.setTimeout(30000);
+    })
+
+    describe("constructor check for chainID", () => {
+        it("will fail for invalid chainID", async () => {
+            expect(() => {fetcher = new Fetcher(999999)}).toThrowError
+        })
     })
 
     describe("#getSolaceRiskBalances_SingleChain", () => {

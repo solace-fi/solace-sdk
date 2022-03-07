@@ -5,7 +5,13 @@ import { Policyholder } from "../src"
 describe("Policyholder", () => {
     const PRIVATE_KEY = "5ba7c22bfe3ff8c1bc026edd63e8d32e6f874ce0fedbcc28c1d0b60b44bd210c" // Random private key from https://privatekeys.pw/keys/ethereum/random
     const wallet = new Wallet(PRIVATE_KEY, getDefaultProvider(getNetwork(1)));
-    const policyholder = new Policyholder(1, wallet);
+    let policyholder = new Policyholder(1, wallet);
+
+    describe("constructor check for chainID", () => {
+        it("will fail for invalid chainID", async () => {
+            expect(() => {policyholder = new Policyholder(999999, wallet)}).toThrowError
+        })
+    })
 
     describe("#getReferralCode", () => {
         it("gets the correct referral code", async () => {

@@ -6,7 +6,7 @@ import SolaceCoverProduct from "../src/abis/SolaceCoverProduct.json"
 describe("Fetcher", () => {
     const provider = getDefaultProvider(getNetwork(1)) // Note using default provider gets rate-limit notification
     const solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[1], SolaceCoverProduct, provider)
-    const fetcher = new Fetcher(1);
+    let fetcher = new Fetcher(1);
     const POLICYHOLDER_ADDRESS = "0xfb5cAAe76af8D3CE730f3D62c6442744853d43Ef" // Use first policy minted
     const POLICY_ID = 1;
     const COVER_LIMIT = BN.from("1000000000000000000") // 1 USD
@@ -16,6 +16,12 @@ describe("Fetcher", () => {
     beforeEach(() => {
         // Avoid jest avoid timeout error
         jest.setTimeout(10000);
+    })
+
+    describe("constructor check for chainID", () => {
+        it("will fail for invalid chainID", async () => {
+            expect(() => {fetcher = new Fetcher(999999)}).toThrowError
+        })
     })
 
     describe("#activeCoverLimit", () => {

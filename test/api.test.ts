@@ -13,7 +13,7 @@ describe("Fetcher API call", () => {
 
     describe("#getSolaceRiskBalances_SingleChain", () => {
         it("will return a valid response", async () => {
-            positions_singlechain = await fetcher.getSolaceRiskBalances_SingleChain(POLICYHOLDER_ADDRESS)
+            positions_singlechain = await fetcher.getSolaceRiskBalances(POLICYHOLDER_ADDRESS)
             console.log(positions_singlechain)
         })
     })

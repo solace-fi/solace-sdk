@@ -168,7 +168,7 @@ export class Fetcher {
      * @param address Ethereum address.
      * @returns DeFi protocol balances in USD for the address. See documentation for sample response object.
      */
-    public async getSolaceRiskBalances_SingleChain(address: string): Promise<SolaceRiskBalance[] | undefined | unknown > {
+    public async getSolaceRiskBalances(address: string): Promise<SolaceRiskBalance[] | undefined | unknown > {
         return await axios({
             url: 'https://risk-data.solace.fi/balances', 
             method: 'POST',

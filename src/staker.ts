@@ -16,7 +16,7 @@ export class Staker {
     **************/
     chainID: number;
     providerOrSigner: Wallet | providers.JsonRpcSigner | providers.Provider;
-    StakingRewards: Contract;
+    stakingRewards: Contract;
     xsLocker: Contract;
 
     /**************
@@ -31,7 +31,7 @@ export class Staker {
         invariant(isNetworkSupported(chainID),"not a supported chainID")
         this.chainID = chainID;
         this.providerOrSigner = providerOrSigner;
-        this.StakingRewards = new Contract(STAKING_REWARDS_ADDRESS[chainID], StakingRewards, providerOrSigner)
+        this.stakingRewards = new Contract(STAKING_REWARDS_ADDRESS[chainID], StakingRewards, providerOrSigner)
         this.xsLocker = new Contract(XSLOCKER_ADDRESS[chainID], xsLocker, providerOrSigner)
     }
 
@@ -256,14 +256,6 @@ export class Staker {
         return (await this.xsLocker.stakedBalance(account))
     }
 
-    /**
-     * @notice The list of contracts that are listening to lock updates.
-     * @return listeners_ The list as an array.
-     */
-     public async getXsLockListeners(): Promise<string[]> {
-        return (await this.xsLocker.getXsLockListeners())
-    }
-
     /**********************************
     StakingRewards Mutator Functions
     **********************************/
@@ -277,7 +269,7 @@ export class Staker {
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
         invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
-        const tx: providers.TransactionResponse = await this.xsLocker.harvestLock(xsLockID, {...gasConfig})
+        const tx: providers.TransactionResponse = await this.stakingRewards.harvestLock(xsLockID, {...gasConfig})
         return tx
     }
     
@@ -290,7 +282,7 @@ export class Staker {
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
         invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
-        const tx: providers.TransactionResponse = await this.xsLocker.harvestLock(xsLockIDs, {...gasConfig})
+        const tx: providers.TransactionResponse = await this.stakingRewards.harvestLock(xsLockIDs, {...gasConfig})
         return tx
     }
 
@@ -304,7 +296,7 @@ export class Staker {
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
         invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
-        const tx: providers.TransactionResponse = await this.xsLocker.compoundLock(xsLockID, {...gasConfig})
+        const tx: providers.TransactionResponse = await this.stakingRewards.compoundLock(xsLockID, {...gasConfig})
         return tx
     }
 
@@ -320,7 +312,7 @@ export class Staker {
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
         invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
-        const tx: providers.TransactionResponse = await this.xsLocker.compoundLocks(xsLockIDs, increasedLockID, {...gasConfig})
+        const tx: providers.TransactionResponse = await this.stakingRewards.compoundLocks(xsLockIDs, increasedLockID, {...gasConfig})
         return tx
     }
 
@@ -334,7 +326,7 @@ export class Staker {
      * @return StakedLockInfo
      */
      public async stakedLockInfo(xsLockID: number): Promise<any> {
-        return (await this.xsLocker.stakedLockInfo(xsLockID))
+        return (await this.stakingRewards.stakedLockInfo(xsLockID))
     }
 
     /**
@@ -343,17 +335,7 @@ export class Staker {
      * @return reward Total amount of withdrawable reward tokens.
      */
      public async pendingRewardsOfLock(xsLockID: number): Promise<BN> {
-        return (await this.xsLocker.pendingRewardsOfLock(xsLockID))
-    }
-
-    /**
-     * @notice Calculates the reward amount distributed between two timestamps.
-     * @param from The start of the period to measure rewards for.
-     * @param to The end of the period to measure rewards for.
-     * @return amount The reward amount distributed in the given period.
-     */
-     public async getRewardAmountDistributed(from: BN, to: BN): Promise<BN> {
-        return (await this.xsLocker.getRewardAmountDistributed(from, to))
+        return (await this.stakingRewards.pendingRewardsOfLock(xsLockID))
     }
 
 }

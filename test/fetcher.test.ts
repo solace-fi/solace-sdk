@@ -2,11 +2,17 @@ import { BigNumber as BN, Contract, getDefaultProvider, providers } from "ethers
 const { getNetwork } = providers
 import { Fetcher, SOLACE_COVER_PRODUCT_ADDRESS } from "../src"
 import SolaceCoverProduct from "../src/abis/SolaceCoverProduct.json"
+import SolaceCoverProductV2 from "../src/abis/SolaceCoverProductV2.json"
 
 describe("Fetcher", () => {
     const provider = getDefaultProvider(getNetwork(1)) // Note using default provider gets rate-limit notification
     const solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[1], SolaceCoverProduct, provider)
     let fetcher = new Fetcher(1);
+
+    const provider_matic = new providers.JsonRpcProvider("https://polygon-rpc.com")
+    const solaceCoverProductV2 = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[137], SolaceCoverProductV2, provider_matic)
+    let fetcher_matic = new Fetcher(137);
+
     const POLICYHOLDER_ADDRESS = "0xfb5cAAe76af8D3CE730f3D62c6442744853d43Ef" // Use first policy minted
     const POLICY_ID = 1;
     const COVER_LIMIT = BN.from("1000000000000000000") // 1 USD
@@ -84,6 +90,12 @@ describe("Fetcher", () => {
         })
     })
 
+    describe("#cooldownStart", () => {
+        it("gets the same value as directly querying mainnet contract", async () => {
+            expect(await fetcher.cooldownStart(POLICYHOLDER_ADDRESS)).toEqual(await solaceCoverProduct.cooldownStart(POLICYHOLDER_ADDRESS));
+        })
+    })
+
     describe("#isReferralCodeUsed", () => {
         it("gets the same value as directly querying mainnet contract", async () => {
             expect(await fetcher.isReferralCodeUsed(POLICYHOLDER_ADDRESS)).toEqual(await solaceCoverProduct.isReferralCodeUsed(POLICYHOLDER_ADDRESS));
@@ -100,6 +112,22 @@ describe("Fetcher", () => {
         it("returns true for valid referral code", async () => {
             expect(await fetcher.isReferralCodeValid(REFERRAL_CODE)).toEqual(true);
             expect(await fetcher.isReferralCodeValid(FAKE_REFERRAL_CODE)).toEqual(false);
+        })
+    })
+
+    /****************************
+    SOLACECOVERPRODUCTV2 METHODS
+    ****************************/
+
+    describe("#premiumsPaidOf", () => {
+        it("gets the same value as directly querying mainnet contract", async () => {
+            expect(await fetcher_matic.premiumsPaidOf(POLICYHOLDER_ADDRESS)).toEqual(await solaceCoverProductV2.premiumsPaidOf(POLICYHOLDER_ADDRESS));
+        })
+    })
+
+    describe("#getPolicyChainInfo", () => {
+        it("gets the same value as directly querying mainnet contract", async () => {
+            expect(await fetcher_matic.getPolicyChainInfo(POLICY_ID)).toEqual(await solaceCoverProductV2.getPolicyChainInfo(POLICY_ID));
         })
     })
 })

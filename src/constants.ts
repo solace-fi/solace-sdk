@@ -28,7 +28,9 @@ export const DAI_ADDRESS: { [chainID : number]: string } = {
 
 export const SOLACE_COVER_PRODUCT_ADDRESS: { [chainID: number]: string } = {
     [1]: "0x501ACEbe29eabc346779BcB5Fd62Eaf6Bfb5320E",
-    [4]: "0x501AcE125346445b04A7c414C55a3d18d51Bf547"
+    [4]: "0x501AcE125346445b04A7c414C55a3d18d51Bf547",
+    [137]: "0x501AcEC83d440c00644cA5C48d059e1840852a64",
+    [80001]: "0x501AcEC83d440c00644cA5C48d059e1840852a64"
 }
 
 export const XSLOCKER_ADDRESS: { [chainID: number]: string } = {

@@ -1,6 +1,7 @@
 import { BigNumber as BN, Contract, getDefaultProvider, providers, utils } from 'ethers'
 const { getNetwork } = providers
 import SolaceCoverProduct from "./abis/SolaceCoverProduct.json"
+import SolaceCoverProductV2 from "./abis/SolaceCoverProductV2.json"
 import invariant from 'tiny-invariant'
 import axios, { AxiosResponse } from "axios"
 import { SOLACE_COVER_PRODUCT_ADDRESS, isNetworkSupported } from './constants'
@@ -40,8 +41,27 @@ export class Fetcher {
     constructor(chainID: number, provider?: providers.Provider) {
         invariant(isNetworkSupported(chainID),"not a supported chainID")
         this.chainID = chainID;
-        typeof(provider) == 'undefined' ? this.provider = getDefaultProvider(getNetwork(chainID)) : this.provider = provider;
-        this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProduct, this.provider)
+
+        if (typeof(provider) == 'undefined') {
+            // ethers.js getDefaultProvider method doesn't work for MATIC or Mumbai
+            // Use public RPC endpoints instead
+            if (chainID == 137) {
+                this.provider = new providers.JsonRpcProvider("https://polygon-rpc.com")
+            } else if (chainID == 80001) {
+                this.provider = new providers.JsonRpcProvider("https://matic-mumbai.chainstacklabs.com")
+            } else {
+                this.provider = getDefaultProvider(getNetwork(chainID))
+            }
+        } else {
+            this.provider = provider
+        }
+
+        if (chainID == 137 || 80001) {
+            // SolaceCoverProductV2 deployed on Polygon mainnet (137) and Mumbai (80001)
+            this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProductV2, this.provider)
+        } else {
+            this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProduct, this.provider)
+        }
     }
 
     /*************************************************************
@@ -118,6 +138,15 @@ export class Fetcher {
 
     /**
      * TO-DO Decide if need to decode return value from BN hex.
+     * @param policyID The policy ID.
+     * @returns Array of chainIDs that the policy has been purchased for
+     */
+    public async getPolicyChainInfo(policyID: number): Promise<boolean> {
+        return (await this.solaceCoverProduct.getPolicyChainInfo(policyID))
+    }
+
+    /**
+     * TO-DO Decide if need to decode return value from BN hex.
      * @param policyholder The policyholder address.
      * @returns policyID The policy ID.
      */
@@ -134,6 +163,26 @@ export class Fetcher {
     public async rewardPointsOf(policyholder: string): Promise<BN> {
         invariant(utils.isAddress(policyholder), 'not an Ethereum address')
         return (await this.solaceCoverProduct.rewardPointsOf(policyholder))
+    }
+
+    /**
+     * TO-DO Decide if need to decode return value from BN hex.
+     * @param policyholder The policyholder address.
+     * @returns The total premium paid for the policyholder.
+     */
+    public async premiumsPaidOf(policyholder: string): Promise<BN> {
+        invariant(utils.isAddress(policyholder), 'not an Ethereum address')
+        return (await this.solaceCoverProduct.premiumsPaidOf(policyholder))
+    }
+
+    /**
+     * TO-DO Decide if need to decode return value from BN hex.
+     * @param policyholder The policyholder address.
+     * @returns The cooldown period start expressed as Unix timestamp
+     */
+     public async cooldownStart(policyholder: string): Promise<BN> {
+        invariant(utils.isAddress(policyholder), 'not an Ethereum address')
+        return (await this.solaceCoverProduct.cooldownStart(policyholder))
     }
 
     /**

@@ -2,7 +2,6 @@ export type SolaceRiskBalance = {
     network: string
     appId: string
     balanceUSD: number
-    balanceETH: number
 }
 
 export type SolaceRiskScore = {
@@ -10,21 +9,19 @@ export type SolaceRiskScore = {
     address_rp: number
     current_rate: number
     timestamp: string
-    metadata: {
-        seriesName: string
-        version: string
-        dateCreated: string
-        provenance: string
-        generatedBy: string
-        sourceDataType: string
-        sourceDataVersion: string
-    }
+    metadata: Metadata
     protocols: SolaceRiskProtocol[]
 }
 
-export type SolaceRiskProtocol = {
+type Metadata = {
+    seriesName: string
+    version: string
+    dateCreated: string
+    provenance: string
+}
+
+type SolaceRiskProtocol = {
     appId: string
-    balanceETH: number
     balanceUSD: number
     category: string
     network: string
@@ -34,4 +31,48 @@ export type SolaceRiskProtocol = {
     tier: number
     ['rp-usd']: number
     ['risk-adj']: number
+}
+
+export type SolaceRiskSeries = {
+    metadata: Metadata
+    function: {
+        name: string
+        description: string
+        provenance: string
+    }
+    data: {
+        protocolMap: ProtocolMap[]
+        corrValue: CorrelationValue[]
+        correlCat: CorrelationCategory[]
+        rateCard: RateCard[]
+    }
+}
+
+type ProtocolMap = {
+    appId: string
+    category: string
+    tier: number
+}
+
+type CorrelationValue = {
+    category: string,
+    correlation: number
+}
+
+type CorrelationCategory = {
+    category: string
+    lending: number
+    exchange: number
+    ['liquidity-pool']: number
+    unknown: number
+    ['yield-aggregator']: number
+    ['asset-management']: number,
+    other: number
+}
+
+type RateCard = {
+    tier: number
+    rol: number
+    rrol: number
+    riskLoad: number
 }

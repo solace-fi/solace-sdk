@@ -1,7 +1,8 @@
 import { BigNumber as BN, Contract, providers, Wallet, utils } from 'ethers'
 import SolaceCoverProduct from "./abis/SolaceCoverProduct.json"
+import SolaceCoverProductV2 from "./abis/SolaceCoverProductV2.json"
 import invariant from 'tiny-invariant'
-import { SOLACE_COVER_PRODUCT_ADDRESS, ZERO_ADDRESS } from './constants'
+import { SOLACE_COVER_PRODUCT_ADDRESS, ZERO_ADDRESS, isNetworkSupported } from './constants'
 import { GasConfiguration } from './types';
 
 /*
@@ -28,9 +29,16 @@ export class Policyholder {
      * Either a Wallet (custom script with provided private key) or JsonRpcSigner (for Metamask integration) entity can be provided.
      */
     constructor(chainID: number, signer: Wallet | providers.JsonRpcSigner) {
+        invariant(isNetworkSupported(chainID),"not a supported chainID")
         this.chainID = chainID;
         this.signer = signer;
-        this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProduct, signer)
+
+        if (chainID == 137 || 80001) {
+            // SolaceCoverProductV2 deployed on Polygon mainnet (137) and Mumbai (80001)
+            this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProductV2, this.signer)
+        } else {
+            this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProduct, this.signer)
+        }
     }
 
     /**************
@@ -43,6 +51,7 @@ export class Policyholder {
      * @param coverLimit The maximum value to cover in **USD**.
      * @param amount The deposit amount in **USD** to fund the policyholder's account.
      * @param referralCode The referral code.
+     * @param chains_ The chain ids.
      * @return policyID The ID of the newly minted policy.
      */
     public async activatePolicy(
@@ -50,12 +59,27 @@ export class Policyholder {
         coverLimit: BN,
         amount: BN,
         referralCode: utils.BytesLike,
+        chains?: number[],
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
         invariant(utils.isAddress(policyholder), "not an Ethereum address")
         invariant(policyholder != ZERO_ADDRESS, "cannot enter zero address policyholder")
         invariant(coverLimit.gt(0), "cannot enter zero cover limit")
-        const tx: providers.TransactionResponse = await this.solaceCoverProduct.activatePolicy(policyholder, coverLimit, amount, referralCode, {...gasConfig})
+        
+        if (typeof(chains) !== 'undefined') {
+            for (let chain of chains) {
+                invariant(isNetworkSupported(chain),"not a supported chainID")
+            }
+        }
+
+        let tx: providers.TransactionResponse
+
+        if (this.chainID == 137 || 80001) {
+            tx = await this.solaceCoverProduct.activatePolicy(policyholder, coverLimit, amount, referralCode, chains, {...gasConfig})
+        } else {
+            tx = await this.solaceCoverProduct.activatePolicy(policyholder, coverLimit, amount, referralCode, {...gasConfig})
+        }
+
         return tx
     }
 

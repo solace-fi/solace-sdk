@@ -1,10 +1,11 @@
 import { BigNumber as BN, Contract, getDefaultProvider, providers, utils } from 'ethers'
 const { getNetwork } = providers
 import SolaceCoverProduct from "./abis/SolaceCoverProduct.json"
+import SolaceCoverProductV2 from "./abis/SolaceCoverProductV2.json"
 import invariant from 'tiny-invariant'
 import axios, { AxiosResponse } from "axios"
-import { SOLACE_COVER_PRODUCT_ADDRESS } from './constants'
-import { SolaceRiskBalance, SolaceRiskScore } from './types'
+import { SOLACE_COVER_PRODUCT_ADDRESS, isNetworkSupported } from './constants'
+import { SolaceRiskBalance, SolaceRiskScore, SolaceRiskSeries } from './types'
 
 /*
  * Contains methods for accessing external view functions in SolaceCoverProduct.sol
@@ -38,9 +39,29 @@ export class Fetcher {
      * If no provider argument is given, Fetcher object will use the default provider as per ethers.js.
      */
     constructor(chainID: number, provider?: providers.Provider) {
+        invariant(isNetworkSupported(chainID),"not a supported chainID")
         this.chainID = chainID;
-        typeof(provider) == 'undefined' ? this.provider = getDefaultProvider(getNetwork(chainID)) : this.provider = provider;
-        this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProduct, this.provider)
+
+        if (typeof(provider) == 'undefined') {
+            // ethers.js getDefaultProvider method doesn't work for MATIC or Mumbai
+            // Use public RPC endpoints instead
+            if (chainID == 137) {
+                this.provider = new providers.JsonRpcProvider("https://polygon-rpc.com")
+            } else if (chainID == 80001) {
+                this.provider = new providers.JsonRpcProvider("https://matic-mumbai.chainstacklabs.com")
+            } else {
+                this.provider = getDefaultProvider(getNetwork(chainID))
+            }
+        } else {
+            this.provider = provider
+        }
+
+        if (chainID == 137 || 80001) {
+            // SolaceCoverProductV2 deployed on Polygon mainnet (137) and Mumbai (80001)
+            this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProductV2, this.provider)
+        } else {
+            this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProduct, this.provider)
+        }
     }
 
     /*************************************************************
@@ -117,6 +138,15 @@ export class Fetcher {
 
     /**
      * TO-DO Decide if need to decode return value from BN hex.
+     * @param policyID The policy ID.
+     * @returns Array of chainIDs that the policy has been purchased for
+     */
+    public async getPolicyChainInfo(policyID: number): Promise<boolean> {
+        return (await this.solaceCoverProduct.getPolicyChainInfo(policyID))
+    }
+
+    /**
+     * TO-DO Decide if need to decode return value from BN hex.
      * @param policyholder The policyholder address.
      * @returns policyID The policy ID.
      */
@@ -133,6 +163,26 @@ export class Fetcher {
     public async rewardPointsOf(policyholder: string): Promise<BN> {
         invariant(utils.isAddress(policyholder), 'not an Ethereum address')
         return (await this.solaceCoverProduct.rewardPointsOf(policyholder))
+    }
+
+    /**
+     * TO-DO Decide if need to decode return value from BN hex.
+     * @param policyholder The policyholder address.
+     * @returns The total premium paid for the policyholder.
+     */
+    public async premiumsPaidOf(policyholder: string): Promise<BN> {
+        invariant(utils.isAddress(policyholder), 'not an Ethereum address')
+        return (await this.solaceCoverProduct.premiumsPaidOf(policyholder))
+    }
+
+    /**
+     * TO-DO Decide if need to decode return value from BN hex.
+     * @param policyholder The policyholder address.
+     * @returns The cooldown period start expressed as Unix timestamp
+     */
+     public async cooldownStart(policyholder: string): Promise<BN> {
+        invariant(utils.isAddress(policyholder), 'not an Ethereum address')
+        return (await this.solaceCoverProduct.cooldownStart(policyholder))
     }
 
     /**
@@ -166,23 +216,55 @@ export class Fetcher {
 
     /**
      * @param address Ethereum address.
-     * @returns DeFi protocol balances (in ETH and USD) for the address. See documentation for sample response object.
+     * @returns DeFi protocol balances in USD for the address. See documentation for sample response object.
      */
     public async getSolaceRiskBalances(address: string): Promise<SolaceRiskBalance[] | undefined | unknown > {
         return await axios({
-            url: `https://risk-data.solace.fi/balances?account=${address}&chain_id=${this.chainID}`, 
-            method: 'GET',
+            url: 'https://risk-data.solace.fi/balances', 
+            method: 'POST',
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
             },
+            data: JSON.stringify({
+                chain_id: this.chainID,
+                account: address,
+            }),
         })
         .then((response: AxiosResponse<any, any>) => {return response.data})
         .catch((error: AxiosResponse<any, any>) => {
             console.error('Error getSolaceRiskBalances:', error)
             return undefined
         })
-    }    
+    }  
+
+    /**
+     * @param address Ethereum address.
+     * @param chains Array of chainIDs to obtain DeFi protocol balances for.
+     * @returns DeFi protocol balances in USD for the address for the selected chains. See documentation for sample response object.
+     */
+    public async getSolaceRiskBalances_MultiChain(address: string, chains: number[]): Promise<SolaceRiskBalance[] | undefined | unknown > {
+        // Input check for chainIds
+        chains.forEach(item => invariant(isNetworkSupported(item),"not a supported chainID"))
+
+        return await axios({
+            url: 'https://risk-data.solace.fi/balances', 
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            data: JSON.stringify({
+                chains: chains,
+                account: address,
+            }),
+        })
+        .then((response: AxiosResponse<any, any>) => {return response.data})
+        .catch((error: AxiosResponse<any, any>) => {
+            console.error('Error getSolaceRiskBalances:', error)
+            return undefined
+        })
+    }  
 
     /**
      * @param address Ethereum address.
@@ -211,4 +293,23 @@ export class Fetcher {
             return undefined
         })
     }
+
+    /**
+     * @returns Get Solace risk series data.
+     */
+     public async getSolaceRiskSeries(): Promise<SolaceRiskSeries | undefined | unknown > {
+        return await axios({
+            url: 'https://risk-data.solace.fi/series', 
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((response: AxiosResponse<any, any>) => {return response.data})
+        .catch((error: AxiosResponse<any, any>) => {
+            console.error('Error getSolaceRiskSeries', error)
+            return undefined
+        })
+    }    
 }

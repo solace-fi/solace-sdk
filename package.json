@@ -1,6 +1,6 @@
 {
   "name": "@solace-fi/sdk",
-  "version": "0.2.4",
+  "version": "0.3.3",
   "license": "MIT",
   "repository": "https://github.com/solace-fi/solace-sdk.git",
   "keywords": [

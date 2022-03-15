@@ -85,7 +85,7 @@ export class Bonder {
 
     /**
      * @notice Claim payout for a bond that the user holds. 
-     * @dev User calling `claimPayout()`` must be either the owner or approved for the entered bondID.
+     * @dev User calling `claimPayout()` must be either the owner or approved for the entered bondID.
      * @param bondID The ID of the bond to redeem.
      */
      public async claimPayout(
@@ -187,7 +187,7 @@ export class Bonder {
     }
 
     /**
-     * @notice Create a bond by depositing amount WETH. WETH will be transferred from msg.sender using allowance.
+     * @notice Create a bond by depositing amount of WETH. WETH will be transferred from msg.sender using allowance.
      * @param deposit Amount of WETH to deposit.
      * @param minAmountOut The minimum SOLACE out.
      * @param depositor The bond recipient, default msg.sender.
@@ -211,7 +211,7 @@ export class Bonder {
     }
 
     /**
-     * @notice Create a bond by depositing amount WETH. WETH will be transferred from depositor using permit. 
+     * @notice Create a bond by depositing amount of WETH. WETH will be transferred from depositor using permit. 
      * @dev Note that not all WETHs have a permit function, in which case this function will revert.
      * @param deposit Amount of WETH to deposit.
      * @param minAmountOut The minimum SOLACE out.

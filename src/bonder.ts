@@ -182,7 +182,7 @@ export class Bonder {
         invariant(depositor != ZERO_ADDRESS, "cannot enter zero address policyholder")
         invariant(this.token === "eth", "function only exists on BondTellerEth")
 
-        const tx: providers.TransactionResponse = await this.bondTeller.depositEth(minAmountOut, depositor, stake, {...gasConfig}, {value: deposit})
+        const tx: providers.TransactionResponse = await this.bondTeller.depositEth(minAmountOut, depositor, stake, {value: deposit, ...gasConfig})
         return tx
     }
 
@@ -265,7 +265,7 @@ export class Bonder {
         invariant(depositor != ZERO_ADDRESS, "cannot enter zero address policyholder")
         invariant(this.token === "matic", "function only exists on BondTellerMatic")
 
-        const tx: providers.TransactionResponse = await this.bondTeller.depositMatic(minAmountOut, depositor, stake, {...gasConfig}, {value: deposit})
+        const tx: providers.TransactionResponse = await this.bondTeller.depositMatic(minAmountOut, depositor, stake, {value: deposit, ...gasConfig})
         return tx
     }
 

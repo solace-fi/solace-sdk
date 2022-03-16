@@ -74,7 +74,7 @@ export class Staker {
         amount: BN,
         end: BN,
         deadline: BN,
-        v: BN,
+        v: utils.BytesLike,
         r: utils.BytesLike,
         s: utils.BytesLike,
         gasConfig?: GasConfiguration
@@ -107,7 +107,7 @@ export class Staker {
 
     /**
      * @notice Deposit SOLACE to increase the value of an existing lock.
-     * @dev SOLACE is transferred from msg.sender, , uses EIP-712 signature to perform approval in same transaction
+     * @dev SOLACE is transferred from msg.sender, uses EIP-712 signature to perform approval in same transaction
      * @param xsLockID The ID of the lock to update.
      * @param amount The amount of SOLACE to deposit.
      * @param deadline Time the transaction must go through before.
@@ -119,7 +119,7 @@ export class Staker {
         xsLockID: number,
         amount: BN,
         deadline: BN,
-        v: BN,
+        v: utils.BytesLike,
         r: utils.BytesLike,
         s: utils.BytesLike,
         gasConfig?: GasConfiguration
@@ -228,7 +228,7 @@ export class Staker {
     }
 
     /**
-     * @notice Determines if the lock is locked.
+     * @notice Returns whether a lock is locked.
      * @param xsLockID The ID of the lock to query.
      * @return locked True if the lock is locked, false if unlocked.
      */

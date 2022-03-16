@@ -128,6 +128,7 @@ describe("Fetcher", () => {
     describe("#getPolicyChainInfo", () => {
         it("gets the same value as directly querying mainnet contract", async () => {
             expect(await fetcher_matic.getPolicyChainInfo(POLICY_ID)).toEqual(await solaceCoverProductV2.getPolicyChainInfo(POLICY_ID));
+            console.log(await fetcher_matic.getPolicyChainInfo(POLICY_ID))
         })
     })
 })

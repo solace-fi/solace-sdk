@@ -1,9 +1,10 @@
-import { BigNumber as BN, Contract, providers, Wallet, utils } from 'ethers'
-import xsLocker from "./abis/xsLocker.json"
-import StakingRewards from "./abis/StakingRewards.json"
+import { BigNumber as BN, Contract, providers, Wallet, utils, getDefaultProvider } from 'ethers'
+const { getNetwork } = providers
+import xsLocker from "../abis/xsLocker.json"
+import StakingRewards from "../abis/StakingRewards.json"
 import invariant from 'tiny-invariant'
-import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS, ZERO_ADDRESS, isNetworkSupported } from './constants'
-import { GasConfiguration } from './types';
+import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS, ZERO_ADDRESS, isNetworkSupported } from '../constants'
+import { GasConfiguration } from '../types';
 
 /*
  * Contains methods for accessing Solace staking functionality (xsLocker.sol & StakingRewards.sol).
@@ -27,10 +28,23 @@ export class Staker {
      * @param chainID The chainID for the Staker object, 1 for Ethereum Mainnet.
      * @param providerOrSigner providerOrSigner object - either a Provider (https://docs.ethers.io/v5/api/providers/) or Signer (https://docs.ethers.io/v5/api/signer/)
      */
-    constructor(chainID: number, providerOrSigner: Wallet | providers.JsonRpcSigner | providers.Provider) {
+    constructor(chainID: number, providerOrSigner?: Wallet | providers.JsonRpcSigner | providers.Provider) {
         invariant(isNetworkSupported(chainID),"not a supported chainID")
         this.chainID = chainID;
-        this.providerOrSigner = providerOrSigner;
+        if (typeof(providerOrSigner) == 'undefined') {
+            // ethers.js getDefaultProvider method doesn't work for MATIC or Mumbai
+            // Use public RPC endpoints instead
+            if (chainID == 137) {
+                this.providerOrSigner = new providers.JsonRpcProvider("https://polygon-rpc.com")
+            } else if (chainID == 80001) {
+                this.providerOrSigner = new providers.JsonRpcProvider("https://matic-mumbai.chainstacklabs.com")
+            } else {
+                this.providerOrSigner = getDefaultProvider(getNetwork(chainID))
+            }
+        } else {
+            this.providerOrSigner = providerOrSigner
+        }
+         
         this.stakingRewards = new Contract(STAKING_REWARDS_ADDRESS[chainID], StakingRewards, providerOrSigner)
         this.xsLocker = new Contract(XSLOCKER_ADDRESS[chainID], xsLocker, providerOrSigner)
     }

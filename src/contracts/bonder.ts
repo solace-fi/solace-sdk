@@ -1,10 +1,11 @@
-import { BigNumber as BN, Contract, providers, Wallet, utils } from 'ethers'
-import BondTellerErc20 from "./abis/BondTellerErc20.json"
-import BondTellerEth from "./abis/BondTellerEth.json"
-import BondTellerMatic from "./abis/BondTellerMatic.json"
+import { BigNumber as BN, Contract, providers, Wallet, utils, getDefaultProvider } from 'ethers'
+const { getNetwork } = providers
+import BondTellerErc20 from "../abis/BondTellerErc20.json"
+import BondTellerEth from "../abis/BondTellerEth.json"
+import BondTellerMatic from "../abis/BondTellerMatic.json"
 import invariant from 'tiny-invariant'
-import { BOND_TELLER_ADDRESSES, ZERO_ADDRESS, isNetworkSupported } from './constants'
-import { GasConfiguration } from './types';
+import { BOND_TELLER_ADDRESSES, ZERO_ADDRESS, isNetworkSupported } from '../constants'
+import { GasConfiguration } from '../types';
 
 /*
  * Contains methods for accessing Solace bonding functionality (BondTellerErc20.sol, BondTellerEth.sol & BondTellerMatic.sol).
@@ -29,13 +30,27 @@ export class Bonder {
      * @param providerOrSigner providerOrSigner object - either a Provider (https://docs.ethers.io/v5/api/providers/) or Signer (https://docs.ethers.io/v5/api/signer/)
      * @param token string (can be lowercase, uppercase or mixed) describing token for bond purchases. See documentation for supported tokens.
      */
-     constructor(chainID: number, providerOrSigner: Wallet | providers.JsonRpcSigner | providers.Provider, token: string) {
+     constructor(chainID: number, token: string, providerOrSigner?: Wallet | providers.JsonRpcSigner | providers.Provider) {
         invariant(isNetworkSupported(chainID),"not a supported chainID")
         invariant( BOND_TELLER_ADDRESSES.hasOwnProperty(token.toLowerCase()), "not a supported token for bonds" )
         invariant ( BOND_TELLER_ADDRESSES[token][chainID] !== undefined, "not a supported token for bonds on this chainid" )
         
         this.chainID = chainID;
-        this.providerOrSigner = providerOrSigner;
+
+        if (typeof(providerOrSigner) == 'undefined') {
+            // ethers.js getDefaultProvider method doesn't work for MATIC or Mumbai
+            // Use public RPC endpoints instead
+            if (chainID == 137) {
+                this.providerOrSigner = new providers.JsonRpcProvider("https://polygon-rpc.com")
+            } else if (chainID == 80001) {
+                this.providerOrSigner = new providers.JsonRpcProvider("https://matic-mumbai.chainstacklabs.com")
+            } else {
+                this.providerOrSigner = getDefaultProvider(getNetwork(chainID))
+            }
+        } else {
+            this.providerOrSigner = providerOrSigner
+        }
+
         this.token = token;
 
         if (token.toLowerCase() === "eth") {

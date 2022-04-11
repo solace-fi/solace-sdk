@@ -1,17 +1,18 @@
-import { BigNumber as BN, Contract, getDefaultProvider, providers } from "ethers"
+import { BigNumber as BN, Contract, getDefaultProvider, providers, Wallet } from "ethers"
 const { getNetwork } = providers
-import { Fetcher, SOLACE_COVER_PRODUCT_ADDRESS } from "../src"
+import { SOLACE_COVER_PRODUCT_ADDRESS } from "../src"
+import { Coverage } from "../src/contracts/coverage"
 import SolaceCoverProduct from "../src/abis/SolaceCoverProduct.json"
 import SolaceCoverProductV2 from "../src/abis/SolaceCoverProductV2.json"
 
-describe("Fetcher", () => {
+describe("Coverage Fetcher", () => {
     const provider = getDefaultProvider(getNetwork(1)) // Note using default provider gets rate-limit notification
     const solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[1], SolaceCoverProduct, provider)
-    let fetcher = new Fetcher(1);
+    let fetcher = new Coverage(1);
 
     const provider_matic = new providers.JsonRpcProvider("https://polygon-rpc.com")
     const solaceCoverProductV2 = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[137], SolaceCoverProductV2, provider_matic)
-    let fetcher_matic = new Fetcher(137);
+    let fetcher_matic = new Coverage(137);
 
     const POLICYHOLDER_ADDRESS = "0xfb5cAAe76af8D3CE730f3D62c6442744853d43Ef" // Use first policy minted
     const POLICY_ID = 1;
@@ -26,7 +27,7 @@ describe("Fetcher", () => {
 
     describe("constructor check for chainID", () => {
         it("will fail for invalid chainID", async () => {
-            expect(() => {fetcher = new Fetcher(999999)}).toThrowError
+            expect(() => {fetcher = new Coverage(999999)}).toThrowError
         })
     })
 
@@ -131,4 +132,24 @@ describe("Fetcher", () => {
             console.log(await fetcher_matic.getPolicyChainInfo(POLICY_ID))
         })
     })
+})
+
+describe("Policyholder", () => {
+    const PRIVATE_KEY = "5ba7c22bfe3ff8c1bc026edd63e8d32e6f874ce0fedbcc28c1d0b60b44bd210c" // Random private key from https://privatekeys.pw/keys/ethereum/random
+    const wallet = new Wallet(PRIVATE_KEY, getDefaultProvider(getNetwork(1)));
+    let policyholder = new Coverage(1, wallet);
+
+    describe("constructor check for chainID", () => {
+        it("will fail for invalid chainID", async () => {
+            expect(() => {policyholder = new Coverage(999999, wallet)}).toThrowError
+        })
+    })
+
+    describe("#getReferralCode", () => {
+        it("gets the correct referral code", async () => {
+            expect(await policyholder.getReferralCode()).toEqual("0x5406a8636b0cb38db066f2c87ea88d2d882d3407a5fdbba95cd70df2e43817a75643fa22feaf4b550f153d13c3f2eaa68626194291646b0fc1a06d6ca8c371001b")
+        })
+    })
+
+    // Can't really test the mutator functions in a unit test in this environment, blockchain altering function calls
 })

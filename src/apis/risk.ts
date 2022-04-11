@@ -4,39 +4,67 @@ import { isNetworkSupported } from '../constants'
 import { SolaceRiskBalance, SolaceRiskScore, SolaceRiskSeries } from '../types'
 
 export class Risk {
+
+    /*************************************************************
+    RATE CARD
+    *************************************************************/
+    
+    /**
+     * @returns Get Solace risk series data.
+     */
+     public async getSolaceRiskSeries(): Promise<SolaceRiskSeries | undefined | unknown > {
+        return await axios({
+            url: 'https://risk-data.solace.fi/series', 
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((response: AxiosResponse<any, any>) => {return response.data})
+        .catch((error: AxiosResponse<any, any>) => {
+            console.error('Error getSolaceRiskSeries', error)
+            return undefined
+        })
+    }
+
+    /*************************************************************
+    QUOTE POLICY PRICE
+    *************************************************************/
+
+    /**
+     * @param address Ethereum address.
+     * @param chainId DeFi protocol chain ID.
+     * @returns Get annual premium for current account
+     */
+
+    public async getSolaceRiskPremium(address: string, chainId: number) {
+        return await axios({
+            url: 'https://risk-data.solace.fi/premium', 
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            params: {
+                account: address,
+                chain_id: chainId,
+            }
+        })
+        .then((response: AxiosResponse<any, any>) => {return response.data})
+        .catch((error: AxiosResponse<any, any>) => {
+            console.error('Error getSolaceRiskPremium', error)
+            return undefined
+        })
+    }  
     
     /**
      * @param address Ethereum address.
      * @returns DeFi protocol balances in USD for the address. See documentation for sample response object.
      */
-     public async getSolaceRiskBalances(address: string, chainId: number): Promise<SolaceRiskBalance[] | undefined | unknown > {
-        return await axios({
-            url: 'https://risk-data.solace.fi/balances', 
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-            },
-            data: JSON.stringify({
-                chain_id: chainId,
-                account: address,
-            }),
-        })
-        .then((response: AxiosResponse<any, any>) => {return response.data})
-        .catch((error: AxiosResponse<any, any>) => {
-            console.error('Error getSolaceRiskBalances:', error)
-            return undefined
-        })
-    }  
 
-    /**
-     * @param address Ethereum address.
-     * @param chains Array of chainIDs to obtain DeFi protocol balances for.
-     * @returns DeFi protocol balances in USD for the address for the selected chains. See documentation for sample response object.
-     */
-    public async getSolaceRiskBalances_MultiChain(address: string, chains: number[]): Promise<SolaceRiskBalance[] | undefined | unknown > {
-        // Input check for chainIds
-        chains.forEach(item => invariant(isNetworkSupported(item),"not a supported chainID"))
+     public async getSolaceRiskBalances(address: string, chainIdOrChains: number | number[]): Promise<SolaceRiskBalance[] | undefined | unknown > {
+        if (Array.isArray(chainIdOrChains)) chainIdOrChains.forEach(item => invariant(isNetworkSupported(item),"not a supported chainID"))
 
         return await axios({
             url: 'https://risk-data.solace.fi/balances', 
@@ -45,8 +73,11 @@ export class Risk {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
             },
-            data: JSON.stringify({
-                chains: chains,
+            data: JSON.stringify(typeof(chainIdOrChains) == 'number' ? {
+                chain_id: chainIdOrChains,
+                account: address,
+            } : {
+                chains: chainIdOrChains,
                 account: address,
             }),
         })
@@ -55,7 +86,7 @@ export class Risk {
             console.error('Error getSolaceRiskBalances:', error)
             return undefined
         })
-    }  
+    }
 
     /**
      * @param address Ethereum address.
@@ -85,22 +116,80 @@ export class Risk {
         })
     }
 
+    /*************************************************************
+    ACCOUNTING MONITORING
+    *************************************************************/
+
     /**
-     * @returns Get Solace risk series data.
+     * @param address Ethereum address.
+     * @param chainId DeFi protocol chain ID.
+     * @returns Get all tracking files account billing
      */
-     public async getSolaceRiskSeries(): Promise<SolaceRiskSeries | undefined | unknown > {
+    public async getSolaceRiskTracks (address: string, chainId: number) {
         return await axios({
-            url: 'https://risk-data.solace.fi/series', 
+            url: 'https://risk-data.solace.fi/tracks',
             method: 'GET',
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
             },
+            params: {
+                account: address,
+                chain_id: chainId,
+            }
         })
         .then((response: AxiosResponse<any, any>) => {return response.data})
         .catch((error: AxiosResponse<any, any>) => {
-            console.error('Error getSolaceRiskSeries', error)
+            console.error('Error getSolaceRiskTracks:', error)
             return undefined
         })
-    }  
+    }
+
+    /**
+     * @param chainId DeFi protocol chain ID.
+     * @returns Get all billings for a chain
+     */
+    public async getSolaceRiskBillings_All (chainId: number) {
+        return await axios({
+            url: 'https://risk-data.solace.fi/billings/all',
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            params: {
+                chain_id: chainId,
+            }
+        })
+        .then((response: AxiosResponse<any, any>) => {return response.data})
+        .catch((error: AxiosResponse<any, any>) => {
+            console.error('Error getSolaceRiskBillings_All:', error)
+            return undefined
+        })
+    }
+
+    /**
+     * @param address Ethereum address.
+     * @param chainId DeFi protocol chain ID.
+     * @returns Get all billings for a chain
+     */
+     public async getSolaceRiskBillings ( address: string, chainId: number, category?: 'paid' | 'unpaid') {
+        return await axios({
+            url: `https://risk-data.solace.fi/billings${category ? `/${category}` : ''}`,
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            params: {
+                account: address,
+                chain_id: chainId,
+            }
+        })
+        .then((response: AxiosResponse<any, any>) => {return response.data})
+        .catch((error: AxiosResponse<any, any>) => {
+            console.error('Error getSolaceRiskBillings:', error)
+            return undefined
+        })
+    }
 }

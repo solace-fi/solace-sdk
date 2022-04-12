@@ -1,12 +1,13 @@
 import { getDefaultProvider, providers, Contract } from "ethers";
 import { formatUnits } from "ethers/lib/utils";
 const { getNetwork } = providers
+import ERC20 from "../abis/ERC20.json";
 
 export class TotalSupply {
     CHAIN_IDS = [1,137,1313161554] // mainnet, polygon, aurora
     SOLACE_ADDRESS = "0x501acE9c35E60f03A2af4d484f49F9B1EFde9f40"
     XSOLACE_ADDRESS = "0x501ACe802447B1Ed4Aae36EA830BFBde19afbbF9"
-    ERC20ABI = [{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}]
+    ERC20ABI = ERC20
 
     public async getTotalSupply(chainId: number, token: 'SOLACE' | 'XSOLACE') {
         let provider = null
@@ -45,7 +46,7 @@ export class CirculatingSupply {
     CHAIN_IDS = [1,137,1313161554] // mainnet, polygon, aurora
     SOLACE_ADDRESS = "0x501acE9c35E60f03A2af4d484f49F9B1EFde9f40"
     XSOLACE_ADDRESS = "0x501ACe802447B1Ed4Aae36EA830BFBde19afbbF9"
-    ERC20ABI = [{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}]
+    ERC20ABI = ERC20
 
     skipSolaceAddrs: {[key: string]: any} = {
         "1": {

@@ -76,3 +76,5 @@ type RateCard = {
     rrol: number
     riskLoad: number
 }
+
+export type TokenToPriceMapping = { [key: string]: number }

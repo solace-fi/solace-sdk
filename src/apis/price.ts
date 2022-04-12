@@ -145,7 +145,7 @@ export class Price {
       })
   }
 
-  public async getTokenPrices () {
+  public async getCoinGeckoTokenPrices () {
       const getPricesByAddress = async (tokenObjs: { symbol: string, addr: string}[]): Promise<TokenToPriceMapping> => {
         const uniqueAddrs = tokenObjs.filter((v, i, a) => a.indexOf(v) === i)
         const prices = await withBackoffRetries(async () => fetchCoingeckoTokenPricesByAddr(uniqueAddrs.map((a) => a.addr), 'usd', 'ethereum'))

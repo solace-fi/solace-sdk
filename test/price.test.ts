@@ -36,9 +36,9 @@ describe('Price', () => {
         })
     })
 
-    describe('#getTokenPrices', () => {
+    describe('#getCoinGeckoTokenPrices', () => {
         it('will return a valid response', async () => {
-            const token_prices = await price.getTokenPrices()
+            const token_prices = await price.getCoinGeckoTokenPrices()
             console.log(token_prices)
         })
     })

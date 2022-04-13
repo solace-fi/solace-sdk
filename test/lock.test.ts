@@ -22,9 +22,16 @@ describe('Lock', () => {
         })
     })
 
-    describe('#getGlobalStats', () => {
+    describe('#getGlobalLockStats', () => {
         it('will return a valid response', async () => {
-            const res = await xsl.getGlobalStats(1)
+            const res = await xsl.getGlobalLockStats(1)
+            console.log(res)
+        })
+    })
+
+    describe('#getUserLocks', () => {
+        it('will return a valid response', async () => {
+            const res = await xsl.getUserLocks(1, '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
             console.log(res)
         })
     })

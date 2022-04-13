@@ -32,3 +32,11 @@ export const withBackoffRetries = async (f: any, retryCount = 3, jitter = 250) =
 export const delay = async (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
+
+export const rangeFrom0 = (stop: number): number[] => {
+  const arr = []
+  for (let i = 0; i < stop; ++i) {
+    arr.push(i)
+  }
+  return arr
+}

@@ -3,6 +3,7 @@ const { getNetwork } = providers
 import ERC20 from '../abis/ERC20.json'
 import { UWP_ADDRESS } from "../constants"
 import { fetchBalances, withBackoffRetries } from "../utils"
+import { getProvider } from '../utils/ethers'
 import { Price } from './price'
 export class UnderwritingPoolBalances {
 
@@ -42,7 +43,7 @@ export class UnderwritingPoolBalances {
   }
 
   public async getBalances_Polygon() {
-    const provider = new providers.JsonRpcProvider("https://polygon-rpc.com")
+    const provider = getProvider("https://polygon-rpc.com")
     const blockTag = await provider.getBlockNumber()
     let res = []
 
@@ -77,7 +78,7 @@ export class UnderwritingPoolBalances {
   }
 
   public async getBalances_Aurora() {
-    const provider = new providers.JsonRpcProvider("https://mainnet.aurora.dev")
+    const provider = getProvider("https://mainnet.aurora.dev")
     const blockTag = await provider.getBlockNumber()
     let res = []
 

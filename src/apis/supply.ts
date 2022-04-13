@@ -2,6 +2,7 @@ import { getDefaultProvider, providers, Contract } from "ethers";
 import { formatUnits } from "ethers/lib/utils";
 const { getNetwork } = providers
 import ERC20 from "../abis/ERC20.json";
+import { getProvider } from "../utils/ethers";
 
 export class TotalSupply {
     CHAIN_IDS = [1,137,1313161554] // mainnet, polygon, aurora
@@ -12,9 +13,9 @@ export class TotalSupply {
     public async getTotalSupply(chainId: number, token: 'SOLACE' | 'XSOLACE') {
         let provider = null
         if (chainId == 137) {
-            provider = new providers.JsonRpcProvider("https://polygon-rpc.com")
+            provider = getProvider("https://polygon-rpc.com")
         } else if (chainId == 1313161554) {
-            provider = new providers.JsonRpcProvider("https://mainnet.aurora.dev")
+            provider = getProvider("https://mainnet.aurora.dev")
         } else {
             provider = getDefaultProvider(getNetwork(chainId))
         }
@@ -76,9 +77,9 @@ export class CirculatingSupply {
     public async getCirculatingSupply(chainId: number, token: 'SOLACE' | 'XSOLACE') {
         let provider = null
         if (chainId == 137) {
-            provider = new providers.JsonRpcProvider("https://polygon-rpc.com")
+            provider = getProvider("https://polygon-rpc.com")
         } else if (chainId == 1313161554) {
-            provider = new providers.JsonRpcProvider("https://mainnet.aurora.dev")
+            provider = getProvider("https://mainnet.aurora.dev")
         } else {
             provider = getDefaultProvider(getNetwork(chainId))
         }

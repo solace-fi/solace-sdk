@@ -8,12 +8,12 @@ const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
 // returns the balance of a holder for a list of tokens
 // result is an array
 // each element will be a decimal formatted string eg [ "1.2" ]
-export async function fetchBalances(providerOrSigner: Wallet | providers.JsonRpcSigner | providers.Provider, tokenList: { contract: Contract, address: string, symbol: string, decimals: number }[], holder: string, blockTag: number): Promise<string[]> {
+export async function fetchBalances(walletOrProviderOrSigner: Wallet | providers.JsonRpcSigner | providers.Provider, tokenList: { contract: Contract, address: string, symbol: string, decimals: number }[], holder: string, blockTag: number): Promise<string[]> {
   function createBalancePromise(i: number): Promise<string> {
 
     return new Promise((resolve, reject) => {
       withBackoffRetries(() => ((tokenList[i].address == ETH_ADDRESS)
-        ? providerOrSigner.getBalance(holder, blockTag=blockTag)
+        ? walletOrProviderOrSigner.getBalance(holder, blockTag=blockTag)
         : tokenList[i].contract.balanceOf(holder, {blockTag:blockTag})
       )).then(bal => { resolve(formatUnits(bal, tokenList[i].decimals)) }).catch(() => { resolve("0.0") })
     })

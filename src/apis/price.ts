@@ -70,9 +70,9 @@ export class Price {
       })
   }
 
-  public async getPolygonPrices() {
+  public async getPolygonPrices(): Promise<{ [key: string]: number }> {
 
-      async function fetchGuniPrice(provider: providers.JsonRpcProvider, blockTag: number) {
+      async function fetchGuniPrice(provider: providers.JsonRpcProvider, blockTag: number): Promise<number> {
         const fraxSolacePool = "0x85Efec4ee18a06CE1685abF93e434751C3cb9bA9"
 
         const guniContract = new Contract('0x38e7e05Dfd9fa3dE80dB0e7AC03AC57Fa832C78A', ERC20, provider)
@@ -110,7 +110,7 @@ export class Price {
       })
   }
 
-  public async getAuroraPrices() {
+  public async getAuroraPrices(): Promise<{ [key: string]: number }> {
       const provider = getProvider("https://mainnet.aurora.dev")
       const blockTag = await provider.getBlockNumber()
 

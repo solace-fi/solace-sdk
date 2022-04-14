@@ -1,4 +1,4 @@
-import { BigNumber as BN, providers, Wallet, Contract, getDefaultProvider, utils } from 'ethers'
+import { BigNumber as BN, providers, Wallet, Contract, getDefaultProvider, utils, BigNumber } from 'ethers'
 const { getNetwork } = providers
 import invariant from 'tiny-invariant'
 import SolaceCoverProduct from "../abis/SolaceCoverProduct.json"
@@ -216,7 +216,28 @@ export class Coverage {
      * @returns Array of chainIDs that the policy has been purchased for
      */
     public async getPolicyChainInfo(policyID: number): Promise<boolean> {
+        invariant(this.chainID == 137 || 80001, 'cannot call this function for chainId other than 137 or 80001')
         return (await this.solaceCoverProduct.getPolicyChainInfo(policyID))
+    }
+
+        /**
+     * TO-DO Decide if need to decode return value from BN hex.
+     * @param policyID The policy ID.
+     * @returns Array of chainIDs that the policy has been purchased for
+     */
+    public async getChain(chainIndex: number): Promise<boolean> {
+        invariant(this.chainID == 137 || 80001, 'cannot call this function for chainId other than 137 or 80001')
+        return (await this.solaceCoverProduct.getChain(BigNumber.from(chainIndex)))
+    }
+
+            /**
+     * TO-DO Decide if need to decode return value from BN hex.
+     * @param policyID The policy ID.
+     * @returns Array of chainIDs that the policy has been purchased for
+     */
+    public async numSupportedChains(): Promise<boolean> {
+        invariant(this.chainID == 137 || 80001, 'cannot call this function for chainId other than 137 or 80001')
+        return (await this.solaceCoverProduct.numSupportedChains())
     }
 
     /**

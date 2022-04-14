@@ -83,7 +83,7 @@ const ONE_ETHER = BigNumber.from("1000000000000000000")
 const x192 = BigNumber.from("0x01000000000000000000000000000000000000000000000000")
 
 // fetch the price of a token in a uniswap v3 pool
-export async function fetchUniswapV3PriceOrZero(pool: Contract, oneZero: boolean, decimals0: number, decimals1: number, blockTag: number) {
+export async function fetchUniswapV3PriceOrZero(pool: Contract, oneZero: boolean, decimals0: number, decimals1: number, blockTag: number): Promise<number> {
   return new Promise((resolve, reject) => {
     withBackoffRetries(() => pool.slot0({blockTag:blockTag})).then(slot0 => {
       var price = formatUnits(

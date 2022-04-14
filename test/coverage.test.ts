@@ -132,6 +132,18 @@ describe("Coverage Fetcher", () => {
             console.log(await fetcher_matic.getPolicyChainInfo(POLICY_ID))
         })
     })
+
+    describe("#getChain", () => {
+        it("gets the same value as directly querying matic contract", async () => {
+            expect(await fetcher_matic.getChain(1)).toEqual(await solaceCoverProductV2.getChain(1));
+        })
+    })
+
+    describe("#getNumSupportedChains", () => {
+        it("gets the same value as directly querying matic contract", async () => {
+            expect(await fetcher_matic.numSupportedChains()).toEqual(await solaceCoverProductV2.numSupportedChains());
+        })
+    })
 })
 
 describe("Policyholder", () => {

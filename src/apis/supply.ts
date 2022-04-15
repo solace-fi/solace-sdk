@@ -3,6 +3,7 @@ import { formatUnits } from "ethers/lib/utils";
 const { getNetwork } = providers
 import ERC20 from "../abis/ERC20.json";
 import { getProvider } from "../utils/ethers";
+import { MulticallContract, MulticallProvider } from "../utils/multicall";
 
 export class TotalSupply {
     CHAIN_IDS = [1,137,1313161554] // mainnet, polygon, aurora
@@ -77,16 +78,18 @@ export class CirculatingSupply {
     public async getCirculatingSupply(chainId: number, token: 'SOLACE' | 'XSOLACE') {
         let provider = null
         if (chainId == 137) {
-            provider = getProvider("https://polygon-rpc.com")
+            provider = new MulticallProvider(getProvider("https://polygon-rpc.com"), chainId)
         } else if (chainId == 1313161554) {
-            provider = getProvider("https://mainnet.aurora.dev")
+            provider = new MulticallProvider(getProvider("https://mainnet.aurora.dev"), chainId)
         } else {
-            provider = getDefaultProvider(getNetwork(chainId))
+            provider = new MulticallProvider(getDefaultProvider(getNetwork(chainId)), chainId)
         }
-        const contract = new Contract(token == 'SOLACE' ? this.SOLACE_ADDRESS : this.XSOLACE_ADDRESS, this.ERC20ABI, provider)
-        var blockTag = await provider.getBlockNumber()
-        let supply = await contract.totalSupply({blockTag:blockTag})
-        var balances = await Promise.all(Object.keys((token == 'SOLACE' ? this.skipSolaceAddrs : this.skipXSolaceAddrs)[chainId+""]).map(addr => contract.balanceOf(addr, {blockTag:blockTag})))
+
+        const contract = new MulticallContract(token == 'SOLACE' ? this.SOLACE_ADDRESS : this.XSOLACE_ADDRESS, this.ERC20ABI)
+        const supplyPromise = contract.totalSupply()
+        const balancePromises = Object.keys((token == 'SOLACE' ? this.skipSolaceAddrs : this.skipXSolaceAddrs)[chainId+""]).map(addr => contract.balanceOf(addr))
+        let promises = [supplyPromise, ...balancePromises]
+        let [supply, ...balances] = await provider.all(promises)
         balances.forEach(b => supply = supply.sub(b));
         return formatUnits(supply, 18)
     }

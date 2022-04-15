@@ -1,4 +1,4 @@
-import { TotalSupply, CirculatingSupply } from "../src/apis/supply"
+import { CirculatingSupply, TotalSupply } from "../src/apis/supply"
 
 describe('TotalSupply', () => {
     let totalSupply = new TotalSupply();
@@ -53,7 +53,7 @@ describe('CirculatingSupply', () => {
         jest.setTimeout(30000);
     })
 
-    describe('#getCirculatingSupply', () => {
+    describe('#getCirculatingSupply - Mainnet', () => {
         it('will return a valid response for solace', async () => {
             const res = await circulatingSupply.getCirculatingSupply(1, 'SOLACE')
             console.log('getCirculatingSupply(1, SOLACE)', res)
@@ -62,6 +62,30 @@ describe('CirculatingSupply', () => {
         it('will return a valid response for xsolace', async () => {
             const res = await circulatingSupply.getCirculatingSupply(1, 'XSOLACE')
             console.log('getCirculatingSupply(1, XSOLACE)', res)
+        })
+    })
+
+    describe('#getCirculatingSupply - Polygon', () => {
+        it('will return a valid response for solace', async () => {
+            const res = await circulatingSupply.getCirculatingSupply(137, 'SOLACE')
+            console.log('getCirculatingSupply(137, SOLACE)', res)
+        })
+
+        it('will return a valid response for xsolace', async () => {
+            const res = await circulatingSupply.getCirculatingSupply(137, 'XSOLACE')
+            console.log('getCirculatingSupply(137, XSOLACE)', res)
+        })
+    })
+
+    describe('#getCirculatingSupply - Aurora', () => {
+        it('will return a valid response for solace', async () => {
+            const res = await circulatingSupply.getCirculatingSupply(1313161554, 'SOLACE')
+            console.log('getCirculatingSupply(1313161554, SOLACE)', res)
+        })
+
+        it('will return a valid response for xsolace', async () => {
+            const res = await circulatingSupply.getCirculatingSupply(1313161554, 'XSOLACE')
+            console.log('getCirculatingSupply(1313161554, XSOLACE)', res)
         })
     })
 

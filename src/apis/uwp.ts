@@ -119,10 +119,16 @@ export class UnderwritingPoolUSDBalances {
   public async getUSDBalances_Mainnet() {
     const uwpbObj = new UnderwritingPoolBalances()
     const priceObj = new Price()
-    const balances = await withBackoffRetries(async () => uwpbObj.getBalances_Mainnet())
-    const prices = await withBackoffRetries(async () => priceObj.getMainnetPrices())
-    const tokenPrices = await withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices())
+    // const balances = await withBackoffRetries(async () => uwpbObj.getBalances_Mainnet())
+    // const prices = await withBackoffRetries(async () => priceObj.getMainnetPrices())
+    // const tokenPrices = await withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices())
     
+    const [ balances, prices, tokenPrices ] = await Promise.all([
+      withBackoffRetries(async () => uwpbObj.getBalances_Mainnet()),
+      withBackoffRetries(async () => priceObj.getMainnetPrices()),
+      withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices())
+    ])
+
     const USDBalances = balances.map((b: {
       token: string;
       amount: string;
@@ -147,10 +153,16 @@ export class UnderwritingPoolUSDBalances {
   public async getUSDBalances_Polygon() {
     const uwpbObj = new UnderwritingPoolBalances()
     const priceObj = new Price()
-    const balances = await withBackoffRetries(async () => uwpbObj.getBalances_Polygon())
-    const prices = await withBackoffRetries(async () => priceObj.getPolygonPrices())
-    const tokenPrices = await withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices())
+    // const balances = await withBackoffRetries(async () => uwpbObj.getBalances_Polygon())
+    // const prices = await withBackoffRetries(async () => priceObj.getPolygonPrices())
+    // const tokenPrices = await withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices())
     
+    const [balances, prices, tokenPrices] = await Promise.all([
+      withBackoffRetries(async () => uwpbObj.getBalances_Polygon()),
+      withBackoffRetries(async () => priceObj.getPolygonPrices()),
+      withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices())
+    ])
+
     const USDBalances = balances.map((b: {
       token: string;
       amount: string;
@@ -175,10 +187,16 @@ export class UnderwritingPoolUSDBalances {
   public async getUSDBalances_Aurora() {
     const uwpbObj = new UnderwritingPoolBalances()
     const priceObj = new Price()
-    const balances = await withBackoffRetries(async () => uwpbObj.getBalances_Aurora())
-    const prices = await withBackoffRetries(async () => priceObj.getAuroraPrices())
-    const tokenPrices = await withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices())
+    // const balances = await withBackoffRetries(async () => uwpbObj.getBalances_Aurora())
+    // const prices = await withBackoffRetries(async () => priceObj.getAuroraPrices())
+    // const tokenPrices = await withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices())
     
+    const [balances, prices, tokenPrices] = await Promise.all([
+      withBackoffRetries(async () => uwpbObj.getBalances_Aurora()),
+      withBackoffRetries(async () => priceObj.getAuroraPrices()),
+      withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices())
+    ])
+
     const USDBalances = balances.map((b: {
       token: string;
       amount: string;

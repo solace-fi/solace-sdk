@@ -1,6 +1,6 @@
 {
   "name": "@solace-fi/sdk",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "license": "MIT",
   "repository": "https://github.com/solace-fi/solace-sdk.git",
   "keywords": [
@@ -31,6 +31,7 @@
     "@web3-react/walletlink-connector": "^6.2.12",
     "axios": "^0.26.0",
     "ethers": "^5.5.4",
+    "ethers-multicall": "^0.2.3",
     "tiny-invariant": "^1.2.0"
   },
   "devDependencies": {

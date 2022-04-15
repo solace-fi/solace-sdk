@@ -31,7 +31,7 @@ describe('Lock', () => {
 
     describe('#getUserLocks', () => {
         it('will return a valid response', async () => {
-            const res = await xsl.getUserLocks(1, '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
+            const res = await xsl.getUserLocks(1, '0x9a1768f92c57e7b0f609364185c92404049f4f3b')
             console.log(res)
         })
     })

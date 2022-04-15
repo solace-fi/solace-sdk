@@ -34,3 +34,9 @@ export const isNetworkSupported = (chainID: number): boolean => {
     if ( supportedChainIds.includes(chainID) ) return true
     else return false
 }
+
+export const DEFAULT_ENDPOINT: { [chainID : number]: string } = {
+    [137] : "https://polygon-rpc.com", // Polygon
+    [80001] : "https://matic-mumbai.chainstacklabs.com", // Polygon Testnet
+    [1313161554] : "https://mainnet.aurora.dev/", // Aurora
+} 

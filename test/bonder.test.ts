@@ -28,7 +28,7 @@ describe("Bonder", () => {
         beforeEach(() => {
             provider = getDefaultProvider(getNetwork(1)) // Note using default provider gets rate-limit notification
             bond_teller_dai_contract = new Contract(BOND_TELLER_ADDRESSES["usdt"][1], BondTellerEth, provider)
-            bonder = new Bonder(1, provider, "usdt");
+            bonder = new Bonder(1, "usdt", provider);
         })
 
         test("#bondPrice - gets the same value as directly querying mainnet contract", async () => {
@@ -52,7 +52,7 @@ describe("Bonder", () => {
         beforeEach(() => {
             provider = new providers.JsonRpcProvider("https://polygon-rpc.com")
             bond_teller_matic_contract = new Contract(BOND_TELLER_ADDRESSES["matic"][137], BondTellerMatic, provider)
-            bonder = new Bonder(137, provider, "matic");
+            bonder = new Bonder(137, "matic", provider);
         })
 
         test("#bondPrice - gets the same value as directly querying mainnet contract", async () => {
@@ -76,7 +76,7 @@ describe("Bonder", () => {
         beforeEach(() => {
             provider = new providers.JsonRpcProvider("https://mainnet.aurora.dev")
             bond_teller_wnear_contract = new Contract(BOND_TELLER_ADDRESSES["wnear"][1313161554], BondTellerErc20, provider)
-            bonder = new Bonder(1313161554, provider, "wnear");
+            bonder = new Bonder(1313161554, "wnear", provider);
         })
 
         test("#bondPrice - gets the same value as directly querying mainnet contract", async () => {

@@ -1,39 +1,42 @@
-import { BigNumber as BN, providers, Wallet, Contract, getDefaultProvider, utils } from 'ethers'
+import { BigNumber as BN, providers, Wallet, Contract, getDefaultProvider, utils, BigNumber } from 'ethers'
 const { getNetwork } = providers
 import invariant from 'tiny-invariant'
 import SolaceCoverProduct from "../abis/SolaceCoverProduct.json"
 import SolaceCoverProductV2 from "../abis/SolaceCoverProductV2.json"
 import { SOLACE_COVER_PRODUCT_ADDRESS, ZERO_ADDRESS, isNetworkSupported } from '../constants'
 import { GasConfiguration } from '../types';
+import { getProvider } from '../utils/ethers'
 
 export class Coverage {
     chainID: number;
-    providerOrSigner: Wallet | providers.JsonRpcSigner | providers.Provider;
+    walletOrProviderOrSigner: Wallet | providers.JsonRpcSigner | providers.Provider;
     solaceCoverProduct: Contract;
 
-    constructor(chainID: number, providerOrSigner?: Wallet | providers.JsonRpcSigner | providers.Provider) {
+    constructor(chainID: number, walletOrProviderOrSigner?: Wallet | providers.JsonRpcSigner | providers.Provider) {
         invariant(isNetworkSupported(chainID),"not a supported chainID")
         this.chainID = chainID;
 
-        if (typeof(providerOrSigner) == 'undefined') {
+        if (typeof(walletOrProviderOrSigner) == 'undefined') {
             // ethers.js getDefaultProvider method doesn't work for MATIC or Mumbai
             // Use public RPC endpoints instead
             if (chainID == 137) {
-                this.providerOrSigner = new providers.JsonRpcProvider("https://polygon-rpc.com")
+                this.walletOrProviderOrSigner = getProvider("https://polygon-rpc.com")
             } else if (chainID == 80001) {
-                this.providerOrSigner = new providers.JsonRpcProvider("https://matic-mumbai.chainstacklabs.com")
+                this.walletOrProviderOrSigner = getProvider("https://matic-mumbai.chainstacklabs.com")
+            } else if (chainID == 1313161554) {
+                this.walletOrProviderOrSigner = getProvider("https://mainnet.aurora.dev")
             } else {
-                this.providerOrSigner = getDefaultProvider(getNetwork(chainID))
+                this.walletOrProviderOrSigner = getDefaultProvider(getNetwork(chainID))
             }
         } else {
-            this.providerOrSigner = providerOrSigner
+            this.walletOrProviderOrSigner = walletOrProviderOrSigner
         }
 
         if (chainID == 137 || 80001) {
             // SolaceCoverProductV2 deployed on Polygon mainnet (137) and Mumbai (80001)
-            this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProductV2, this.providerOrSigner)
+            this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProductV2, this.walletOrProviderOrSigner)
         } else {
-            this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProduct, this.providerOrSigner)
+            this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProduct, this.walletOrProviderOrSigner)
         }
     }
 
@@ -58,7 +61,7 @@ export class Coverage {
         chains?: number[],
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(policyholder), "not an Ethereum address")
         invariant(policyholder != ZERO_ADDRESS, "cannot enter zero address policyholder")
         invariant(coverLimit.gt(0), "cannot enter zero cover limit")
@@ -91,7 +94,7 @@ export class Coverage {
         referralCode: utils.BytesLike,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(newCoverLimit.gt(0), "cannot enter zero cover limit")
         const tx: providers.TransactionResponse = await this.solaceCoverProduct.updateCoverLimit(newCoverLimit, referralCode, {...gasConfig})
         return tx
@@ -107,7 +110,7 @@ export class Coverage {
         amount: BN,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(policyholder), "not an Ethereum address")
         invariant(policyholder != ZERO_ADDRESS, "cannot enter zero address policyholder")
         const tx: providers.TransactionResponse = await this.solaceCoverProduct.deposit(policyholder, amount, {...gasConfig})
@@ -120,7 +123,7 @@ export class Coverage {
      * If cooldown has not started, or has not passed, the user will not be able to withdraw their entire account. A minimum required account balance (one epoch's fee) will be left in the user's account.
      */
     public async withdraw(gasConfig?: GasConfiguration): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         const tx: providers.TransactionResponse = await this.solaceCoverProduct.withdraw({...gasConfig})
         return tx
     }
@@ -130,7 +133,7 @@ export class Coverage {
      * This will set a user's cover limit to 0, and begin the cooldown timer. Read comments for [`cooldownPeriod()`](#cooldownperiod) for more information on the cooldown mechanic.
      */
     public async deactivatePolicy(gasConfig?: GasConfiguration): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         const tx: providers.TransactionResponse = await this.solaceCoverProduct.deactivatePolicy({...gasConfig})
         return tx
     }
@@ -213,7 +216,28 @@ export class Coverage {
      * @returns Array of chainIDs that the policy has been purchased for
      */
     public async getPolicyChainInfo(policyID: number): Promise<boolean> {
+        invariant(this.chainID == 137 || 80001, 'cannot call this function for chainId other than 137 or 80001')
         return (await this.solaceCoverProduct.getPolicyChainInfo(policyID))
+    }
+
+        /**
+     * TO-DO Decide if need to decode return value from BN hex.
+     * @param policyID The policy ID.
+     * @returns Array of chainIDs that the policy has been purchased for
+     */
+    public async getChain(chainIndex: number): Promise<boolean> {
+        invariant(this.chainID == 137 || 80001, 'cannot call this function for chainId other than 137 or 80001')
+        return (await this.solaceCoverProduct.getChain(BigNumber.from(chainIndex)))
+    }
+
+            /**
+     * TO-DO Decide if need to decode return value from BN hex.
+     * @param policyID The policy ID.
+     * @returns Array of chainIDs that the policy has been purchased for
+     */
+    public async numSupportedChains(): Promise<boolean> {
+        invariant(this.chainID == 137 || 80001, 'cannot call this function for chainId other than 137 or 80001')
+        return (await this.solaceCoverProduct.numSupportedChains())
     }
 
     /**
@@ -292,11 +316,11 @@ export class Coverage {
      * If the last two characters of the signature are '01', replace with '0c'.
      */
          public async getReferralCode(): Promise<string> {
-            invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot get referral code without a signer")
+            invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot get referral code without a signer")
             const domain = {
                 name: "Solace.fi-SolaceCoverProduct",
                 version: "1",
-                chainId: await this.providerOrSigner.getChainId(),
+                chainId: await this.walletOrProviderOrSigner.getChainId(),
                 verifyingContract: SOLACE_COVER_PRODUCT_ADDRESS[this.chainID]
             };
     
@@ -310,7 +334,7 @@ export class Coverage {
                 version: 1
             };
     
-            const signature = await this.providerOrSigner._signTypedData(domain, types, value)
+            const signature = await this.walletOrProviderOrSigner._signTypedData(domain, types, value)
             return signature
         }
 }

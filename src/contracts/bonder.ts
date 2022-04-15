@@ -6,6 +6,7 @@ import BondTellerMatic from "../abis/BondTellerMatic.json"
 import invariant from 'tiny-invariant'
 import { BOND_TELLER_ADDRESSES, ZERO_ADDRESS, isNetworkSupported } from '../constants'
 import { GasConfiguration } from '../types';
+import { getProvider } from '../utils/ethers'
 
 /*
  * Contains methods for accessing Solace bonding functionality (BondTellerErc20.sol, BondTellerEth.sol & BondTellerMatic.sol).
@@ -17,7 +18,7 @@ export class Bonder {
     PROPERTIES
     **************/
     chainID: number;
-    providerOrSigner: Wallet | providers.JsonRpcSigner | providers.Provider;
+    walletOrProviderOrSigner: Wallet | providers.JsonRpcSigner | providers.Provider;
     bondTeller: Contract;
     token: string;
 
@@ -27,38 +28,40 @@ export class Bonder {
 
     /**
      * @param chainID The chainID for the Staker object, 1 for Ethereum Mainnet.
-     * @param providerOrSigner providerOrSigner object - either a Provider (https://docs.ethers.io/v5/api/providers/) or Signer (https://docs.ethers.io/v5/api/signer/)
+     * @param walletOrProviderOrSigner walletOrProviderOrSigner object - a Wallet (https://docs.ethers.io/v5/api/signer/#Wallet) or a Provider (https://docs.ethers.io/v5/api/providers/) or Signer (https://docs.ethers.io/v5/api/signer/)
      * @param token string (can be lowercase, uppercase or mixed) describing token for bond purchases. See documentation for supported tokens.
      */
-     constructor(chainID: number, token: string, providerOrSigner?: Wallet | providers.JsonRpcSigner | providers.Provider) {
+     constructor(chainID: number, token: string, walletOrProviderOrSigner?: Wallet | providers.JsonRpcSigner | providers.Provider) {
         invariant(isNetworkSupported(chainID),"not a supported chainID")
         invariant( BOND_TELLER_ADDRESSES.hasOwnProperty(token.toLowerCase()), "not a supported token for bonds" )
         invariant ( BOND_TELLER_ADDRESSES[token][chainID] !== undefined, "not a supported token for bonds on this chainid" )
         
         this.chainID = chainID;
 
-        if (typeof(providerOrSigner) == 'undefined') {
+        if (typeof(walletOrProviderOrSigner) == 'undefined') {
             // ethers.js getDefaultProvider method doesn't work for MATIC or Mumbai
             // Use public RPC endpoints instead
             if (chainID == 137) {
-                this.providerOrSigner = new providers.JsonRpcProvider("https://polygon-rpc.com")
+                this.walletOrProviderOrSigner = getProvider("https://polygon-rpc.com")
             } else if (chainID == 80001) {
-                this.providerOrSigner = new providers.JsonRpcProvider("https://matic-mumbai.chainstacklabs.com")
+                this.walletOrProviderOrSigner = getProvider("https://matic-mumbai.chainstacklabs.com")
+            } else if (chainID == 1313161554) {
+                this.walletOrProviderOrSigner = getProvider("https://mainnet.aurora.dev")
             } else {
-                this.providerOrSigner = getDefaultProvider(getNetwork(chainID))
+                this.walletOrProviderOrSigner = getDefaultProvider(getNetwork(chainID))
             }
         } else {
-            this.providerOrSigner = providerOrSigner
+            this.walletOrProviderOrSigner = walletOrProviderOrSigner
         }
 
         this.token = token;
 
         if (token.toLowerCase() === "eth") {
-            this.bondTeller = new Contract(BOND_TELLER_ADDRESSES[token][chainID], BondTellerEth, providerOrSigner)
+            this.bondTeller = new Contract(BOND_TELLER_ADDRESSES[token][chainID], BondTellerEth, walletOrProviderOrSigner)
         } else if (token.toLowerCase() === "matic") {
-            this.bondTeller = new Contract(BOND_TELLER_ADDRESSES[token][chainID], BondTellerMatic, providerOrSigner)
+            this.bondTeller = new Contract(BOND_TELLER_ADDRESSES[token][chainID], BondTellerMatic, walletOrProviderOrSigner)
         } else {
-            this.bondTeller = new Contract(BOND_TELLER_ADDRESSES[token][chainID], BondTellerErc20, providerOrSigner)
+            this.bondTeller = new Contract(BOND_TELLER_ADDRESSES[token][chainID], BondTellerErc20, walletOrProviderOrSigner)
         }
     }
 
@@ -107,7 +110,7 @@ export class Bonder {
         bondID: number,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
 
         const tx: providers.TransactionResponse = await this.bondTeller.claimPayout(bondID, {...gasConfig})
         return tx
@@ -131,7 +134,7 @@ export class Bonder {
         stake: boolean,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(depositor), "not an Ethereum address")
         invariant(depositor != ZERO_ADDRESS, "cannot enter zero address policyholder")
         invariant(this.token !== "eth", "function does not exist on BondTellerEth")
@@ -164,7 +167,7 @@ export class Bonder {
         s: utils.BytesLike,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(depositor), "not an Ethereum address")
         invariant(depositor != ZERO_ADDRESS, "cannot enter zero address policyholder")
         invariant(this.token !== "eth", "function does not exist on BondTellerEth")
@@ -192,7 +195,7 @@ export class Bonder {
         stake: boolean,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(depositor), "not an Ethereum address")
         invariant(depositor != ZERO_ADDRESS, "cannot enter zero address policyholder")
         invariant(this.token === "eth", "function only exists on BondTellerEth")
@@ -215,7 +218,7 @@ export class Bonder {
         stake: boolean,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(depositor), "not an Ethereum address")
         invariant(depositor != ZERO_ADDRESS, "cannot enter zero address policyholder")
         invariant(this.token === "eth", "function only exists on BondTellerEth")
@@ -248,7 +251,7 @@ export class Bonder {
         s: utils.BytesLike,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(depositor), "not an Ethereum address")
         invariant(depositor != ZERO_ADDRESS, "cannot enter zero address policyholder")
         invariant(this.token === "eth", "function only exists on BondTellerEth")
@@ -275,7 +278,7 @@ export class Bonder {
         stake: boolean,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(depositor), "not an Ethereum address")
         invariant(depositor != ZERO_ADDRESS, "cannot enter zero address policyholder")
         invariant(this.token === "matic", "function only exists on BondTellerMatic")
@@ -298,7 +301,7 @@ export class Bonder {
         stake: boolean,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(depositor), "not an Ethereum address")
         invariant(depositor != ZERO_ADDRESS, "cannot enter zero address policyholder")
         invariant(this.token === "matic", "function only exists on BondTellerMatic")
@@ -331,7 +334,7 @@ export class Bonder {
         s: utils.BytesLike,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(depositor), "not an Ethereum address")
         invariant(depositor != ZERO_ADDRESS, "cannot enter zero address policyholder")
         invariant(this.token === "matic", "function only exists on BondTellerMatic")

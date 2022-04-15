@@ -5,6 +5,7 @@ import StakingRewards from "../abis/StakingRewards.json"
 import invariant from 'tiny-invariant'
 import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS, ZERO_ADDRESS, isNetworkSupported } from '../constants'
 import { GasConfiguration } from '../types';
+import { getProvider } from '../utils/ethers'
 
 /*
  * Contains methods for accessing Solace staking functionality (xsLocker.sol & StakingRewards.sol).
@@ -16,7 +17,7 @@ export class Staker {
     PROPERTIES
     **************/
     chainID: number;
-    providerOrSigner: Wallet | providers.JsonRpcSigner | providers.Provider;
+    walletOrProviderOrSigner: Wallet | providers.JsonRpcSigner | providers.Provider;
     stakingRewards: Contract;
     xsLocker: Contract;
 
@@ -26,27 +27,29 @@ export class Staker {
 
     /**
      * @param chainID The chainID for the Staker object, 1 for Ethereum Mainnet.
-     * @param providerOrSigner providerOrSigner object - either a Provider (https://docs.ethers.io/v5/api/providers/) or Signer (https://docs.ethers.io/v5/api/signer/)
+     * @param walletOrProviderOrSigner walletOrProviderOrSigner object - a Wallet (https://docs.ethers.io/v5/api/signer/#Wallet) or a Provider (https://docs.ethers.io/v5/api/providers/) or Signer (https://docs.ethers.io/v5/api/signer/)
      */
-    constructor(chainID: number, providerOrSigner?: Wallet | providers.JsonRpcSigner | providers.Provider) {
+    constructor(chainID: number, walletOrProviderOrSigner?: Wallet | providers.JsonRpcSigner | providers.Provider) {
         invariant(isNetworkSupported(chainID),"not a supported chainID")
         this.chainID = chainID;
-        if (typeof(providerOrSigner) == 'undefined') {
+        if (typeof(walletOrProviderOrSigner) == 'undefined') {
             // ethers.js getDefaultProvider method doesn't work for MATIC or Mumbai
             // Use public RPC endpoints instead
             if (chainID == 137) {
-                this.providerOrSigner = new providers.JsonRpcProvider("https://polygon-rpc.com")
+                this.walletOrProviderOrSigner = getProvider("https://polygon-rpc.com")
             } else if (chainID == 80001) {
-                this.providerOrSigner = new providers.JsonRpcProvider("https://matic-mumbai.chainstacklabs.com")
+                this.walletOrProviderOrSigner = getProvider("https://matic-mumbai.chainstacklabs.com")
+            } else if (chainID == 1313161554) {
+                this.walletOrProviderOrSigner = getProvider("https://mainnet.aurora.dev")
             } else {
-                this.providerOrSigner = getDefaultProvider(getNetwork(chainID))
+                this.walletOrProviderOrSigner = getDefaultProvider(getNetwork(chainID))
             }
         } else {
-            this.providerOrSigner = providerOrSigner
+            this.walletOrProviderOrSigner = walletOrProviderOrSigner
         }
          
-        this.stakingRewards = new Contract(STAKING_REWARDS_ADDRESS[chainID], StakingRewards, providerOrSigner)
-        this.xsLocker = new Contract(XSLOCKER_ADDRESS[chainID], xsLocker, providerOrSigner)
+        this.stakingRewards = new Contract(STAKING_REWARDS_ADDRESS[chainID], StakingRewards, walletOrProviderOrSigner)
+        this.xsLocker = new Contract(XSLOCKER_ADDRESS[chainID], xsLocker, walletOrProviderOrSigner)
     }
 
     /**********************************
@@ -65,7 +68,7 @@ export class Staker {
         end: BN,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(recipient), "not an Ethereum address")
         invariant(recipient != ZERO_ADDRESS, "cannot enter zero address policyholder")
         invariant(amount.gt(0), "cannot enter zero amount")
@@ -93,7 +96,7 @@ export class Staker {
         s: utils.BytesLike,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(amount.gt(0), "cannot enter zero amount")
 
         const tx: providers.TransactionResponse = await this.xsLocker.createLockSigned(amount, end, deadline, v, r, s, {...gasConfig})
@@ -112,7 +115,7 @@ export class Staker {
         amount: BN,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(amount.gt(0), "cannot enter zero amount")
 
         const tx: providers.TransactionResponse = await this.xsLocker.increaseAmount(xsLockID, amount, {...gasConfig})
@@ -138,7 +141,7 @@ export class Staker {
         s: utils.BytesLike,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(amount.gt(0), "cannot enter zero amount")
 
         const tx: providers.TransactionResponse = await this.xsLocker.increaseAmountSigned(xsLockID, amount, deadline, v, r, s, {...gasConfig})
@@ -156,7 +159,7 @@ export class Staker {
         end: BN,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(end.gt(0), "not extended")
 
         const tx: providers.TransactionResponse = await this.xsLocker.extendLock(xsLockID, end, {...gasConfig})
@@ -175,7 +178,7 @@ export class Staker {
         recipient: string,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(recipient), "not an Ethereum address")
         invariant(recipient != ZERO_ADDRESS, "cannot enter zero address policyholder")
 
@@ -197,7 +200,7 @@ export class Staker {
         amount: BN,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(recipient), "not an Ethereum address")
         invariant(recipient != ZERO_ADDRESS, "cannot enter zero address policyholder")
         invariant(amount.gt(0), "cannot enter zero amount")
@@ -218,7 +221,7 @@ export class Staker {
         recipient: string,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(recipient), "not an Ethereum address")
         invariant(recipient != ZERO_ADDRESS, "cannot enter zero address policyholder")
 
@@ -282,7 +285,7 @@ export class Staker {
         xsLockID: number,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         const tx: providers.TransactionResponse = await this.stakingRewards.harvestLock(xsLockID, {...gasConfig})
         return tx
     }
@@ -295,7 +298,7 @@ export class Staker {
         xsLockIDs: number[],
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         const tx: providers.TransactionResponse = await this.stakingRewards.harvestLock(xsLockIDs, {...gasConfig})
         return tx
     }
@@ -309,7 +312,7 @@ export class Staker {
         xsLockID: number,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         const tx: providers.TransactionResponse = await this.stakingRewards.compoundLock(xsLockID, {...gasConfig})
         return tx
     }
@@ -325,7 +328,7 @@ export class Staker {
         increasedLockID: number[],
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         const tx: providers.TransactionResponse = await this.stakingRewards.compoundLocks(xsLockIDs, increasedLockID, {...gasConfig})
         return tx
     }

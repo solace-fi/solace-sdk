@@ -1,22 +1,9 @@
-export type GasConfiguration =
-  | {
-      maxFeePerGas?: undefined
-      type?: undefined
-      gasPrice?: undefined
-      gasLimit?: undefined
-    }
-  | {
-      maxFeePerGas: number
-      type: number
-      gasPrice?: undefined
-      gasLimit?: number | undefined
-    }
-| {
-    gasPrice: number
-    maxFeePerGas?: undefined
-    type?: undefined
-    gasLimit?: number | undefined
-  }
+export type GasConfiguration ={
+  gasPrice?: number
+  maxFeePerGas?: number
+  maxPriorityFeePerGas?: number
+  type?: number
+}
 
 export type GasArgs = {
   connector?: string

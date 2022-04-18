@@ -1,4 +1,4 @@
-import { BigNumber as BN, Contract, providers, Wallet, utils, getDefaultProvider } from 'ethers'
+import { BigNumber as BN, Contract, providers, Wallet, utils, getDefaultProvider, BigNumber } from 'ethers'
 const { getNetwork } = providers
 import BondTellerErc20 from "../abis/BondTellerErc20.json"
 import BondTellerEth from "../abis/BondTellerEth.json"
@@ -107,7 +107,7 @@ export class Bonder {
      * @param bondID The ID of the bond to redeem.
      */
      public async claimPayout(
-        bondID: number,
+        bondID: BN,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")

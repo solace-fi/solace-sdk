@@ -111,7 +111,7 @@ export class Staker {
      * @param amount The amount of SOLACE to deposit.
      */
      public async increaseAmount(
-        xsLockID: number,
+        xsLockID: BN,
         amount: BN,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
@@ -133,7 +133,7 @@ export class Staker {
      * @param s secp256k1 signature
      */
      public async increaseAmountSigned(
-        xsLockID: number,
+        xsLockID: BN,
         amount: BN,
         deadline: BN,
         v: utils.BytesLike,
@@ -155,7 +155,7 @@ export class Staker {
      * @param end The new time for the lock to unlock.
      */
      public async extendLock(
-        xsLockID: number,
+        xsLockID: BN,
         end: BN,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
@@ -174,7 +174,7 @@ export class Staker {
      * @param recipient The user to receive the lock's SOLACE.
      */
      public async withdraw(
-        xsLockID: number,
+        xsLockID: BN,
         recipient: string,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
@@ -195,7 +195,7 @@ export class Staker {
      * @param amount The amount of SOLACE to withdraw.
      */
      public async withdrawInPart(
-        xsLockID: number,
+        xsLockID: BN,
         recipient: string,
         amount: BN,
         gasConfig?: GasConfiguration
@@ -217,7 +217,7 @@ export class Staker {
      * @param recipient The user to receive the lock's SOLACE.
      */
      public async withdrawMany(
-        xsLockIDs: number[],
+        xsLockIDs: BN[],
         recipient: string,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
@@ -240,7 +240,7 @@ export class Staker {
      * @param xsLockID The ID of the lock to query.
      * @return lock_ Information about the lock.
      */
-     public async locks(xsLockID: number): Promise<any> {
+     public async locks(xsLockID: BN): Promise<any> {
         return (await this.xsLocker.locks(xsLockID))
     }
 
@@ -249,7 +249,7 @@ export class Staker {
      * @param xsLockID The ID of the lock to query.
      * @return locked True if the lock is locked, false if unlocked.
      */
-     public async isLocked(xsLockID: number): Promise<boolean> {
+     public async isLocked(xsLockID: BN): Promise<boolean> {
         return (await this.xsLocker.isLocked(xsLockID))
     }
 
@@ -258,7 +258,7 @@ export class Staker {
      * @param xsLockID The ID of the lock to query.
      * @return time The time left in seconds, 0 if unlocked.
      */
-     public async timeLeft(xsLockID: number): Promise<BN> {
+     public async timeLeft(xsLockID: BN): Promise<BN> {
         return (await this.xsLocker.timeLeft(xsLockID))
     }
 
@@ -282,7 +282,7 @@ export class Staker {
      * @param xsLockID The ID of the lock to process rewards for.
      */
      public async harvestLock(
-        xsLockID: number,
+        xsLockID: BN,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
@@ -295,7 +295,7 @@ export class Staker {
      * @param xsLockID The ID of the lock to process rewards for.
      */
      public async harvestLocks(
-        xsLockIDs: number[],
+        xsLockIDs: BN[],
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
@@ -309,7 +309,7 @@ export class Staker {
      * @param xsLockID The ID of the lock to compound.
      */
      public async compoundLock(
-        xsLockID: number,
+        xsLockID: BN,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
@@ -324,8 +324,8 @@ export class Staker {
      * @param increasedLockID The ID of the lock to deposit into.
      */
      public async compoundLocks(
-        xsLockIDs: number[],
-        increasedLockID: number[],
+        xsLockIDs: BN[],
+        increasedLockID: BN,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
@@ -342,7 +342,7 @@ export class Staker {
      * @param xsLockID The ID of the lock to query.
      * @return StakedLockInfo
      */
-     public async stakedLockInfo(xsLockID: number): Promise<any> {
+     public async stakedLockInfo(xsLockID: BN): Promise<any> {
         return (await this.stakingRewards.stakedLockInfo(xsLockID))
     }
 
@@ -351,7 +351,7 @@ export class Staker {
      * @param xsLockID The ID of the lock to query rewards for.
      * @return reward Total amount of withdrawable reward tokens.
      */
-     public async pendingRewardsOfLock(xsLockID: number): Promise<BN> {
+     public async pendingRewardsOfLock(xsLockID: BN): Promise<BN> {
         return (await this.stakingRewards.pendingRewardsOfLock(xsLockID))
     }
 

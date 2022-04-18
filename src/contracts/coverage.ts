@@ -58,7 +58,7 @@ export class Coverage {
         coverLimit: BN,
         amount: BN,
         referralCode: utils.BytesLike,
-        chains?: number[],
+        chains?: BN[],
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
@@ -68,7 +68,7 @@ export class Coverage {
         
         if (typeof(chains) !== 'undefined') {
             for (let chain of chains) {
-                invariant(isNetworkSupported(chain),"not a supported chainID")
+                invariant(isNetworkSupported(chain.toNumber()),"not a supported chainID")
             }
         }
 
@@ -188,7 +188,7 @@ export class Coverage {
      * @param policyID The policy ID.
      * @returns The cover limit for the given policy ID.
      */
-    public async coverLimitOf(policyID: number): Promise<BN> {
+    public async coverLimitOf(policyID: BN): Promise<BN> {
         return (await this.solaceCoverProduct.coverLimitOf(policyID))
     }
 
@@ -206,7 +206,7 @@ export class Coverage {
      * @param policyID The policy ID.
      * @returns True if policy is active. False if policy is inactive, or does not exist.
      */
-    public async policyStatus(policyID: number): Promise<boolean> {
+    public async policyStatus(policyID: BN): Promise<boolean> {
         return (await this.solaceCoverProduct.policyStatus(policyID))
     }
 
@@ -215,7 +215,7 @@ export class Coverage {
      * @param policyID The policy ID.
      * @returns Array of chainIDs that the policy has been purchased for
      */
-    public async getPolicyChainInfo(policyID: number): Promise<boolean> {
+    public async getPolicyChainInfo(policyID: BN): Promise<boolean> {
         invariant(this.chainID == 137 || 80001, 'cannot call this function for chainId other than 137 or 80001')
         return (await this.solaceCoverProduct.getPolicyChainInfo(policyID))
     }
@@ -225,7 +225,7 @@ export class Coverage {
      * @param policyID The policy ID.
      * @returns Array of chainIDs that the policy has been purchased for
      */
-    public async getChain(chainIndex: number): Promise<boolean> {
+    public async getChain(chainIndex: BN): Promise<boolean> {
         invariant(this.chainID == 137 || 80001, 'cannot call this function for chainId other than 137 or 80001')
         return (await this.solaceCoverProduct.getChain(BigNumber.from(chainIndex)))
     }

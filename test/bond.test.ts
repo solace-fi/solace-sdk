@@ -2,7 +2,7 @@ import { Price } from "../src";
 import { Bond } from "../src/apis/bond"
 
 describe('Bond', () => {
-    let bond = new Bond();
+    let bond = new Bond(1);
     let price = new Price()
 
     beforeEach(() => {
@@ -13,7 +13,7 @@ describe('Bond', () => {
     describe('#getBondTellerData', () => {
         it('will return a valid response', async () => {
             const apiPriceMapping = await price.getCoinGeckoTokenPrices()
-            const res = await bond.getBondTellerData(1, apiPriceMapping)
+            const res = await bond.getBondTellerData(apiPriceMapping)
             console.log(res)
         })
     })

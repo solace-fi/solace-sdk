@@ -13,7 +13,7 @@ export class Coverage {
     solaceCoverProduct: Contract;
 
     constructor(chainID: number, walletOrProviderOrSigner?: Wallet | providers.JsonRpcSigner | providers.Provider) {
-        invariant(isNetworkSupported(chainID),"not a supported chainID")
+        invariant(SOLACE_COVER_PRODUCT_ADDRESS[chainID],"not a supported chainID")
         this.chainID = chainID;
 
         if (typeof(walletOrProviderOrSigner) == 'undefined') {
@@ -23,8 +23,6 @@ export class Coverage {
                 this.walletOrProviderOrSigner = getProvider("https://polygon-rpc.com")
             } else if (chainID == 80001) {
                 this.walletOrProviderOrSigner = getProvider("https://matic-mumbai.chainstacklabs.com")
-            } else if (chainID == 1313161554) {
-                this.walletOrProviderOrSigner = getProvider("https://mainnet.aurora.dev")
             } else {
                 this.walletOrProviderOrSigner = getDefaultProvider(getNetwork(chainID))
             }

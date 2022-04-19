@@ -2,12 +2,14 @@ import { Contract } from '@ethersproject/contracts'
 import { BigNumber } from 'ethers'
 
 export type BondTellerDetails = {
-    tellerData: BondTellerData
-    principalData: BondPrincipalData
-  }
+  tellerData: BondTellerData
+  principalData: BondPrincipalData
+}
+
+export type BondTellerTokenData = { [chainId: number]: { addr: string; type: 'erc20' | 'eth' | 'matic' } }
   
 export type BondTellerData = {
-  teller: Contract
+  teller: BondTellerContractData
   bondPrice: BigNumber
   usdBondPrice: number
   vestingTermInSeconds: number
@@ -16,6 +18,8 @@ export type BondTellerData = {
   bondFeeBps?: BigNumber
   bondRoi: number
 }
+
+export type BondTellerContractData = { contract: Contract; type: 'erc20' | 'eth' | 'matic' }
 
 export type BondPrincipalData = {
   principal: Contract
@@ -27,4 +31,16 @@ export type BondPrincipalData = {
   }
   token0?: string
   token1?: string
+}
+
+export type BondTokenData = {
+  payoutAmount: BigNumber
+  payoutAlreadyClaimed: BigNumber
+  principalPaid: BigNumber
+  vestingStart: number
+  localVestingTerm: number
+}
+
+export type BondToken = BondTokenData & {
+  id: BigNumber
 }

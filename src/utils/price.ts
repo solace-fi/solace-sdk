@@ -15,13 +15,18 @@ export async function fetchBalances(walletOrProviderOrSigner: Wallet | providers
       withBackoffRetries(() => ((tokenList[i].address == ETH_ADDRESS)
         ? walletOrProviderOrSigner.getBalance(holder, blockTag=blockTag)
         : tokenList[i].contract.balanceOf(holder, {blockTag:blockTag})
-      )).then(bal => { resolve(formatUnits(bal, tokenList[i].decimals)) }).catch(() => { resolve("0.0") })
+      ))
+      .then(bal => { resolve(formatUnits(bal, tokenList[i].decimals)) })
+      .catch(() => { resolve("0.0") })
     })
   }
-  var promises: string[] = []
+
+  var promises: Promise<string>[] = []
+
   for(var i = 0; i < tokenList.length; ++i) {
-    promises.push(await createBalancePromise(i))
+    promises.push(createBalancePromise(i))
   }
+
   return Promise.all(promises)
 }
 
@@ -60,9 +65,11 @@ export async function fetchReservesOrZero(pair: Contract, blockTag: number): Pro
 // fetch the price of a token in a uniswap v2 pool
 export async function fetchUniswapV2PriceOrZero(pair: Contract, oneZero: boolean, decimals0: number, decimals1: number, blockTag: number): Promise<number> {
   return new Promise((resolve, reject) => {
-    withBackoffRetries(() => pair.getReserves({blockTag:blockTag})).then(reserves => {
+    withBackoffRetries(() => pair.getReserves({blockTag:blockTag}))
+    .then(reserves => {
       resolve(calculateUniswapV2PriceOrZero(reserves._reserve0, reserves._reserve1, oneZero, decimals0, decimals1))
-    }).catch(()=>{resolve(0.0)})
+    })
+    .catch(()=>{resolve(0.0)})
   })
 }
 
@@ -77,6 +84,7 @@ function calculateUniswapV2PriceOrZero(reserve0: BigNumber, reserve1: BigNumber,
     return price
   }
 }
+
 exports.calculateUniswapV2PriceOrZero = calculateUniswapV2PriceOrZero
 
 const ONE_ETHER = BigNumber.from("1000000000000000000")

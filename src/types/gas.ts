@@ -1,25 +1,21 @@
-export type GasConfiguration =
-  | {
-      maxFeePerGas?: undefined
-      type?: undefined
-      gasPrice?: undefined
-      gasLimit?: undefined
-    }
-  | {
-      maxFeePerGas: number
-      type: number
-      gasPrice?: undefined
-      gasLimit?: number | undefined
-    }
-| {
-    gasPrice: number
-    maxFeePerGas?: undefined
-    type?: undefined
-    gasLimit?: number | undefined
-  }
+import { BigNumber } from "ethers"
+
+export type GasConfiguration ={
+  gasPrice?: number
+  maxFeePerGas?: number
+  maxPriorityFeePerGas?: number
+  type?: number
+  gasLimit?: number
+}
 
 export type GasArgs = {
   connector?: string
   gasLimit?: number
   gasForTestnet?: boolean
+}
+
+export interface FeeData {
+  maxFeePerGas: null | BigNumber;
+  maxPriorityFeePerGas: null | BigNumber;
+  gasPrice: null | BigNumber;
 }

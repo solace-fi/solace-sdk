@@ -16,6 +16,7 @@ import WMATIC from '../abis/WMATIC.json'
 import { withBackoffRetries } from "../utils";
 import { BondTellerDetails } from "../types/bond";
 import { Price } from "./price";
+import { getProvider } from "../utils/ethers";
 
 
 export class Bond {
@@ -28,18 +29,18 @@ export class Bond {
         let fetchedPriceMappingPromise: Promise<typeof fetchedPriceMapping>
 
         if (chainId == 137) {
-            provider = new providers.JsonRpcProvider("https://polygon-rpc.com")
+            provider = getProvider("https://polygon-rpc.com")
             fetchedPriceMappingPromise = withBackoffRetries(async () => price_obj.getPolygonPrices())
         } else if (chainId == 80001) {
-            provider = new providers.JsonRpcProvider("https://matic-mumbai.chainstacklabs.com")
+            provider = getProvider("https://matic-mumbai.chainstacklabs.com")
             fetchedPriceMappingPromise = withBackoffRetries(async () => price_obj.getPolygonPrices())
         }
         else if (chainId == 1313161554) {
-            provider = new providers.JsonRpcProvider("https://mainnet.aurora.dev")
+            provider = getProvider("https://mainnet.aurora.dev")
             fetchedPriceMappingPromise = withBackoffRetries( async () => price_obj.getAuroraPrices())
         } 
         else if (chainId == 1313161555) {
-            provider = new providers.JsonRpcProvider("https://testnet.aurora.dev")
+            provider = getProvider("https://testnet.aurora.dev")
             fetchedPriceMappingPromise = withBackoffRetries( async () => price_obj.getAuroraPrices())
         }
         else {

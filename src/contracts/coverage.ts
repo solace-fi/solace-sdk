@@ -1,4 +1,4 @@
-import { BigNumber as BN, providers, Wallet, Contract, getDefaultProvider, utils, BigNumber } from 'ethers'
+import { BigNumber as BN, providers, Wallet, Contract, getDefaultProvider, utils, BigNumberish } from 'ethers'
 const { getNetwork } = providers
 import invariant from 'tiny-invariant'
 import SolaceCoverProduct from "../abis/SolaceCoverProduct.json"
@@ -55,20 +55,20 @@ export class Coverage {
      */
      public async activatePolicy(
         policyholder: string,
-        coverLimit: BN,
-        amount: BN,
+        coverLimit: BigNumberish,
+        amount: BigNumberish,
         referralCode: utils.BytesLike,
-        chains?: number[],
+        chains?: BigNumberish[],
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(policyholder), "not an Ethereum address")
         invariant(policyholder != ZERO_ADDRESS, "cannot enter zero address policyholder")
-        invariant(coverLimit.gt(0), "cannot enter zero cover limit")
+        invariant(BN.from(coverLimit).gt(0), "cannot enter zero cover limit")
         
         if (typeof(chains) !== 'undefined') {
             for (let chain of chains) {
-                invariant(isNetworkSupported(chain),"not a supported chainID")
+                invariant(isNetworkSupported(BN.from(chain).toNumber()),"not a supported chainID")
             }
         }
 
@@ -90,12 +90,12 @@ export class Coverage {
      * @param referralCode_ The referral code.
      */
     public async updateCoverLimit(
-        newCoverLimit: BN,
+        newCoverLimit: BigNumberish,
         referralCode: utils.BytesLike,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
-        invariant(newCoverLimit.gt(0), "cannot enter zero cover limit")
+        invariant(BN.from(newCoverLimit).gt(0), "cannot enter zero cover limit")
         const tx: providers.TransactionResponse = await this.solaceCoverProduct.updateCoverLimit(newCoverLimit, referralCode, {...gasConfig})
         return tx
     }
@@ -107,7 +107,7 @@ export class Coverage {
      */
     public async deposit(
         policyholder: string,
-        amount: BN,
+        amount: BigNumberish,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
@@ -188,7 +188,7 @@ export class Coverage {
      * @param policyID The policy ID.
      * @returns The cover limit for the given policy ID.
      */
-    public async coverLimitOf(policyID: number): Promise<BN> {
+    public async coverLimitOf(policyID: BigNumberish): Promise<BN> {
         return (await this.solaceCoverProduct.coverLimitOf(policyID))
     }
 
@@ -206,7 +206,7 @@ export class Coverage {
      * @param policyID The policy ID.
      * @returns True if policy is active. False if policy is inactive, or does not exist.
      */
-    public async policyStatus(policyID: number): Promise<boolean> {
+    public async policyStatus(policyID: BigNumberish): Promise<boolean> {
         return (await this.solaceCoverProduct.policyStatus(policyID))
     }
 
@@ -215,7 +215,7 @@ export class Coverage {
      * @param policyID The policy ID.
      * @returns Array of chainIDs that the policy has been purchased for
      */
-    public async getPolicyChainInfo(policyID: number): Promise<boolean> {
+    public async getPolicyChainInfo(policyID: BigNumberish): Promise<boolean> {
         invariant(this.chainID == 137 || 80001, 'cannot call this function for chainId other than 137 or 80001')
         return (await this.solaceCoverProduct.getPolicyChainInfo(policyID))
     }
@@ -225,9 +225,9 @@ export class Coverage {
      * @param policyID The policy ID.
      * @returns Array of chainIDs that the policy has been purchased for
      */
-    public async getChain(chainIndex: number): Promise<boolean> {
+    public async getChain(chainIndex: BigNumberish): Promise<boolean> {
         invariant(this.chainID == 137 || 80001, 'cannot call this function for chainId other than 137 or 80001')
-        return (await this.solaceCoverProduct.getChain(BigNumber.from(chainIndex)))
+        return (await this.solaceCoverProduct.getChain(chainIndex))
     }
 
             /**

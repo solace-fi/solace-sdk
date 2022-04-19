@@ -1,5 +1,4 @@
-import { BOND_TELLER_ADDRESSES } from "../constants";
-// import { Contract as MultiCallContract, Provider } from 'ethers-multicall';
+import { BOND_TELLER_ADDRESSES, MasterTokenList } from "../constants";
 import { getDefaultProvider, providers, Contract } from "ethers";
 const { getNetwork } = providers
 const ethers = require('ethers')
@@ -49,6 +48,7 @@ export class Bond {
         }
 
         let teller: {addr: string, token: string}[] = []
+        
         Object.keys(BOND_TELLER_ADDRESSES).forEach((key) => {
             if(BOND_TELLER_ADDRESSES[key][chainId] != undefined) {
                 teller.push({addr: BOND_TELLER_ADDRESSES[key][chainId], token: key})
@@ -56,7 +56,6 @@ export class Bond {
         })
 
         const data = await Promise.all(teller.map(async (t) => {
-
             let bondTellerAbi = null
 
             if (t.token == 'eth' && chainId == 1 || 4 || 42 || 1313161554 || 1313161555 ) {
@@ -69,7 +68,7 @@ export class Bond {
     
             const tellerContract = new Contract(t.addr, bondTellerAbi, provider)
 
-            const [principalAddr, bondPrice, vestingTermInSeconds, capacity, maxPayout, _] = await Promise.all([
+            const [principalAddr, bondPrice, vestingTermInSeconds, capacity, maxPayout] = await Promise.all([
                 withBackoffRetries(async () => tellerContract.principal()),
                 withBackoffRetries(async () => tellerContract.bondPrice()),
                 withBackoffRetries(async () => tellerContract.globalVestingTerm()),
@@ -98,15 +97,14 @@ export class Bond {
 
             const principalContract = new Contract(principalAddr, principalAbi, provider)
 
-            const [decimals, name, symbol] = await Promise.all([
-                principalContract.decimals(),
-                principalContract.name(),
-                principalContract.symbol(),
-            ])
+            const {decimals, name, symbol} = MasterTokenList[chainId][t.token]
 
             let usdBondPrice = 0
             let solacePrice = 0
 
+            // Why do we are we repeating network calls: 
+            // getCoingeckoPrice() to obtain the parameter - apiPriceMapping
+            // Then getMainnetPrices/getAuroraPrices/getPolygonPrices again within this function
             if(fetchedPriceMapping[symbol.toLowerCase()]) {
                 const price: number = fetchedPriceMapping[symbol.toLowerCase()]
                 usdBondPrice = price * parseFloat(formatUnits(bondPrice, decimals))
@@ -146,6 +144,7 @@ export class Bond {
             }
             return d
         }))
+        
         return data
     }
 }

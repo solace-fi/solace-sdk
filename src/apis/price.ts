@@ -32,7 +32,6 @@ export class Price {
 
         await axios.get('https://stats.solace.fi/analytics/').then((data: any) => {
             const markets = data.data.markets
-
             const set1 = reformatData(markets['1'], "mainnet")
             price_set.push({ chainId: 1, price: set1[set1.length - 1].mainnet})
             const set137 = reformatData(markets['137'], "polygon")

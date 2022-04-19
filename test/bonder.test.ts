@@ -1,4 +1,4 @@
-import { Contract, getDefaultProvider, providers, BigNumber as BN } from "ethers"
+import { Contract, getDefaultProvider, providers, BigNumber as BN, BigNumberish } from "ethers"
 const { getNetwork } = providers
 import { Bonder, BOND_TELLER_ADDRESSES } from "../src"
 
@@ -32,7 +32,8 @@ describe("Bonder", () => {
         })
 
         test("#bondPrice - gets the same value as directly querying mainnet contract", async () => {
-            expect(await bond_teller_dai_contract.bondPrice()).toEqual(await bonder.bondPrice());
+            expectClose(await bond_teller_dai_contract.bondPrice(), await bonder.bondPrice(), 1e14)
+            // expect(await bond_teller_dai_contract.bondPrice()).toEqual(await bonder.bondPrice());
         })
         
         test("#calculateAmountOut - gets the same value as directly querying mainnet contract", async () => {
@@ -56,7 +57,8 @@ describe("Bonder", () => {
         })
 
         test("#bondPrice - gets the same value as directly querying mainnet contract", async () => {
-            expect(await bond_teller_matic_contract.bondPrice()).toEqual(await bonder.bondPrice());
+            expectClose(await bond_teller_matic_contract.bondPrice(), await bonder.bondPrice(), 1e14)
+            // expect(await bond_teller_matic_contract.bondPrice()).toEqual(await bonder.bondPrice());
         })
         
         test("#calculateAmountOut - gets the same value as directly querying mainnet contract", async () => {
@@ -72,7 +74,7 @@ describe("Bonder", () => {
     Aurora Mainnet View Functions
     **********************************/
 
-    describe("Matic mainnet MATIC-teller", () => {
+    describe("Aurora mainnet WNEAR-teller", () => {
         beforeEach(() => {
             provider = new providers.JsonRpcProvider("https://mainnet.aurora.dev")
             bond_teller_wnear_contract = new Contract(BOND_TELLER_ADDRESSES["wnear"][1313161554], BondTellerErc20, provider)
@@ -80,7 +82,8 @@ describe("Bonder", () => {
         })
 
         test("#bondPrice - gets the same value as directly querying mainnet contract", async () => {
-            expect(await bond_teller_wnear_contract.bondPrice()).toEqual(await bonder.bondPrice());
+            expectClose(await bond_teller_wnear_contract.bondPrice(), await bonder.bondPrice(), 1e14)
+            // expect(await bond_teller_wnear_contract.bondPrice()).toEqual(await bonder.bondPrice());
         })
         
         test("#calculateAmountOut - gets the same value as directly querying mainnet contract", async () => {
@@ -94,3 +97,15 @@ describe("Bonder", () => {
 
 })
 
+// Copied from https://github.com/solace-fi/solace-core/blob/main/test/utilities/math.ts
+// asserts (expected-delta) <= actual <= expected+delta
+export function expectClose(actual: BigNumberish, expected: BigNumberish, delta: BigNumberish) {
+    let a = BN.from(actual);
+    let e = BN.from(expected);
+    let d = BN.from(delta);
+    let l = e.sub(d);
+    let r = e.add(d);
+    let b = a.gte(l) && a.lte(r);
+    // let m = `Expected ${a.toString()} to be within ${d.toString()} of ${e.toString()}`;
+    expect(b).toEqual(true);
+  }

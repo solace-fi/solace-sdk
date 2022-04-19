@@ -1,4 +1,4 @@
-import { BigNumber as BN, Contract, providers, Wallet, utils, getDefaultProvider, BigNumber } from 'ethers'
+import { BigNumber as BN, Contract, providers, Wallet, utils, getDefaultProvider, BigNumberish } from 'ethers'
 const { getNetwork } = providers
 import BondTellerErc20 from "../abis/BondTellerErc20.json"
 import BondTellerEth from "../abis/BondTellerEth.json"
@@ -83,7 +83,7 @@ export class Bonder {
      * @param stake True to stake, false to not stake.
      * @return amountOut Amount of SOLACE out.
      */
-     public async calculateAmountOut(amountIn: BN, stake: boolean): Promise<BN> {
+     public async calculateAmountOut(amountIn: BigNumberish, stake: boolean): Promise<BN> {
         return (await this.bondTeller.calculateAmountOut(amountIn, stake))
     }
 
@@ -93,7 +93,7 @@ export class Bonder {
      * @param stake True to stake, false to not stake.
      * @return amountIn Amount of principal to deposit.
      */
-     public async calculateAmountIn(amountOut: BN, stake: boolean): Promise<BN> {
+     public async calculateAmountIn(amountOut: BigNumberish, stake: boolean): Promise<BN> {
         return (await this.bondTeller.calculateAmountIn(amountOut, stake))
     }
 
@@ -128,8 +128,8 @@ export class Bonder {
      * @param stake True to stake, false to not stake.
      */
      public async deposit(
-        deposit: BN,
-        minAmountOut: BN,
+        deposit: BigNumberish,
+        minAmountOut: BigNumberish,
         depositor: string,
         stake: boolean,
         gasConfig?: GasConfiguration
@@ -157,11 +157,11 @@ export class Bonder {
      * @param s secp256k1 signature
      */
      public async depositSigned(
-        deposit: BN,
-        minAmountOut: BN,
+        deposit: BigNumberish,
+        minAmountOut: BigNumberish,
         depositor: string,
         stake: boolean,
-        deadline: BN,
+        deadline: BigNumberish,
         v: utils.BytesLike,
         r: utils.BytesLike,
         s: utils.BytesLike,
@@ -189,8 +189,8 @@ export class Bonder {
      * @param stake True to stake, false to not stake.
      */
      public async depositEth(
-        deposit: BN,
-        minAmountOut: BN,
+        deposit: BigNumberish,
+        minAmountOut: BigNumberish,
         depositor: string,
         stake: boolean,
         gasConfig?: GasConfiguration
@@ -212,8 +212,8 @@ export class Bonder {
      * @param stake True to stake, false to not stake.
      */
      public async depositWeth(
-        deposit: BN,
-        minAmountOut: BN,
+        deposit: BigNumberish,
+        minAmountOut: BigNumberish,
         depositor: string,
         stake: boolean,
         gasConfig?: GasConfiguration
@@ -241,11 +241,11 @@ export class Bonder {
      * @param s secp256k1 signature
      */
      public async depositWethSigned(
-        deposit: BN,
-        minAmountOut: BN,
+        deposit: BigNumberish,
+        minAmountOut: BigNumberish,
         depositor: string,
         stake: boolean,
-        deadline: BN,
+        deadline: BigNumberish,
         v: utils.BytesLike,
         r: utils.BytesLike,
         s: utils.BytesLike,
@@ -272,8 +272,8 @@ export class Bonder {
      * @param stake True to stake, false to not stake.
      */
      public async depositMatic(
-        deposit: BN,
-        minAmountOut: BN,
+        deposit: BigNumberish,
+        minAmountOut: BigNumberish,
         depositor: string,
         stake: boolean,
         gasConfig?: GasConfiguration
@@ -295,8 +295,8 @@ export class Bonder {
      * @param stake True to stake, false to not stake.
      */
      public async depositWmatic(
-        deposit: BN,
-        minAmountOut: BN,
+        deposit: BigNumberish,
+        minAmountOut: BigNumberish,
         depositor: string,
         stake: boolean,
         gasConfig?: GasConfiguration
@@ -324,11 +324,11 @@ export class Bonder {
      * @param s secp256k1 signature
      */
      public async depositWmaticSigned(
-        deposit: BN,
-        minAmountOut: BN,
+        deposit: BigNumberish,
+        minAmountOut: BigNumberish,
         depositor: string,
         stake: boolean,
-        deadline: BN,
+        deadline: BigNumberish,
         v: utils.BytesLike,
         r: utils.BytesLike,
         s: utils.BytesLike,

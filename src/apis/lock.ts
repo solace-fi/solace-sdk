@@ -2,13 +2,12 @@ import axios from "axios"
 import { BigNumber, Contract, providers, getDefaultProvider } from 'ethers'
 const { getNetwork } = providers
 import { formatUnits } from "ethers/lib/utils"
-import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS } from "../constants"
+import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS, ZERO_ADDRESS } from "../constants"
 import xsLocker from '../abis/xsLocker.json'
 import stakingRewards from '../abis/StakingRewards.json'
-import { rangeFrom0, withBackoffRetries } from "../utils"
+import { withBackoffRetries } from "../utils"
 import { getProvider } from "../utils/ethers"
 import { LockData, UserLocksInfo, GlobalLockInfo, UserLocksData } from "../types/lock"
-import { MulticallContract, MulticallProvider } from "../utils/multicall";
 
 export class Lock {
     public async getXsLocker() {
@@ -59,7 +58,7 @@ export class Lock {
         })
     }
 
-    public async getGlobalLockStats (chainId: number): Promise<GlobalLockInfo> {
+    public async getGlobalLockStats (chainId: number): Promise<GlobalLockInfo> {      
       const xslAddr = XSLOCKER_ADDRESS[chainId]
       const srAddr = STAKING_REWARDS_ADDRESS[chainId]
       if (!xslAddr || !srAddr) return {
@@ -71,41 +70,50 @@ export class Lock {
         successfulFetch: false
       }
 
-      let _provider = null
-      let _provider_multicall = null
-
+      let _provider: any = null
+      
       if (chainId == 137) {
           _provider = getProvider("https://polygon-rpc.com")
-          _provider_multicall = new MulticallProvider(_provider, chainId)
       } else if (chainId == 1313161554) {
           _provider = getProvider("https://mainnet.aurora.dev")
-          _provider_multicall = new MulticallProvider(_provider, chainId)
       } else {
           _provider = getDefaultProvider(getNetwork(chainId))
-          _provider_multicall = new MulticallProvider(_provider, chainId)
       }
 
-      const xsl_multicall = new MulticallContract(xslAddr, xsLocker)
-      const sr_multicall = new MulticallContract(srAddr, stakingRewards)
       const xsl = new Contract(xslAddr, xsLocker, _provider)
+      const sr = new Contract(srAddr, stakingRewards, _provider)
       let totalSolaceStaked = BigNumber.from(0)
 
-      const [blockTag, [rewardPerSecond, valueStaked, numlocks]] = await Promise.all([
+      const filterLockCreated = xsl.filters.LockCreated()
+      const filterLockBurned = xsl.filters.Transfer(null, ZERO_ADDRESS)
+
+      // Ran trials with Multicall vs Promise.all, Promise.all is on average 1s faster
+      // Syntax for Multicall slightly more convoluted
+      // The concern with Promise.all is that we aren't getting info from the same block
+      // But surely if you commence all your network requests at the same time, you can be reasonably sure that they will return information for the same block?
+      const [blockTag, rewardPerSecond, valueStaked, lockCreatedEvents, lockBurnedEvents] = await Promise.all([
         _provider.getBlockNumber(),
-        _provider_multicall.all([
-          sr_multicall.rewardPerSecond(), // across all locks
-          sr_multicall.valueStaked(), // across all locks
-          xsl_multicall.totalSupply(),
-        ])
+        sr.rewardPerSecond(), // across all locks
+        sr.valueStaked(), // across all locks
+        xsl.queryFilter(filterLockCreated),
+        xsl.queryFilter(filterLockBurned)
       ])
 
-      const indices = rangeFrom0(numlocks.toNumber())
+      const xsLockIDs_burned = []
 
-      const xsLockIDs = await Promise.all(
-        indices.map(async (index) => {
-          return await withBackoffRetries(async () => xsl.tokenByIndex(index, { blockTag: blockTag }))
-        })
-      )
+      for (const event of lockBurnedEvents) {
+        xsLockIDs_burned.push(event.args?.tokenId.toNumber())
+      }
+
+      const xsLockIDs = []
+
+      for (const event of lockCreatedEvents) {
+        if (!xsLockIDs_burned.includes(event.args?.xsLockID.toNumber())) {
+          xsLockIDs.push(event.args?.xsLockID.toNumber())
+        } 
+      }
+
+      const numlocks = xsLockIDs.length
 
       const locks = await Promise.all(
         xsLockIDs.map(async (xsLockID) => {
@@ -161,9 +169,8 @@ export class Lock {
       const xsl = new Contract(xslAddr, xsLocker, _provider)
       const sr = new Contract(srAddr, stakingRewards, _provider)
 
-      // const blockTag = await _provider.getBlockNumber()
-      // const latestBlock = await _provider.getBlock(blockTag)
-      // const timestamp = latestBlock.timestamp
+      const filterLockCreated = xsl.filters.Transfer(ZERO_ADDRESS, address)
+      const filterLockBurned = xsl.filters.Transfer(address, ZERO_ADDRESS)
 
       // Is getting the timestamp from the last block, worth waiting for 2 API requests?
       const timestamp = Math.floor ( new Date().getTime() / 1000 )
@@ -174,29 +181,33 @@ export class Lock {
       let pendingRewards = BigNumber.from(0)
       let userValue = BigNumber.from(0) // measured in SOLACE * rewards multiplier
 
-      const [rewardPerSecond, valueStaked, numLocks] = await Promise.all([
-        withBackoffRetries(async () => sr.rewardPerSecond()), // across all locks
-        withBackoffRetries(async () => sr.valueStaked()), // across all locks from all users
-        withBackoffRetries(async () => xsl.balanceOf(address)),
+      const [rewardPerSecond, valueStaked, lockCreatedEvents, lockBurnedEvents] = await Promise.all([
+        sr.rewardPerSecond(), // across all locks
+        sr.valueStaked(), // across all locks from all users
+        xsl.queryFilter(filterLockCreated),
+        xsl.queryFilter(filterLockBurned)
       ])
-      const indices = rangeFrom0(numLocks)
 
-      const xsLockIDs = await Promise.all(
-        indices.map(async (index) => {
-          return await withBackoffRetries(async () => xsl.tokenOfOwnerByIndex(address, index))
-        })
-      )
+      const xsLockIDs_burned = []
+
+      for (const event of lockBurnedEvents) {
+        xsLockIDs_burned.push(event.args?.tokenId.toNumber())
+      }
+
+      const xsLockIDs = []
+
+      for (const event of lockCreatedEvents) {
+        if (!xsLockIDs_burned.includes(event.args?.tokenId.toNumber())) {
+          xsLockIDs.push(event.args?.tokenId.toNumber())
+        } 
+      }
 
       const locks: LockData[] = await Promise.all(
         xsLockIDs.map(async (xsLockID) => {
-          // const rewards: BigNumber = await withBackoffRetries(async () => sr.pendingRewardsOfLock(xsLockID))
-          // const lock = await withBackoffRetries(async () => xsl.locks(xsLockID))
-          // const stakedLock = await withBackoffRetries(async () => sr.stakedLockInfo(xsLockID))
-
           const [rewards, lock, stakedLock] = await Promise.all([
-            withBackoffRetries(async () => sr.pendingRewardsOfLock(xsLockID)),
-            withBackoffRetries(async () => xsl.locks(xsLockID)),
-            withBackoffRetries(async () => sr.stakedLockInfo(xsLockID))
+            withBackoffRetries(async() =>  sr.pendingRewardsOfLock(xsLockID) ),
+            withBackoffRetries(async() =>  xsl.locks(xsLockID) ),
+            withBackoffRetries(async() =>  sr.stakedLockInfo(xsLockID ))
           ])
 
           const timeLeft: BigNumber = lock.end.gt(timestamp) ? lock.end.sub(timestamp) : BigNumber.from(0)
@@ -204,7 +215,9 @@ export class Lock {
           const yearlyReturns: BigNumber = valueStaked.gt(BigNumber.from(0))
             ? rewardPerSecond.mul(BigNumber.from(31536000)).mul(stakedLock.value).div(valueStaked)
             : BigNumber.from(0)
+
           const apr: BigNumber = lock.amount.gt(BigNumber.from(0)) ? yearlyReturns.mul(100).div(lock.amount) : BigNumber.from(0)
+
           const _lock: LockData = {
             xsLockID: xsLockID,
             unboostedAmount: lock.amount,
@@ -214,9 +227,11 @@ export class Lock {
             pendingRewards: rewards,
             apr: apr,
           }
+
           return _lock
         })
       )
+
       locks.forEach((lock) => {
         pendingRewards = pendingRewards.add(lock.pendingRewards)
         stakedBalance = stakedBalance.add(lock.unboostedAmount)
@@ -224,10 +239,13 @@ export class Lock {
         else unlockedBalance = unlockedBalance.add(lock.unboostedAmount)
         userValue = userValue.add(lock.boostedValue)
       })
+
       const userYearlyReturns: BigNumber = valueStaked.gt(BigNumber.from(0))
         ? rewardPerSecond.mul(BigNumber.from(31536000)).mul(userValue).div(valueStaked)
         : BigNumber.from(0)
+
       const userApr: BigNumber = stakedBalance.gt(BigNumber.from(0)) ? userYearlyReturns.mul(100).div(stakedBalance) : BigNumber.from(0)
+
       const userInfo: UserLocksInfo = {
         pendingRewards: pendingRewards,
         stakedBalance: stakedBalance,
@@ -236,11 +254,13 @@ export class Lock {
         yearlyReturns: userYearlyReturns,
         apr: userApr,
       }
+
       const data = {
         user: userInfo,
         locks: locks,
         successfulFetch: true,
       }
+
       return data
     }
 }

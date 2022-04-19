@@ -8,8 +8,10 @@ import { Price } from './price'
 export class UnderwritingPoolBalances {
 
   public async getBalances_Mainnet() {
+
     const provider = getDefaultProvider(getNetwork(1))
     const blockTag = await provider.getBlockNumber()
+
     let res = []
 
     const tokenList = [
@@ -119,9 +121,6 @@ export class UnderwritingPoolUSDBalances {
   public async getUSDBalances_Mainnet() {
     const uwpbObj = new UnderwritingPoolBalances()
     const priceObj = new Price()
-    // const balances = await withBackoffRetries(async () => uwpbObj.getBalances_Mainnet())
-    // const prices = await withBackoffRetries(async () => priceObj.getMainnetPrices())
-    // const tokenPrices = await withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices())
     
     const [ balances, prices, tokenPrices ] = await Promise.all([
       withBackoffRetries(async () => uwpbObj.getBalances_Mainnet()),

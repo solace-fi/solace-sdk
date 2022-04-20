@@ -90,39 +90,3 @@ export const GAS_TOKEN: { [chainID : number]: string } = {
     [137] : "matic-network", // Polygon
     [1313161554] : "ethereum", // Aurora
 }
-
-const MainnetTokenList: {[ token: string]: {name: string, symbol: string, decimals: number} } = {
-    ['dai']: {name: 'Dai Stablecoin', symbol: 'DAI', decimals: 18},
-    ['usdc']: {name: 'USD Coin', symbol: 'USDC', decimals: 6},
-    ['usdt']: {name: 'Tether USD', symbol: 'USDT', decimals: 6},
-    ['eth']: {name: 'Wrapped Ether', symbol: 'WETH', decimals: 18},
-    ['wbtc']: {name: 'Wrapped BTC', symbol: 'WBTC', decimals: 8},
-    ['frax']: {name: 'Frax', symbol: 'FRAX', decimals: 18},
-}
-
-const PolygonTokenList: {[ token: string]: {name: string, symbol: string, decimals: number} } = {
-    ['dai']: {name: '(PoS) Dai Stablecoin', symbol: 'DAI', decimals: 18},
-    ['usdc']: {name: 'USD Coin (PoS)', symbol: 'USDC', decimals: 6},
-    ['usdt']: {name: '(PoS) Tether USD', symbol: 'USDT', decimals: 6},
-    ['eth']: {name: 'Wrapped Ether', symbol: 'WETH', decimals: 18},
-    ['wbtc']: {name: '(PoS) Wrapped BTC', symbol: 'WBTC', decimals: 8},
-    ['frax']: {name: 'Frax', symbol: 'FRAX', decimals: 18},
-    ['matic']: {name: 'Wrapped Matic', symbol: 'WMATIC', decimals: 18},
-}
-
-const AuroraTokenList: {[ token: string]: {name: string, symbol: string, decimals: number} } = {
-    ['dai']: {name: 'Dai Stablecoin', symbol: 'DAI', decimals: 18},
-    ['usdc']: {name: 'USD Coin', symbol: 'USDC', decimals: 6},
-    ['usdt']: {name: 'Tether USD', symbol: 'USDT', decimals: 6},
-    ['eth']: {name: 'Wrapped Ether', symbol: 'WETH', decimals: 18},
-    ['wbtc']: {name: 'Wrapped BTC', symbol: 'WBTC', decimals: 8},
-    ['frax']: {name: 'Frax', symbol: 'FRAX', decimals: 18},
-    ['wnear']: {name: 'NEAR', symbol: 'NEAR', decimals: 24},
-    ['aurora']: {name: 'Aurora', symbol: 'AURORA', decimals: 18},
-}
-
-export const MasterTokenList: { [chainId: number]: {[ token: string]: {name: string, symbol: string, decimals: number}} } = {
-    [1]: MainnetTokenList,
-    [137]: PolygonTokenList,
-    [1313161554]: AuroraTokenList
-}

@@ -1,6 +1,7 @@
-import { Contract, getDefaultProvider, providers, BigNumber as BN, BigNumberish } from "ethers"
+import { Contract, getDefaultProvider, providers, BigNumber as BN } from "ethers"
 const { getNetwork } = providers
 import { Bonder, BOND_TELLER_ADDRESSES } from "../src"
+import { expectClose } from "../src/utils/test"
 
 import BondTellerErc20 from "../src/abis/BondTellerErc20.json"
 import BondTellerEth from "../src/abis/BondTellerEth.json"
@@ -27,8 +28,8 @@ describe("Bonder", () => {
     describe("Ethereum mainnet USDT-teller", () => {
         beforeEach(() => {
             provider = getDefaultProvider(getNetwork(1)) // Note using default provider gets rate-limit notification
-            bond_teller_dai_contract = new Contract(BOND_TELLER_ADDRESSES["usdt"][1], BondTellerEth, provider)
-            bonder = new Bonder(1, "usdt", provider);
+            bond_teller_dai_contract = new Contract(BOND_TELLER_ADDRESSES["usdt"][1].addr, BondTellerEth, provider)
+            bonder = new Bonder(1, {contract: bond_teller_dai_contract, type: BOND_TELLER_ADDRESSES["usdt"][1].type}, provider);
         })
 
         test("#bondPrice - gets the same value as directly querying mainnet contract", async () => {
@@ -52,8 +53,8 @@ describe("Bonder", () => {
     describe("Matic mainnet MATIC-teller", () => {
         beforeEach(() => {
             provider = new providers.JsonRpcProvider("https://polygon-rpc.com")
-            bond_teller_matic_contract = new Contract(BOND_TELLER_ADDRESSES["matic"][137], BondTellerMatic, provider)
-            bonder = new Bonder(137, "matic", provider);
+            bond_teller_matic_contract = new Contract(BOND_TELLER_ADDRESSES["matic"][137].addr, BondTellerMatic, provider)
+            bonder = new Bonder(137, {contract: bond_teller_matic_contract, type: BOND_TELLER_ADDRESSES["matic"][137].type }, provider);
         })
 
         test("#bondPrice - gets the same value as directly querying mainnet contract", async () => {
@@ -77,8 +78,8 @@ describe("Bonder", () => {
     describe("Aurora mainnet WNEAR-teller", () => {
         beforeEach(() => {
             provider = new providers.JsonRpcProvider("https://mainnet.aurora.dev")
-            bond_teller_wnear_contract = new Contract(BOND_TELLER_ADDRESSES["wnear"][1313161554], BondTellerErc20, provider)
-            bonder = new Bonder(1313161554, "wnear", provider);
+            bond_teller_wnear_contract = new Contract(BOND_TELLER_ADDRESSES["wnear"][1313161554].addr, BondTellerErc20, provider)
+            bonder = new Bonder(1313161554, { contract: bond_teller_wnear_contract, type: BOND_TELLER_ADDRESSES["wnear"][1313161554].type }, provider);
         })
 
         test("#bondPrice - gets the same value as directly querying mainnet contract", async () => {
@@ -96,16 +97,3 @@ describe("Bonder", () => {
     })
 
 })
-
-// Copied from https://github.com/solace-fi/solace-core/blob/main/test/utilities/math.ts
-// asserts (expected-delta) <= actual <= expected+delta
-export function expectClose(actual: BigNumberish, expected: BigNumberish, delta: BigNumberish) {
-    let a = BN.from(actual);
-    let e = BN.from(expected);
-    let d = BN.from(delta);
-    let l = e.sub(d);
-    let r = e.add(d);
-    let b = a.gte(l) && a.lte(r);
-    // let m = `Expected ${a.toString()} to be within ${d.toString()} of ${e.toString()}`;
-    expect(b).toEqual(true);
-  }

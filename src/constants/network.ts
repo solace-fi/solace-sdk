@@ -39,4 +39,5 @@ export const DEFAULT_ENDPOINT: { [chainID : number]: string } = {
     [137] : "https://polygon-rpc.com", // Polygon
     [80001] : "https://matic-mumbai.chainstacklabs.com", // Polygon Testnet
     [1313161554] : "https://mainnet.aurora.dev/", // Aurora
+    [1313161555] : "https://testnet.aurora.dev/", // Aurora Testnet
 } 

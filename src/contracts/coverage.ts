@@ -13,7 +13,7 @@ export class Coverage {
     solaceCoverProduct: Contract;
 
     constructor(chainID: number, walletOrProviderOrSigner?: Wallet | providers.JsonRpcSigner | providers.Provider) {
-        invariant(isNetworkSupported(chainID),"not a supported chainID")
+        invariant(SOLACE_COVER_PRODUCT_ADDRESS[chainID],"not a supported chainID")
         this.chainID = chainID;
 
         if (typeof(walletOrProviderOrSigner) == 'undefined') {
@@ -23,8 +23,6 @@ export class Coverage {
                 this.walletOrProviderOrSigner = getProvider("https://polygon-rpc.com")
             } else if (chainID == 80001) {
                 this.walletOrProviderOrSigner = getProvider("https://matic-mumbai.chainstacklabs.com")
-            } else if (chainID == 1313161554) {
-                this.walletOrProviderOrSigner = getProvider("https://mainnet.aurora.dev")
             } else {
                 this.walletOrProviderOrSigner = getDefaultProvider(getNetwork(chainID))
             }
@@ -315,26 +313,28 @@ export class Coverage {
      * To fix this issue, if the last two characters of the signature are '00', replace with '0b'.
      * If the last two characters of the signature are '01', replace with '0c'.
      */
-         public async getReferralCode(): Promise<string> {
-            invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot get referral code without a signer")
-            const domain = {
-                name: "Solace.fi-SolaceCoverProduct",
-                version: "1",
-                chainId: await this.walletOrProviderOrSigner.getChainId(),
-                verifyingContract: SOLACE_COVER_PRODUCT_ADDRESS[this.chainID]
-            };
-    
-            const types = {
-                SolaceReferral: [
-                    { name: "version", type: "uint256" }
-                  ]
-            };
-    
-            const value = {
-                version: 1
-            };
-    
-            const signature = await this.walletOrProviderOrSigner._signTypedData(domain, types, value)
-            return signature
-        }
+    public async getReferralCode(): Promise<string> {
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot get referral code without a signer")
+        
+        const domain = {
+            name: "Solace.fi-SolaceCoverProduct",
+            version: "1",
+            chainId: await this.walletOrProviderOrSigner.getChainId(),
+            verifyingContract: SOLACE_COVER_PRODUCT_ADDRESS[this.chainID]
+        };   
+        
+        const types = {
+            SolaceReferral: [
+                { name: "version", type: "uint256" }
+              ]
+        };   
+        
+        const value = {
+            version: 1
+        };   
+        
+        const signature = await this.walletOrProviderOrSigner._signTypedData(domain, types, value)
+        
+        return signature
+    }
 }

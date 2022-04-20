@@ -23,29 +23,25 @@ describe('Bond', () => {
     describe('#getUserBondData', () => {
         it('will return a valid response', async () => {
             const addr = BOND_TELLER_ADDRESSES['dai'][1].addr
-            const type = BOND_TELLER_ADDRESSES['dai'][1].type
-            const res = await bond1.getUserBondData(addr, type,'0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
+            const res = await bond1.getUserBondData(addr, '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
             console.log(res)
         })
 
         it('will return a valid response', async () => {
             const addr = BOND_TELLER_ADDRESSES['eth'][1].addr
-            const type = BOND_TELLER_ADDRESSES['eth'][1].type
-            const res = await bond1.getUserBondData(addr, type,'0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
+            const res = await bond1.getUserBondData(addr, '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
             console.log(res)
         })
 
         it('will return a valid response', async () => {
             const addr = BOND_TELLER_ADDRESSES['matic'][137].addr
-            const type = BOND_TELLER_ADDRESSES['matic'][137].type
-            const res = await bond137.getUserBondData(addr, type,'0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
+            const res = await bond137.getUserBondData(addr, '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
             console.log(res)
         })
 
         it('will return a valid response', async () => {
             const addr = BOND_TELLER_ADDRESSES['weth'][137].addr
-            const type = BOND_TELLER_ADDRESSES['weth'][137].type
-            const res = await bond137.getUserBondData(addr, type,'0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
+            const res = await bond137.getUserBondData(addr, '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
             console.log(res)
         })
     })

@@ -161,7 +161,7 @@ export class Bond {
         return data
     }
 
-    public async getUserBondData(bondTellerContractAddress: string, type: 'erc20' | 'eth' | 'matic', account: string): Promise<BondToken[]> {
+    public async getUserBondData(bondTellerContractAddress: string, account: string): Promise<BondToken[]> {
         invariant(utils.isAddress(account),"account must be a valid address")
         let storedType = 'erc20'
         let found = false
@@ -174,13 +174,12 @@ export class Bond {
             }
         })
         invariant(found, 'must provide valid bond teller contract address for this chain')
-        invariant(storedType === type, 'type must match the type of the bond teller contract')
 
         let bondTeller: Contract | null = null
 
-        if (type === "eth") {
+        if (String(storedType) === "eth") {
             bondTeller = new Contract(bondTellerContractAddress, BondTellerEth, this.providerOrSigner)
-        } else if (type === "matic") {
+        } else if (String(storedType) === "matic") {
             bondTeller = new Contract(bondTellerContractAddress, BondTellerMatic, this.providerOrSigner)
         } else {
             bondTeller = new Contract(bondTellerContractAddress, BondTellerErc20, this.providerOrSigner)

@@ -30,11 +30,10 @@ export class Bonder {
      * @param chainID The chainID for the Staker object, 1 for Ethereum Mainnet.
      * @param walletOrProviderOrSigner walletOrProviderOrSigner object - a Wallet (https://docs.ethers.io/v5/api/signer/#Wallet) or a Provider (https://docs.ethers.io/v5/api/providers/) or Signer (https://docs.ethers.io/v5/api/signer/)
      * @param bondTellerContractAddress string
-     * @param bondTellerType string ("erc20" or "eth" or "matic")
      */
-     constructor(chainID: number, bondTellerContractAddress: string, bondTellerType: 'erc20' | 'eth' | 'matic', walletOrProviderOrSigner?: Wallet | providers.JsonRpcSigner | providers.Provider) {
+     constructor(chainID: number, bondTellerContractAddress: string, walletOrProviderOrSigner?: Wallet | providers.JsonRpcSigner | providers.Provider) {
         invariant(isNetworkSupported(chainID),"not a supported chainID")
-        let storedType = 'erc20'
+        let storedType: 'erc20' | 'eth' | 'matic' = 'erc20'
         let found = false
         Object.keys(BOND_TELLER_ADDRESSES).forEach((key) => {
             if(BOND_TELLER_ADDRESSES[key][chainID] != undefined) {
@@ -45,10 +44,7 @@ export class Bonder {
             }
         })
         invariant(found, 'must provide valid bond teller contract address for this chain')
-        invariant(storedType === bondTellerType, 'type must match the type of the bond teller contract')
 
-        this.chainID = chainID;
-        this.bondTellerType = bondTellerType
 
         if (typeof(walletOrProviderOrSigner) == 'undefined') {
             // ethers.js getDefaultProvider method doesn't work for MATIC or Mumbai
@@ -62,13 +58,16 @@ export class Bonder {
             this.walletOrProviderOrSigner = walletOrProviderOrSigner
         }
 
-        if (bondTellerType === "eth") {
+        if (String(storedType) === 'eth') {
             this.bondTellerContract = new Contract(bondTellerContractAddress, BondTellerEth, walletOrProviderOrSigner)
-        } else if (bondTellerType === "matic") {
+        } else if (String(storedType) === 'matic') {
             this.bondTellerContract = new Contract(bondTellerContractAddress, BondTellerMatic, walletOrProviderOrSigner)
         } else {
             this.bondTellerContract = new Contract(bondTellerContractAddress, BondTellerErc20, walletOrProviderOrSigner)
         }
+
+        this.chainID = chainID;
+        this.bondTellerType = storedType
     }
 
     /********************************

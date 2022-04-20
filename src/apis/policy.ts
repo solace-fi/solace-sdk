@@ -51,35 +51,37 @@ export class Policy {
         }
     }
 
-    public async getExistingPolicy(account: string): Promise<{ policyId: BigNumber, chainId: number }[]> {
+    public async getExistingPolicy(account: string, includeTestnets?: boolean): Promise<{ policyId: BigNumber, chainId: number }[]> {
         invariant(utils.isAddress(account),"not an Ethereum address")
 
-        const chains = [1, 4, 137, 80001]
+        const supportedChains = [1, 4, 137, 80001]
+
+        const conditionedChains = includeTestnets ? supportedChains : [1, 137]
 
         let res = []
 
-        for(let i = 0; i < chains.length; i++) {
+        for(let i = 0; i < conditionedChains.length; i++) {
 
             let provider = null
             let solaceCoverProduct = null
-            if (chains[i] == 137) {
+            if (conditionedChains[i] == 137) {
                 provider = getProvider("https://polygon-rpc.com")
-            } else if (chains[i] == 80001) {
-                provider = getProvider("https://matic-mumbai.chainstacklabs.com")
+            } else if (conditionedChains[i] == 80001) {
+                provider = getProvider("https://matic-mumbai.conditionedChainstacklabs.com")
             } else {
-                provider = getDefaultProvider(getNetwork(chains[i]))
+                provider = getDefaultProvider(getNetwork(conditionedChains[i]))
             }
             
-            if (chains[i] == 137 || 80001) {
+            if (conditionedChains[i] == 137 || 80001) {
                 // SolaceCoverProductV2 deployed on Polygon mainnet (137) and Mumbai (80001)
-                solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chains[i]], SolaceCoverProductV2, provider)
+                solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[conditionedChains[i]], SolaceCoverProductV2, provider)
             } else {
-                solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chains[i]], SolaceCoverProduct, provider)
+                solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[conditionedChains[i]], SolaceCoverProduct, provider)
             }
 
             const policyId = await solaceCoverProduct.policyOf(account)
             if (policyId.gt(BigNumber.from(0))) {
-                res.push({ policyId, chainId: chains[i] })
+                res.push({ policyId, chainId: conditionedChains[i] })
             }
         }
 

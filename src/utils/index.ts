@@ -2,6 +2,8 @@ import { getProvider, getSigner } from './ethers';
 import { getGasPrice, getGasSettings } from './gas';
 
 export * from './price'
+export * from './contract'
+export * from './api'
 
 export const solaceUtils = {
   getProvider,

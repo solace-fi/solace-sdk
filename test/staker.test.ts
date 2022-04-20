@@ -1,6 +1,7 @@
 import { Contract, getDefaultProvider, providers } from "ethers"
 const { getNetwork } = providers
 import { Staker, STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS } from "../src"
+import { expectClose } from "../src/utils/test"
 
 import xsLocker from "../src/abis/xsLocker.json"
 import StakingRewards from "../src/abis/StakingRewards.json"
@@ -63,12 +64,10 @@ describe("Staker", () => {
         })
     })
 
-    // Following test commented out because it will fail - pendingRewardsOfLock is dependent on time and because these are async calls, they can't be called at the same time
-
-    // describe("#pendingRewardsOfLock", () => {
-    //     it("gets the same value as directly querying mainnet contract", async () => {
-    //         expect(await staker.pendingRewardsOfLock(LOCKER_ID)).toEqual(await stakingRewards_contract.pendingRewardsOfLock(LOCKER_ID));
-    //     })
-    // })
+    describe("#pendingRewardsOfLock", () => {
+        it("gets the same value as directly querying mainnet contract", async () => {
+            expectClose(await staker.pendingRewardsOfLock(LOCKER_ID), await stakingRewards_contract.pendingRewardsOfLock(LOCKER_ID), 1e13)
+        })
+    })
 
 })

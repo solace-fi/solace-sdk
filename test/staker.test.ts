@@ -1,4 +1,4 @@
-import { Contract, getDefaultProvider, providers } from "ethers"
+import { BigNumber, Contract, getDefaultProvider, providers } from "ethers"
 const { getNetwork } = providers
 import { Staker, STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS } from "../src"
 
@@ -12,7 +12,7 @@ describe("Staker", () => {
     let staker = new Staker(1, provider);
 
     const STAKER_ADDRESS = "0xA400f843f0E577716493a3B0b8bC654C6EE8a8A3" // Use first policy minted
-    const LOCKER_ID = 1;
+    const LOCKER_ID = BigNumber.from(1);
 
     beforeEach(() => {
         // Avoid jest avoid timeout error

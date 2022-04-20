@@ -10,7 +10,7 @@ import uniV3PoolAbi from '../abis/uniswapV3Pool.json'
 import ERC20 from '../abis/ERC20.json'
 import { TokenToPriceMapping } from '../types'
 import { fetchCoingeckoTokenPriceById, fetchCoingeckoTokenPricesByAddr } from '../utils/api'
-import { TOKEN_ADDRESSES, UWP_ADDRESS } from '../constants'
+import { DEFAULT_ENDPOINT, TOKEN_ADDRESSES, UWP_ADDRESS } from '../constants'
 import { getProvider } from '../utils/ethers'
 
 export class Price {
@@ -88,7 +88,7 @@ export class Price {
         })
       }
 
-      const provider = getProvider("https://polygon-rpc.com")
+      const provider = getProvider(DEFAULT_ENDPOINT[137])
       const blockTag = await provider.getBlockNumber()
 
       const pools = {
@@ -111,7 +111,7 @@ export class Price {
   }
 
   public async getAuroraPrices(): Promise<{ [key: string]: number }> {
-      const provider = getProvider("https://mainnet.aurora.dev")
+      const provider = getProvider(DEFAULT_ENDPOINT[1313161554])
       const blockTag = await provider.getBlockNumber()
 
       const pools = {

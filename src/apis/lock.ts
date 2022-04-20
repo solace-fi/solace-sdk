@@ -2,15 +2,43 @@ import axios from "axios"
 import { BigNumber, Contract, providers, getDefaultProvider } from 'ethers'
 const { getNetwork } = providers
 import { formatUnits } from "ethers/lib/utils"
-import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS } from "../constants"
+import { DEFAULT_ENDPOINT, STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS } from "../constants"
 import xsLocker from '../abis/xsLocker.json'
 import stakingRewards from '../abis/StakingRewards.json'
 import { rangeFrom0, withBackoffRetries } from "../utils"
 import { getProvider } from "../utils/ethers"
 import { LockData, UserLocksInfo, GlobalLockInfo, UserLocksData } from "../types/lock"
 import { MulticallContract, MulticallProvider } from "../utils/multicall";
+import invariant from "tiny-invariant"
 
 export class Lock {
+
+    provider: providers.Provider
+    chainId: number
+    xslAddr: string
+    srAddr: string
+
+    constructor(chainId: number, provider?: providers.Provider) {
+      const xslAddr = XSLOCKER_ADDRESS[chainId]
+      const srAddr = STAKING_REWARDS_ADDRESS[chainId]
+      invariant(xslAddr, `XSLOCKER_ADDRESS[${chainId}] not found`)
+      invariant(srAddr, `STAKING_REWARDS_ADDRESS[${chainId}] not found`)
+
+      this.xslAddr = xslAddr
+      this.srAddr = srAddr
+
+      if (!provider) {
+        if (DEFAULT_ENDPOINT[chainId]) {
+          this.provider = getProvider(DEFAULT_ENDPOINT[chainId])
+        } else {
+          this.provider = getDefaultProvider(getNetwork(chainId))
+        }
+      } else {
+        this.provider = provider
+      }
+      this.chainId = chainId
+    }
+
     public async getXsLocker() {
         return await axios.get('https://stats.solace.fi/analytics/').then((data: any) => {
             const xsLocker = data.data.xslocker
@@ -59,39 +87,23 @@ export class Lock {
         })
     }
 
-    public async getGlobalLockStats (chainId: number): Promise<GlobalLockInfo> {
-      const xslAddr = XSLOCKER_ADDRESS[chainId]
-      const srAddr = STAKING_REWARDS_ADDRESS[chainId]
-      if (!xslAddr || !srAddr) return {
-        solaceStaked: '0',
-        valueStaked: '0',
-        numLocks: '0',
-        rewardPerSecond: '0',
-        apr: '0',
-        successfulFetch: false
-      }
+    public async getGlobalLockStats (): Promise<GlobalLockInfo> {
 
-      let _provider = null
       let _provider_multicall = null
 
-      if (chainId == 137) {
-          _provider = getProvider("https://polygon-rpc.com")
-          _provider_multicall = new MulticallProvider(_provider, chainId)
-      } else if (chainId == 1313161554) {
-          _provider = getProvider("https://mainnet.aurora.dev")
-          _provider_multicall = new MulticallProvider(_provider, chainId)
+      if (DEFAULT_ENDPOINT[this.chainId]) {
+          _provider_multicall = new MulticallProvider(this.provider, this.chainId)
       } else {
-          _provider = getDefaultProvider(getNetwork(chainId))
-          _provider_multicall = new MulticallProvider(_provider, chainId)
+          _provider_multicall = new MulticallProvider(this.provider, this.chainId)
       }
 
-      const xsl_multicall = new MulticallContract(xslAddr, xsLocker)
-      const sr_multicall = new MulticallContract(srAddr, stakingRewards)
-      const xsl = new Contract(xslAddr, xsLocker, _provider)
+      const xsl_multicall = new MulticallContract(this.xslAddr, xsLocker)
+      const sr_multicall = new MulticallContract(this.srAddr, stakingRewards)
+      const xsl = new Contract(this.xslAddr, xsLocker, this.provider)
       let totalSolaceStaked = BigNumber.from(0)
 
       const [blockTag, [rewardPerSecond, valueStaked, numlocks]] = await Promise.all([
-        _provider.getBlockNumber(),
+        this.provider.getBlockNumber(),
         _provider_multicall.all([
           sr_multicall.rewardPerSecond(), // across all locks
           sr_multicall.valueStaked(), // across all locks
@@ -131,35 +143,10 @@ export class Lock {
       }
     }
 
-    public async getUserLocks (chainId: number, address: string): Promise<UserLocksData> {
-      const xslAddr = XSLOCKER_ADDRESS[chainId]
-      const srAddr = STAKING_REWARDS_ADDRESS[chainId]
+    public async getUserLocks (address: string): Promise<UserLocksData> {
 
-      if (!xslAddr || !srAddr) return {
-        user: {
-          pendingRewards: BigNumber.from(0),
-          stakedBalance: BigNumber.from(0),
-          lockedBalance: BigNumber.from(0),
-          unlockedBalance: BigNumber.from(0),
-          yearlyReturns: BigNumber.from(0),
-          apr: BigNumber.from(0),
-        },
-        locks: [],
-        successfulFetch: false,
-      }
-
-      let _provider = null
-
-      if (chainId == 137) {
-          _provider = getProvider("https://polygon-rpc.com")
-      } else if (chainId == 1313161554) {
-          _provider = getProvider("https://mainnet.aurora.dev")
-      } else {
-          _provider = getDefaultProvider(getNetwork(chainId))
-      }
-
-      const xsl = new Contract(xslAddr, xsLocker, _provider)
-      const sr = new Contract(srAddr, stakingRewards, _provider)
+      const xsl = new Contract(this.xslAddr, xsLocker, this.provider)
+      const sr = new Contract(this.srAddr, stakingRewards, this.provider)
 
       // const blockTag = await _provider.getBlockNumber()
       // const latestBlock = await _provider.getBlock(blockTag)
@@ -242,5 +229,39 @@ export class Lock {
         successfulFetch: true,
       }
       return data
+    }
+
+    public async getUserLockerBalances (account: string): Promise<{ stakedBalance: string, lockedBalance: string, unlockedBalance: string }> {
+      const block = await this.provider.getBlock('latest')
+      const timestamp = block.timestamp
+
+      const xsl = new Contract(this.xslAddr, xsLocker, this.provider)
+
+      let stakedBalance = BigNumber.from(0) // staked = locked + unlocked
+      let lockedBalance = BigNumber.from(0)
+      let unlockedBalance = BigNumber.from(0)
+      const numLocks = await withBackoffRetries(async () => xsl.balanceOf(account))
+      const indices = rangeFrom0(numLocks.toNumber())
+      const xsLockIDs = await Promise.all(
+        indices.map(async (index) => {
+          return await withBackoffRetries(async () => xsl.tokenOfOwnerByIndex(account, index))
+        })
+      )
+      const locks = await Promise.all(
+        xsLockIDs.map(async (xsLockID) => {
+          return await withBackoffRetries(async () => xsl.locks(xsLockID))
+        })
+      )
+      locks.forEach((lock) => {
+        stakedBalance = stakedBalance.add(lock.amount)
+        if (lock.end.gt(timestamp)) lockedBalance = lockedBalance.add(lock.amount)
+        else unlockedBalance = unlockedBalance.add(lock.amount)
+      })
+
+      return {
+        stakedBalance: formatUnits(stakedBalance, 18),
+        lockedBalance: formatUnits(lockedBalance, 18),
+        unlockedBalance: formatUnits(unlockedBalance, 18),
+      }
     }
 }

@@ -1,6 +1,6 @@
 import { BigNumber, Contract, getDefaultProvider, providers, utils } from 'ethers'
 import invariant from 'tiny-invariant'
-import { SOLACE_COVER_PRODUCT_ADDRESS } from '../constants'
+import { DEFAULT_ENDPOINT, SOLACE_COVER_PRODUCT_ADDRESS } from '../constants'
 import { getProvider } from '../utils/ethers'
 const { getNetwork } = providers
 
@@ -13,10 +13,8 @@ export class Policy {
 
         let provider = null
         let solaceCoverProduct = null
-        if (chainId == 137) {
-            provider = getProvider("https://polygon-rpc.com")
-        } else if (chainId == 80001) {
-            provider = getProvider("https://matic-mumbai.chainstacklabs.com")
+        if (chainId == 137 || 80001) {
+            provider = getProvider(DEFAULT_ENDPOINT[chainId])
         } else {
             provider = getDefaultProvider(getNetwork(chainId))
         }
@@ -64,10 +62,8 @@ export class Policy {
 
             let provider = null
             let solaceCoverProduct = null
-            if (conditionedChains[i] == 137) {
-                provider = getProvider("https://polygon-rpc.com")
-            } else if (conditionedChains[i] == 80001) {
-                provider = getProvider("https://matic-mumbai.conditionedChainstacklabs.com")
+            if (conditionedChains[i] == 137 || 80001) {
+                provider = getProvider(DEFAULT_ENDPOINT[conditionedChains[i]])
             } else {
                 provider = getDefaultProvider(getNetwork(conditionedChains[i]))
             }

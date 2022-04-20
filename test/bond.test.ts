@@ -1,9 +1,11 @@
-import { Price } from "../src";
+import { BOND_TELLER_ADDRESSES, Price } from "../src";
 import { Bond } from "../src/apis/bond"
 
 describe('Bond', () => {
-    let bond = new Bond(1);
-    let price = new Price()
+    let bond1 = new Bond(1);
+    let bond137 = new Bond(137);
+
+    let price = new Price();
 
     beforeEach(() => {
         // Avoid jest avoid timeout error
@@ -13,7 +15,37 @@ describe('Bond', () => {
     describe('#getBondTellerData', () => {
         it('will return a valid response', async () => {
             const apiPriceMapping = await price.getCoinGeckoTokenPrices()
-            const res = await bond.getBondTellerData(apiPriceMapping)
+            const res = await bond1.getBondTellerData(apiPriceMapping)
+            console.log(res)
+        })
+    })
+
+    describe('#getUserBondData', () => {
+        it('will return a valid response', async () => {
+            const addr = BOND_TELLER_ADDRESSES['dai'][1].addr
+            const type = BOND_TELLER_ADDRESSES['dai'][1].type
+            const res = await bond1.getUserBondData(addr, type,'0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
+            console.log(res)
+        })
+
+        it('will return a valid response', async () => {
+            const addr = BOND_TELLER_ADDRESSES['eth'][1].addr
+            const type = BOND_TELLER_ADDRESSES['eth'][1].type
+            const res = await bond1.getUserBondData(addr, type,'0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
+            console.log(res)
+        })
+
+        it('will return a valid response', async () => {
+            const addr = BOND_TELLER_ADDRESSES['matic'][137].addr
+            const type = BOND_TELLER_ADDRESSES['matic'][137].type
+            const res = await bond137.getUserBondData(addr, type,'0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
+            console.log(res)
+        })
+
+        it('will return a valid response', async () => {
+            const addr = BOND_TELLER_ADDRESSES['weth'][137].addr
+            const type = BOND_TELLER_ADDRESSES['weth'][137].type
+            const res = await bond137.getUserBondData(addr, type,'0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
             console.log(res)
         })
     })

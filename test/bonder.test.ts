@@ -21,6 +21,31 @@ describe("Bonder", () => {
     })
 
     /****************************************
+    Eth Mainnet View Functions - ETH teller
+    ****************************************/
+
+    describe("Ethereum mainnet ETH-teller", () => {
+        beforeEach(() => {
+            provider = getDefaultProvider(getNetwork(1)) // Note using default provider gets rate-limit notification
+            bond_teller_dai_contract = new Contract(BOND_TELLER_ADDRESSES["eth"][1].addr, BondTellerEth, provider)
+            bonder = new Bonder(1, BOND_TELLER_ADDRESSES["eth"][1].addr, BOND_TELLER_ADDRESSES["eth"][1].type, provider);
+        })
+
+        test("#bondPrice - gets the same value as directly querying mainnet contract", async () => {
+            expect(await bond_teller_dai_contract.bondPrice()).toEqual(await bonder.bondPrice());
+        })
+        
+        test("#calculateAmountOut - gets the same value as directly querying mainnet contract", async () => {
+            expect(await bond_teller_dai_contract.calculateAmountOut(BOND_DEPOSIT, false)).toEqual(await bonder.calculateAmountOut(BOND_DEPOSIT, false));
+        })
+
+        test("#calculateAmountIn - gets the same value as directly querying mainnet contract", async () => {
+            expect(await bond_teller_dai_contract.calculateAmountIn(BOND_DEPOSIT, false)).toEqual(await bonder.calculateAmountIn(BOND_DEPOSIT, false));
+        })
+    })
+
+    
+    /****************************************
     Eth Mainnet View Functions - USDT teller
     ****************************************/
 
@@ -28,7 +53,7 @@ describe("Bonder", () => {
         beforeEach(() => {
             provider = getDefaultProvider(getNetwork(1)) // Note using default provider gets rate-limit notification
             bond_teller_dai_contract = new Contract(BOND_TELLER_ADDRESSES["usdt"][1].addr, BondTellerEth, provider)
-            bonder = new Bonder(1, {contract: bond_teller_dai_contract, type: BOND_TELLER_ADDRESSES["usdt"][1].type}, provider);
+            bonder = new Bonder(1, BOND_TELLER_ADDRESSES["usdt"][1].addr, BOND_TELLER_ADDRESSES["usdt"][1].type, provider);
         })
 
         test("#bondPrice - gets the same value as directly querying mainnet contract", async () => {
@@ -52,7 +77,7 @@ describe("Bonder", () => {
         beforeEach(() => {
             provider = new providers.JsonRpcProvider("https://polygon-rpc.com")
             bond_teller_matic_contract = new Contract(BOND_TELLER_ADDRESSES["matic"][137].addr, BondTellerMatic, provider)
-            bonder = new Bonder(137, {contract: bond_teller_matic_contract, type: BOND_TELLER_ADDRESSES["matic"][137].type }, provider);
+            bonder = new Bonder(137, BOND_TELLER_ADDRESSES["matic"][137].addr, BOND_TELLER_ADDRESSES["matic"][137].type, provider);
         })
 
         test("#bondPrice - gets the same value as directly querying mainnet contract", async () => {
@@ -76,7 +101,7 @@ describe("Bonder", () => {
         beforeEach(() => {
             provider = new providers.JsonRpcProvider("https://mainnet.aurora.dev")
             bond_teller_wnear_contract = new Contract(BOND_TELLER_ADDRESSES["wnear"][1313161554].addr, BondTellerErc20, provider)
-            bonder = new Bonder(1313161554, { contract: bond_teller_wnear_contract, type: BOND_TELLER_ADDRESSES["wnear"][1313161554].type }, provider);
+            bonder = new Bonder(1313161554, bond_teller_wnear_contract.address, BOND_TELLER_ADDRESSES["wnear"][1313161554].type, provider);
         })
 
         test("#bondPrice - gets the same value as directly querying mainnet contract", async () => {

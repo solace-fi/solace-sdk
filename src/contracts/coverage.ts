@@ -3,7 +3,7 @@ const { getNetwork } = providers
 import invariant from 'tiny-invariant'
 import SolaceCoverProduct from "../abis/SolaceCoverProduct.json"
 import SolaceCoverProductV2 from "../abis/SolaceCoverProductV2.json"
-import { SOLACE_COVER_PRODUCT_ADDRESS, ZERO_ADDRESS, isNetworkSupported } from '../constants'
+import { SOLACE_COVER_PRODUCT_ADDRESS, ZERO_ADDRESS, isNetworkSupported, DEFAULT_ENDPOINT } from '../constants'
 import { GasConfiguration } from '../types';
 import { getProvider } from '../utils/ethers'
 
@@ -19,10 +19,8 @@ export class Coverage {
         if (typeof(walletOrProviderOrSigner) == 'undefined') {
             // ethers.js getDefaultProvider method doesn't work for MATIC or Mumbai
             // Use public RPC endpoints instead
-            if (chainID == 137) {
-                this.walletOrProviderOrSigner = getProvider("https://polygon-rpc.com")
-            } else if (chainID == 80001) {
-                this.walletOrProviderOrSigner = getProvider("https://matic-mumbai.chainstacklabs.com")
+            if (chainID == 137 || 80001) {
+                this.walletOrProviderOrSigner = getProvider(DEFAULT_ENDPOINT[chainID])
             } else {
                 this.walletOrProviderOrSigner = getDefaultProvider(getNetwork(chainID))
             }

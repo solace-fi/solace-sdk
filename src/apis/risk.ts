@@ -63,7 +63,7 @@ export class Risk {
      * @returns DeFi protocol balances in USD for the address. See documentation for sample response object.
      */
 
-     public async getSolaceRiskBalances(address: string, chainIdOrChains: number | number[]): Promise<SolaceRiskBalance[] | undefined | unknown > {
+     public async getSolaceRiskBalances(address: string, chainIdOrChains: number | number[]): Promise<SolaceRiskBalance[] | undefined> {
         if (Array.isArray(chainIdOrChains)) chainIdOrChains.forEach(item => invariant(isNetworkSupported(item),"not a supported chainID"))
 
         return await axios({

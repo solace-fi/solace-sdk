@@ -1,7 +1,10 @@
-import { getDefaultProvider, providers, Contract } from "ethers";
+import { getDefaultProvider, providers, Contract, utils } from "ethers";
 import { formatUnits } from "ethers/lib/utils";
+import invariant from "tiny-invariant";
 const { getNetwork } = providers
 import ERC20 from "../abis/ERC20.json";
+import { DEFAULT_ENDPOINT } from "../constants";
+import { getProvider } from "../utils/ethers";
 
 export class SolaceBalance {
 
@@ -9,31 +12,37 @@ export class SolaceBalance {
     SOLACE_ADDRESS = "0x501acE9c35E60f03A2af4d484f49F9B1EFde9f40"
     ERC20ABI = ERC20
 
-    public async getSolaceBalanceOf(chainId: number, account: string) {
+    account: string
+
+    constructor (account: string) {
+        invariant(utils.isAddress(account),"not an Ethereum address")
+        this.account = account
+    }
+
+    public async getSolaceBalanceOf(chainId: number) {
+        invariant(this.CHAIN_IDS.includes(chainId),"not a supported chainID")
 
         let provider = null
-        if (chainId == 137) {
-            provider = new providers.JsonRpcProvider("https://polygon-rpc.com")
-        } else if (chainId == 1313161554) {
-            provider = new providers.JsonRpcProvider("https://mainnet.aurora.dev")
+        if (chainId == 137 || chainId == 1313161554) {
+            provider = getProvider(DEFAULT_ENDPOINT[chainId])
         } else {
             provider = getDefaultProvider(getNetwork(chainId))
         }
         const solace = new Contract(this.SOLACE_ADDRESS, this.ERC20ABI, provider)
-        const bal = await solace.balanceOf(account)
+        const bal = await solace.balanceOf(this.account)
         return formatUnits(bal, 18)
     }
 
-    public async getSolaceBalanceSum(account: string) {
-        const promises = this.CHAIN_IDS.map(chain => this.getSolaceBalanceOf(chain, account))
+    public async getSolaceBalanceSum() {
+        const promises = this.CHAIN_IDS.map(chain => this.getSolaceBalanceOf(chain))
         const balances = await Promise.all(promises)
         let sum = 0
         balances.forEach(bal => sum += parseFloat(bal))
         return sum
     }
 
-    public async getAllSolaceBalances(account: string) {
-        const promises = this.CHAIN_IDS.map(chain => this.getSolaceBalanceOf(chain, account))
+    public async getAllSolaceBalances() {
+        const promises = this.CHAIN_IDS.map(chain => this.getSolaceBalanceOf(chain))
         const balances = await Promise.all(promises)
         const res: any = {}
         for(var i = 0; i < this.CHAIN_IDS.length; ++i) {
@@ -49,31 +58,37 @@ export class xSolaceBalance {
     XSOLACE_ADDRESS = "0x501ACe802447B1Ed4Aae36EA830BFBde19afbbF9"
     ERC20ABI = ERC20
 
-    public async getXSolaceBalanceOf(chainId: number, account: string) {
+    account: string
+
+    constructor (account: string) {
+        invariant(utils.isAddress(account),"not an Ethereum address")
+        this.account = account
+    }
+
+    public async getXSolaceBalanceOf(chainId: number) {
+        invariant(this.CHAIN_IDS.includes(chainId),"not a supported chainID")
 
         let provider = null
-        if (chainId == 137) {
-            provider = new providers.JsonRpcProvider("https://polygon-rpc.com")
-        } else if (chainId == 1313161554) {
-            provider = new providers.JsonRpcProvider("https://mainnet.aurora.dev")
+        if (chainId == 137 || chainId == 1313161554) {
+            provider = getProvider(DEFAULT_ENDPOINT[chainId])
         } else {
             provider = getDefaultProvider(getNetwork(chainId))
         }
         const xsolace = new Contract(this.XSOLACE_ADDRESS, this.ERC20ABI, provider)
-        const bal = await xsolace.balanceOf(account)
+        const bal = await xsolace.balanceOf(this.account)
         return formatUnits(bal, 18)
     }
 
-    public async getXSolaceBalanceSum(account: string) {
-        const promises = this.CHAIN_IDS.map(chain => this.getXSolaceBalanceOf(chain, account))
+    public async getXSolaceBalanceSum() {
+        const promises = this.CHAIN_IDS.map(chain => this.getXSolaceBalanceOf(chain))
         const balances = await Promise.all(promises)
         let sum = 0
         balances.forEach(bal => sum += parseFloat(bal))
         return sum
     }
 
-    public async getAllXSolaceBalances(account: string) {
-        const promises = this.CHAIN_IDS.map(chain => this.getXSolaceBalanceOf(chain, account))
+    public async getAllXSolaceBalances() {
+        const promises = this.CHAIN_IDS.map(chain => this.getXSolaceBalanceOf(chain))
         const balances = await Promise.all(promises)
         const res: any = {}
         for(var i = 0; i < this.CHAIN_IDS.length; ++i) {

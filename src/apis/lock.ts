@@ -201,7 +201,7 @@ export class Lock {
 
       for (const event of lockCreatedEvents) {
         if (!xsLockIDs_burned.includes(event.args?.tokenId.toNumber())) {
-          xsLockIDs.push(event.args?.tokenId.toNumber())
+          xsLockIDs.push(event.args?.tokenId)
         } 
       }
 

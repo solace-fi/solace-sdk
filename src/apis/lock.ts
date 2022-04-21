@@ -145,7 +145,7 @@ export class Lock {
 
       const locks = await Promise.all(
         xsLockIDs.map(async (xsLockID) => {
-          return await withBackoffRetries(async () => xsl.locks(xsLockID, { blockTag: blockTag }))
+          return withBackoffRetries(async () => xsl.locks(xsLockID, { blockTag: blockTag }))
         })
       )
 

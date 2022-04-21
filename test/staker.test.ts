@@ -1,7 +1,6 @@
 import { BigNumber, Contract, getDefaultProvider, providers } from "ethers"
 const { getNetwork } = providers
 import { Staker, STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS } from "../src"
-import { expectClose } from "../src/utils/test"
 
 import xsLocker from "../src/abis/xsLocker.json"
 import StakingRewards from "../src/abis/StakingRewards.json"
@@ -66,7 +65,12 @@ describe("Staker", () => {
 
     describe("#pendingRewardsOfLock", () => {
         it("gets the same value as directly querying mainnet contract", async () => {
-            expectClose(await staker.pendingRewardsOfLock(LOCKER_ID), await stakingRewards_contract.pendingRewardsOfLock(LOCKER_ID), 1e12)
+            const [pendingReward1, pendingRewards2] = await Promise.all([
+                staker.pendingRewardsOfLock(LOCKER_ID),
+                stakingRewards_contract.pendingRewardsOfLock(LOCKER_ID),
+            ])
+
+            expect(pendingReward1).toEqual(pendingRewards2)  
         })
     })
 

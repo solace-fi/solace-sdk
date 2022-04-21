@@ -1,6 +1,6 @@
 import { BigNumber, Contract, getDefaultProvider, providers, utils } from 'ethers'
 import invariant from 'tiny-invariant'
-import { SOLACE_COVER_PRODUCT_ADDRESS } from '../constants'
+import { DEFAULT_ENDPOINT, SOLACE_COVER_PRODUCT_ADDRESS } from '../constants'
 import { getProvider } from '../utils/ethers'
 const { getNetwork } = providers
 
@@ -13,10 +13,8 @@ export class Policy {
 
         let provider = null
         let solaceCoverProduct = null
-        if (chainId == 137) {
-            provider = getProvider("https://polygon-rpc.com")
-        } else if (chainId == 80001) {
-            provider = getProvider("https://matic-mumbai.chainstacklabs.com")
+        if (chainId == ( 137 || 80001 )) {
+            provider = getProvider(DEFAULT_ENDPOINT[chainId])
         } else {
             provider = getDefaultProvider(getNetwork(chainId))
         }
@@ -51,25 +49,25 @@ export class Policy {
         }
     }
 
-    public async getExistingPolicy(account: string): Promise<{ policyId: BigNumber, chainId: number }[]> {
+    public async getExistingPolicy(account: string, includeTestnets?: boolean): Promise<{ policyId: BigNumber, chainId: number }[]> {
         invariant(utils.isAddress(account),"not an Ethereum address")
 
-        const chains = [1, 4, 137, 80001]
+        const supportedChains = [1, 4, 137, 80001]
+
+        const conditionedChains = includeTestnets ? supportedChains : [1, 137]
 
         let res: {policyId: BigNumber, chainId: number}[] = []
 
         async function processChain(chainId: number) {
             let provider = null
             let solaceCoverProduct = null
-            if (chainId == 137) {
-                provider = getProvider("https://polygon-rpc.com")
-            } else if (chainId == 80001) {
-                provider = getProvider("https://matic-mumbai.chainstacklabs.com")
+            if (chainId == ( 137 || 80001 )) {
+                provider = getProvider(DEFAULT_ENDPOINT[chainId])
             } else {
                 provider = getDefaultProvider(getNetwork(chainId))
             }
             
-            if (chainId == 137 || 80001) {
+            if (chainId == ( 137 || 80001 )) {
                 // SolaceCoverProductV2 deployed on Polygon mainnet (137) and Mumbai (80001)
                 solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainId], SolaceCoverProductV2, provider)
             } else {
@@ -79,11 +77,11 @@ export class Policy {
             const policyId = await solaceCoverProduct.policyOf(account)
 
             if (policyId.gt(BigNumber.from(0))) {
-                res.push({ policyId, chainId: chainId })
+                res.push({ policyId, chainId })
             }
         }
 
-        await Promise.all(chains.map((chain) => {return processChain(chain)}))
+        await Promise.all(conditionedChains.map((chain) => {return processChain(chain)}))
 
         res.sort((a, b) => a.chainId - b.chainId)
 

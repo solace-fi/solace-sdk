@@ -5,15 +5,18 @@ import { NETWORKS, WALLETS } from '..'
 import { formatUnits } from 'ethers/lib/utils'
 
 import { getProvider } from "../utils/ethers";
+import { DEFAULT_ENDPOINT, isNetworkSupported } from "../constants";
+import invariant from "tiny-invariant";
 
 
-export const getGasPrice = async (abstract: providers.JsonRpcProvider | providers.JsonRpcSigner): Promise<number> => {
-  const bnGasVal = await abstract.getGasPrice()
+export const getGasPrice = async (providerOrSigner: providers.JsonRpcProvider | providers.JsonRpcSigner): Promise<number> => {
+  const bnGasVal = await providerOrSigner.getGasPrice()
   const gasString = formatUnits(bnGasVal, 'gwei')
   return Math.ceil(parseFloat(gasString))
 }
 
 export const getGasSettings = async (chainId: number, gasArgs?: GasArgs): Promise<GasConfiguration> => {
+  invariant(isNetworkSupported(chainId), `Chain ID ${chainId} is not supported`)
 
   const getGasValue = (val: number) => Math.floor(val * Math.pow(10, 9))
 
@@ -27,19 +30,10 @@ export const getGasSettings = async (chainId: number, gasArgs?: GasArgs): Promis
 
   let provider: providers.Provider
 
-  if (chainId == 137) {
-    provider = getProvider("https://polygon-rpc.com")
-  } else if (chainId == 80001) {
-      provider = getProvider("https://matic-mumbai.chainstacklabs.com")
-  }
-  else if (chainId == 1313161554) {
-      provider = getProvider("https://mainnet.aurora.dev")
-  } 
-  else if (chainId == 1313161555) {
-      provider = getProvider("https://testnet.aurora.dev")
-  }
-  else {
-      provider = getDefaultProvider(getNetwork(chainId))
+  if (DEFAULT_ENDPOINT[chainId]) {
+    provider = getProvider(DEFAULT_ENDPOINT[chainId])
+  } else {
+    provider = getDefaultProvider(getNetwork(chainId))
   }
 
   return await provider.getFeeData().then((result: FeeData) => {

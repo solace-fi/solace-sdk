@@ -3,7 +3,7 @@ const { getNetwork } = providers
 import invariant from 'tiny-invariant'
 import SolaceCoverProduct from "../abis/SolaceCoverProduct.json"
 import SolaceCoverProductV2 from "../abis/SolaceCoverProductV2.json"
-import { SOLACE_COVER_PRODUCT_ADDRESS, ZERO_ADDRESS, isNetworkSupported } from '../constants'
+import { SOLACE_COVER_PRODUCT_ADDRESS, ZERO_ADDRESS, isNetworkSupported, DEFAULT_ENDPOINT } from '../constants'
 import { GasConfiguration } from '../types';
 import { getProvider } from '../utils/ethers'
 
@@ -17,12 +17,9 @@ export class Coverage {
         this.chainID = chainID;
 
         if (typeof(walletOrProviderOrSigner) == 'undefined') {
-            // ethers.js getDefaultProvider method doesn't work for MATIC or Mumbai
-            // Use public RPC endpoints instead
-            if (chainID == 137) {
-                this.walletOrProviderOrSigner = getProvider("https://polygon-rpc.com")
-            } else if (chainID == 80001) {
-                this.walletOrProviderOrSigner = getProvider("https://matic-mumbai.chainstacklabs.com")
+            
+            if (chainID == (137 || 80001) ) {
+                this.walletOrProviderOrSigner = getProvider(DEFAULT_ENDPOINT[chainID])
             } else {
                 this.walletOrProviderOrSigner = getDefaultProvider(getNetwork(chainID))
             }
@@ -141,7 +138,6 @@ export class Coverage {
     *************************************************************/
      
     /**
-     * TO-DO Decide if need to decode return value from BN hex.
      * @returns The active cover limit in **USD** to 18 decimal places. In other words, the total cover that has been sold at the current time.
      */
      public async activeCoverLimit(): Promise<BN> {
@@ -149,7 +145,6 @@ export class Coverage {
     }
 
     /**
-     * TO-DO Decide if need to decode return value from BN hex.
      * @returns The amount of available remaining capacity for new cover.
      */
     public async availableCoverCapacity(): Promise<BN> {
@@ -157,7 +152,6 @@ export class Coverage {
     }
 
     /**
-     * TO-DO Decide if need to decode return value from BN hex.
      * @returns The maximum amount of cover that can be sold in **USD** to 18 decimals places.
      */
     public async maxCover(): Promise<BN> {
@@ -172,7 +166,6 @@ export class Coverage {
     }
 
     /**
-     * TO-DO Decide if need to decode return value from BN hex.
      * @param policyholder The policyholder address.
      * @returns The policyholder's account balance in **USD**.
      */
@@ -182,7 +175,6 @@ export class Coverage {
     }
 
     /**
-     * TO-DO Decide if need to decode return value from BN hex.
      * @param policyID The policy ID.
      * @returns The cover limit for the given policy ID.
      */
@@ -191,7 +183,6 @@ export class Coverage {
     }
 
     /**
-     * TO-DO Decide if need to decode return value from BN hex.
      * @param coverLimit Cover limit.
      * @returns The minimum required account balance for a given cover limit. Equals the maximum chargeable fee for one epoch.
      */
@@ -200,7 +191,6 @@ export class Coverage {
     }
 
     /**
-     * TO-DO Decide if need to decode return value from BN hex.
      * @param policyID The policy ID.
      * @returns True if policy is active. False if policy is inactive, or does not exist.
      */
@@ -209,9 +199,8 @@ export class Coverage {
     }
 
     /**
-     * TO-DO Decide if need to decode return value from BN hex.
      * @param policyID The policy ID.
-     * @returns Array of chainIDs that the policy has been purchased for
+     * @returns The policy chain information
      */
     public async getPolicyChainInfo(policyID: BigNumberish): Promise<boolean> {
         invariant(this.chainID == 137 || 80001, 'cannot call this function for chainId other than 137 or 80001')
@@ -219,9 +208,8 @@ export class Coverage {
     }
 
         /**
-     * TO-DO Decide if need to decode return value from BN hex.
      * @param policyID The policy ID.
-     * @returns Array of chainIDs that the policy has been purchased for
+     * @returns The chain at the given index
      */
     public async getChain(chainIndex: BigNumberish): Promise<boolean> {
         invariant(this.chainID == 137 || 80001, 'cannot call this function for chainId other than 137 or 80001')
@@ -229,9 +217,8 @@ export class Coverage {
     }
 
             /**
-     * TO-DO Decide if need to decode return value from BN hex.
      * @param policyID The policy ID.
-     * @returns Array of chainIDs that the policy has been purchased for
+     * @returns The number of supported chains
      */
     public async numSupportedChains(): Promise<boolean> {
         invariant(this.chainID == 137 || 80001, 'cannot call this function for chainId other than 137 or 80001')
@@ -249,7 +236,6 @@ export class Coverage {
     }
 
     /**
-     * TO-DO Decide if need to decode return value from BN hex.
      * @param policyholder The policyholder address.
      * @returns The reward points for the policyholder.
      */
@@ -259,7 +245,6 @@ export class Coverage {
     }
 
     /**
-     * TO-DO Decide if need to decode return value from BN hex.
      * @param policyholder The policyholder address.
      * @returns The total premium paid for the policyholder.
      */
@@ -269,7 +254,6 @@ export class Coverage {
     }
 
     /**
-     * TO-DO Decide if need to decode return value from BN hex.
      * @param policyholder The policyholder address.
      * @returns The cooldown period start expressed as Unix timestamp
      */
@@ -313,28 +297,67 @@ export class Coverage {
      * To fix this issue, if the last two characters of the signature are '00', replace with '0b'.
      * If the last two characters of the signature are '01', replace with '0c'.
      */
-    public async getReferralCode(): Promise<string> {
+    public async getReferralCode(chainId: number): Promise<string> {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot get referral code without a signer")
         
-        const domain = {
-            name: "Solace.fi-SolaceCoverProduct",
-            version: "1",
-            chainId: await this.walletOrProviderOrSigner.getChainId(),
-            verifyingContract: SOLACE_COVER_PRODUCT_ADDRESS[this.chainID]
-        };   
-        
+        let domain, value;
+
         const types = {
             SolaceReferral: [
                 { name: "version", type: "uint256" }
               ]
         };   
-        
-        const value = {
-            version: 1
-        };   
+
+        // Wanted to use switch (chainId) but Typescript made the type of `chainId: 1` instead of `chainId: number`
+        switch (true) {
+            case chainId === 1: {
+                domain = {
+                    name: "Solace.fi-SolaceCoverProduct",
+                    version: "1",
+                    chainId: chainId,
+                    verifyingContract: SOLACE_COVER_PRODUCT_ADDRESS[this.chainID]
+                };
+
+                value = {
+                    version: 1
+                };   
+
+                break;
+            }
+
+            case chainId === 137: {
+                domain = {
+                    name: "Solace.fi-SolaceCoverProductV2",
+                    version: "2",
+                    chainId: chainId,
+                    verifyingContract: SOLACE_COVER_PRODUCT_ADDRESS[this.chainID]
+                };   
+
+                value = {
+                    version: 2
+                };   
+
+                break;
+            }
+
+            default: {
+                domain = {
+                    name: "Solace.fi-SolaceCoverProductV2",
+                    version: "2",
+                    chainId: chainId,
+                    verifyingContract: SOLACE_COVER_PRODUCT_ADDRESS[this.chainID]
+                };   
+
+                value = {
+                    version: 2
+                };   
+
+                break;
+            }
+        }
         
         const signature = await this.walletOrProviderOrSigner._signTypedData(domain, types, value)
-        
+    
         return signature
     }
 }

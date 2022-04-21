@@ -1,7 +1,7 @@
 import { Contract, providers, getDefaultProvider } from 'ethers'
 const { getNetwork } = providers
 import ERC20 from '../abis/ERC20.json'
-import { UWP_ADDRESS } from "../constants"
+import { DEFAULT_ENDPOINT, UWP_ADDRESS } from "../constants"
 import { fetchBalances, withBackoffRetries } from "../utils"
 import { getProvider } from '../utils/ethers'
 import { Price } from './price'
@@ -45,7 +45,7 @@ export class UnderwritingPoolBalances {
   }
 
   public async getBalances_Polygon() {
-    const provider = getProvider("https://polygon-rpc.com")
+    const provider = getProvider(DEFAULT_ENDPOINT[137])
     const blockTag = await provider.getBlockNumber()
     let res = []
 
@@ -80,7 +80,7 @@ export class UnderwritingPoolBalances {
   }
 
   public async getBalances_Aurora() {
-    const provider = getProvider("https://mainnet.aurora.dev")
+    const provider = getProvider(DEFAULT_ENDPOINT[1313161554])
     const blockTag = await provider.getBlockNumber()
     let res = []
 

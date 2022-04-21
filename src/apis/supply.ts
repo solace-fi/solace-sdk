@@ -1,7 +1,9 @@
 import { getDefaultProvider, providers, Contract } from "ethers";
 import { formatUnits } from "ethers/lib/utils";
+import invariant from "tiny-invariant";
 const { getNetwork } = providers
 import ERC20 from "../abis/ERC20.json";
+import { DEFAULT_ENDPOINT } from "../constants";
 import { getProvider } from "../utils/ethers";
 import { MulticallContract, MulticallProvider } from "../utils/multicall";
 
@@ -12,11 +14,10 @@ export class TotalSupply {
     ERC20ABI = ERC20
 
     public async getTotalSupply(chainId: number, token: 'SOLACE' | 'XSOLACE') {
+        invariant(this.CHAIN_IDS.includes(chainId), `chainId must be one of ${this.CHAIN_IDS}`)
         let provider = null
-        if (chainId == 137) {
-            provider = getProvider("https://polygon-rpc.com")
-        } else if (chainId == 1313161554) {
-            provider = getProvider("https://mainnet.aurora.dev")
+        if (chainId == 137 || chainId == 1313161554) {
+            provider = getProvider(DEFAULT_ENDPOINT[chainId])
         } else {
             provider = getDefaultProvider(getNetwork(chainId))
         }
@@ -26,6 +27,7 @@ export class TotalSupply {
     }
 
     public async getTotalSupplySum(token: 'SOLACE' | 'XSOLACE') {
+        invariant(token == 'SOLACE' || 'XSOLACE', `token must be one of 'SOLACE' or 'XSOLACE'`)
         const promises = this.CHAIN_IDS.map(chain => this.getTotalSupply(chain, token))
         const balances = await Promise.all(promises)
         let sum = 0
@@ -34,6 +36,7 @@ export class TotalSupply {
     }
 
     public async getTotalSupplyAll(token: 'SOLACE' | 'XSOLACE') {
+        invariant(token == 'SOLACE' || 'XSOLACE', `token must be one of 'SOLACE' or 'XSOLACE'`)
         const promises = this.CHAIN_IDS.map(chain => this.getTotalSupply(chain, token))
         const balances = await Promise.all(promises)
         const res: any = {}
@@ -76,11 +79,12 @@ export class CirculatingSupply {
     skipXSolaceAddrs: {[key: string]: any} = {"1":{},"137":{},"1313161554":{}}
 
     public async getCirculatingSupply(chainId: number, token: 'SOLACE' | 'XSOLACE') {
+        invariant(this.CHAIN_IDS.includes(chainId), `chainId must be one of ${this.CHAIN_IDS}`)
+        invariant(token == 'SOLACE' || 'XSOLACE', `token must be one of 'SOLACE' or 'XSOLACE'`)
+
         let provider = null
-        if (chainId == 137) {
-            provider = new MulticallProvider(getProvider("https://polygon-rpc.com"), chainId)
-        } else if (chainId == 1313161554) {
-            provider = new MulticallProvider(getProvider("https://mainnet.aurora.dev"), chainId)
+        if (chainId == 137 || chainId == 1313161554) {
+            provider = new MulticallProvider(getProvider(DEFAULT_ENDPOINT[chainId]), chainId)
         } else {
             provider = new MulticallProvider(getDefaultProvider(getNetwork(chainId)), chainId)
         }
@@ -95,6 +99,7 @@ export class CirculatingSupply {
     }
 
      public async getCirculatingSupplySum(token: 'SOLACE' | 'XSOLACE') {
+        invariant(token == 'SOLACE' || 'XSOLACE', `token must be one of 'SOLACE' or 'XSOLACE'`)
         const promises = this.CHAIN_IDS.map(chain => this.getCirculatingSupply(chain, token))
         const balances = await Promise.all(promises)
         let sum = 0
@@ -103,6 +108,7 @@ export class CirculatingSupply {
     }
 
     public async getCirculatingSupplyAll(token: 'SOLACE' | 'XSOLACE') {
+        invariant(token == 'SOLACE' || 'XSOLACE', `token must be one of 'SOLACE' or 'XSOLACE'`)
         const promises = this.CHAIN_IDS.map(chain => this.getCirculatingSupply(chain, token))
         const balances = await Promise.all(promises)
         const res: any = {}

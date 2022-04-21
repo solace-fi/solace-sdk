@@ -3,7 +3,7 @@ const { getNetwork } = providers
 import xsLocker from "../abis/xsLocker.json"
 import StakingRewards from "../abis/StakingRewards.json"
 import invariant from 'tiny-invariant'
-import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS, ZERO_ADDRESS, isNetworkSupported } from '../constants'
+import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS, ZERO_ADDRESS, isNetworkSupported, DEFAULT_ENDPOINT } from '../constants'
 import { GasConfiguration } from '../types';
 import { getProvider } from '../utils/ethers'
 
@@ -35,12 +35,8 @@ export class Staker {
         if (typeof(walletOrProviderOrSigner) == 'undefined') {
             // ethers.js getDefaultProvider method doesn't work for MATIC or Mumbai
             // Use public RPC endpoints instead
-            if (chainID == 137) {
-                this.walletOrProviderOrSigner = getProvider("https://polygon-rpc.com")
-            } else if (chainID == 80001) {
-                this.walletOrProviderOrSigner = getProvider("https://matic-mumbai.chainstacklabs.com")
-            } else if (chainID == 1313161554) {
-                this.walletOrProviderOrSigner = getProvider("https://mainnet.aurora.dev")
+            if (DEFAULT_ENDPOINT[chainID]) {
+                this.walletOrProviderOrSigner = getProvider(DEFAULT_ENDPOINT[chainID])
             } else {
                 this.walletOrProviderOrSigner = getDefaultProvider(getNetwork(chainID))
             }

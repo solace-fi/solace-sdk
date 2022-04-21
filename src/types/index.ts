@@ -1,4 +1,5 @@
 export * from './api'
+export * from './bond'
 export * from './gas'
 export * from './network'
 export * from './wallet'

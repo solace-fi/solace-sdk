@@ -1,10 +1,12 @@
-import { Price } from "../src";
+import { BOND_TELLER_ADDRESSES, Price } from "../src";
 import { Bond } from "../src/apis/bond"
-import { Contract } from "ethers";
-import bondTellerErc20 from '../src/abis/BondTellerErc20.json'
 
 describe('Bond', () => {
-    let price = new Price()
+    let bond1 = new Bond(1);
+    let bond137 = new Bond(137);
+
+    let price = new Price();
+    const bonder = "0xe7aba95073a85abd4ce82487c7fdfa860024b6cc"
 
     beforeEach(() => {
         // Avoid jest avoid timeout error
@@ -13,9 +15,8 @@ describe('Bond', () => {
 
     describe('#getBondTellerData', () => {
         it('will return a valid response - mainnet', async () => {
-            const bond = new Bond(1);
             const apiPriceMapping = await price.getCoinGeckoTokenPrices()
-            const res = await bond.getBondTellerData(apiPriceMapping)
+            const res = await bond1.getBondTellerData(apiPriceMapping)
             console.log(res)
         })
 
@@ -35,15 +36,29 @@ describe('Bond', () => {
     })
 
     describe('#getUserBondData', () => {
-        it('it will return a valid response - mainnet', async () => {
-            const bond = new Bond(137);
-            const bonder = "0xe7aba95073a85abd4ce82487c7fdfa860024b6cc"
-            const usdc_bondteller_matic = new Contract("0x501ace7e977e06a3cb55f9c28d5654c9d74d5ca9", bondTellerErc20, bond.provider)
-            const res = await bond.getUserBondData(usdc_bondteller_matic, bonder)
+        it('will return a valid response', async () => {
+            const addr = BOND_TELLER_ADDRESSES['dai'][1].addr
+            const res = await bond1.getUserBondData(addr, bonder)
+            console.log(res)
+        })
+
+        it('will return a valid response', async () => {
+            const addr = BOND_TELLER_ADDRESSES['eth'][1].addr
+            const res = await bond1.getUserBondData(addr, bonder)
+            console.log(res)
+        })
+
+        it('will return a valid response', async () => {
+            const addr = BOND_TELLER_ADDRESSES['matic'][137].addr
+            const res = await bond137.getUserBondData(addr, bonder)
+            console.log(res)
+        })
+
+        it('will return a valid response', async () => {
+            const addr = BOND_TELLER_ADDRESSES['usdc'][137].addr
+            const res = await bond137.getUserBondData(addr, bonder)
             console.log(res)
         })
     })
-
-    // 0x56d4f890dc8ed926c44a95c02809823893d67ea8b6482ebaaec80d77c5f4b852
 })
 

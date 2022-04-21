@@ -4,10 +4,9 @@ import BondTellerErc20 from "../abis/BondTellerErc20.json"
 import BondTellerEth from "../abis/BondTellerEth.json"
 import BondTellerMatic from "../abis/BondTellerMatic.json"
 import invariant from 'tiny-invariant'
-import { BOND_TELLER_ADDRESSES, ZERO_ADDRESS, isNetworkSupported } from '../constants'
+import { BOND_TELLER_ADDRESSES, ZERO_ADDRESS, isNetworkSupported, DEFAULT_ENDPOINT } from '../constants'
 import { GasConfiguration } from '../types';
 import { getProvider } from '../utils/ethers'
-import { BondTellerContractData } from '../types/bond'
 
 /*
  * Contains methods for accessing Solace bonding functionality (BondTellerErc20.sol, BondTellerEth.sol & BondTellerMatic.sol).
@@ -20,7 +19,8 @@ export class Bonder {
     **************/
     chainID: number;
     walletOrProviderOrSigner: Wallet | providers.JsonRpcSigner | providers.Provider;
-    bondTellerContractData: BondTellerContractData;
+    bondTellerContract: Contract;
+    bondTellerType: 'erc20' | 'eth' | 'matic'
 
     /**************
     CONSTRUCTOR
@@ -29,41 +29,28 @@ export class Bonder {
     /**
      * @param chainID The chainID for the Staker object, 1 for Ethereum Mainnet.
      * @param walletOrProviderOrSigner walletOrProviderOrSigner object - a Wallet (https://docs.ethers.io/v5/api/signer/#Wallet) or a Provider (https://docs.ethers.io/v5/api/providers/) or Signer (https://docs.ethers.io/v5/api/signer/)
-     * @param token string (can be lowercase, uppercase or mixed) describing token for bond purchases. See documentation for supported tokens.
+     * @param bondTellerContractAddress string
      */
-     constructor(chainID: number, bondTellerContractData: BondTellerContractData, walletOrProviderOrSigner?: Wallet | providers.JsonRpcSigner | providers.Provider, token?: string) {
+     constructor(chainID: number, bondTellerContractAddress: string, walletOrProviderOrSigner?: Wallet | providers.JsonRpcSigner | providers.Provider) {
         invariant(isNetworkSupported(chainID),"not a supported chainID")
-
-        this.chainID = chainID;
-
-        invariant(() => {
-            if (!bondTellerContractData) return false
-            if(bondTellerContractData.type != 'erc20' || 'matic' || 'eth') return false
-            let found = false
-            Object.keys(BOND_TELLER_ADDRESSES).forEach((key) => {
-                if(BOND_TELLER_ADDRESSES[key][this.chainID] != undefined) {
-                    if(BOND_TELLER_ADDRESSES[key][this.chainID].addr == bondTellerContractData.contract.address) {
-                        found = true
-                    }
+        let storedType: 'erc20' | 'eth' | 'matic' = 'erc20'
+        let found = false
+        Object.keys(BOND_TELLER_ADDRESSES).forEach((key) => {
+            if(BOND_TELLER_ADDRESSES[key][chainID] != undefined) {
+                if(BOND_TELLER_ADDRESSES[key][chainID].addr.toLowerCase() == bondTellerContractAddress.toLowerCase()) {
+                    storedType = BOND_TELLER_ADDRESSES[key][chainID].type
+                    found = true
                 }
-            })
-            return found
-        }, 'must provide valid bond teller contract data')
-        if(token){
-            invariant(BOND_TELLER_ADDRESSES.hasOwnProperty(token.toLowerCase()), "not a supported token for bonds" )
-            invariant(BOND_TELLER_ADDRESSES[token][chainID] !== undefined, "not a supported token for bonds on this chainid" )
-        }
-        
+            }
+        })
+        invariant(found, 'must provide valid bond teller contract address for this chain')
+
 
         if (typeof(walletOrProviderOrSigner) == 'undefined') {
             // ethers.js getDefaultProvider method doesn't work for MATIC or Mumbai
             // Use public RPC endpoints instead
-            if (chainID == 137) {
-                this.walletOrProviderOrSigner = getProvider("https://polygon-rpc.com")
-            } else if (chainID == 80001) {
-                this.walletOrProviderOrSigner = getProvider("https://matic-mumbai.chainstacklabs.com")
-            } else if (chainID == 1313161554) {
-                this.walletOrProviderOrSigner = getProvider("https://mainnet.aurora.dev")
+            if (DEFAULT_ENDPOINT[chainID]) {
+                this.walletOrProviderOrSigner = getProvider(DEFAULT_ENDPOINT[chainID])
             } else {
                 this.walletOrProviderOrSigner = getDefaultProvider(getNetwork(chainID))
             }
@@ -71,17 +58,16 @@ export class Bonder {
             this.walletOrProviderOrSigner = walletOrProviderOrSigner
         }
 
-        if(token) {
-            if (token.toLowerCase() === "eth") {
-                this.bondTellerContractData = {contract: new Contract(BOND_TELLER_ADDRESSES[token][chainID].addr, BondTellerEth, walletOrProviderOrSigner), type: 'eth'}
-            } else if (token.toLowerCase() === "matic") {
-                this.bondTellerContractData = {contract: new Contract(BOND_TELLER_ADDRESSES[token][chainID].addr, BondTellerMatic, walletOrProviderOrSigner), type: 'matic'}
-            } else {
-                this.bondTellerContractData = {contract: new Contract(BOND_TELLER_ADDRESSES[token][chainID].addr, BondTellerErc20, walletOrProviderOrSigner), type: 'erc20'}
-            }
+        if (String(storedType) === 'eth') {
+            this.bondTellerContract = new Contract(bondTellerContractAddress, BondTellerEth, walletOrProviderOrSigner)
+        } else if (String(storedType) === 'matic') {
+            this.bondTellerContract = new Contract(bondTellerContractAddress, BondTellerMatic, walletOrProviderOrSigner)
         } else {
-            this.bondTellerContractData = bondTellerContractData
+            this.bondTellerContract = new Contract(bondTellerContractAddress, BondTellerErc20, walletOrProviderOrSigner)
         }
+
+        this.chainID = chainID;
+        this.bondTellerType = storedType
     }
 
     /********************************
@@ -93,7 +79,7 @@ export class Bonder {
      * @return price_ The price of the bond measured in principal.
      */
      public async bondPrice(): Promise<BN> {
-        return (await this.bondTellerContractData.contract.bondPrice())
+        return (await this.bondTellerContract.bondPrice())
     }
 
     /**
@@ -103,7 +89,7 @@ export class Bonder {
      * @return amountOut Amount of SOLACE out.
      */
      public async calculateAmountOut(amountIn: BigNumberish, stake: boolean): Promise<BN> {
-        return (await this.bondTellerContractData.contract.calculateAmountOut(amountIn, stake))
+        return (await this.bondTellerContract.calculateAmountOut(amountIn, stake))
     }
 
     /**
@@ -113,7 +99,7 @@ export class Bonder {
      * @return amountIn Amount of principal to deposit.
      */
      public async calculateAmountIn(amountOut: BigNumberish, stake: boolean): Promise<BN> {
-        return (await this.bondTellerContractData.contract.calculateAmountIn(amountOut, stake))
+        return (await this.bondTellerContract.calculateAmountIn(amountOut, stake))
     }
 
     /***********************************
@@ -131,7 +117,7 @@ export class Bonder {
     ): Promise<providers.TransactionResponse> {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
 
-        const tx: providers.TransactionResponse = await this.bondTellerContractData.contract.claimPayout(bondID, {...gasConfig})
+        const tx: providers.TransactionResponse = await this.bondTellerContract.claimPayout(bondID, {...gasConfig})
         return tx
     }
 
@@ -156,10 +142,10 @@ export class Bonder {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(depositor), "not an Ethereum address")
         invariant(depositor != ZERO_ADDRESS, "cannot enter zero address policyholder")
-        invariant(this.bondTellerContractData.type !== "eth", "function does not exist on BondTellerEth")
-        invariant(this.bondTellerContractData.type !== "matic", "function does not exist on BondTellerMatic")
+        invariant(this.bondTellerType !== "eth", "function does not exist on BondTellerEth")
+        invariant(this.bondTellerType !== "matic", "function does not exist on BondTellerMatic")
 
-        const tx: providers.TransactionResponse = await this.bondTellerContractData.contract.deposit(deposit, minAmountOut, depositor, stake, {...gasConfig})
+        const tx: providers.TransactionResponse = await this.bondTellerContract.deposit(deposit, minAmountOut, depositor, stake, {...gasConfig})
         return tx
     }
 
@@ -189,10 +175,10 @@ export class Bonder {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(depositor), "not an Ethereum address")
         invariant(depositor != ZERO_ADDRESS, "cannot enter zero address policyholder")
-        invariant(this.bondTellerContractData.type !== "eth", "function does not exist on BondTellerEth")
-        invariant(this.bondTellerContractData.type !== "matic", "function does not exist on BondTellerMatic")
+        invariant(this.bondTellerType !== "eth", "function does not exist on BondTellerEth")
+        invariant(this.bondTellerType !== "matic", "function does not exist on BondTellerMatic")
 
-        const tx: providers.TransactionResponse = await this.bondTellerContractData.contract.depositSigned(deposit, minAmountOut, depositor, stake, deadline, v, r, s, {...gasConfig})
+        const tx: providers.TransactionResponse = await this.bondTellerContract.depositSigned(deposit, minAmountOut, depositor, stake, deadline, v, r, s, {...gasConfig})
         return tx
     }
 
@@ -217,9 +203,9 @@ export class Bonder {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(depositor), "not an Ethereum address")
         invariant(depositor != ZERO_ADDRESS, "cannot enter zero address policyholder")
-        invariant(this.bondTellerContractData.type === "eth", "function only exists on BondTellerEth")
+        invariant(this.bondTellerType === "eth", "function only exists on BondTellerEth")
 
-        const tx: providers.TransactionResponse = await this.bondTellerContractData.contract.depositEth(minAmountOut, depositor, stake, {value: deposit, ...gasConfig})
+        const tx: providers.TransactionResponse = await this.bondTellerContract.depositEth(minAmountOut, depositor, stake, {value: deposit, ...gasConfig})
         return tx
     }
 
@@ -240,10 +226,10 @@ export class Bonder {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(depositor), "not an Ethereum address")
         invariant(depositor != ZERO_ADDRESS, "cannot enter zero address policyholder")
-        invariant(this.bondTellerContractData.type === "eth", "function only exists on BondTellerEth")
+        invariant(this.bondTellerType === "eth", "function only exists on BondTellerEth")
 
 
-        const tx: providers.TransactionResponse = await this.bondTellerContractData.contract.depositWeth(deposit, minAmountOut, depositor, stake, {...gasConfig})
+        const tx: providers.TransactionResponse = await this.bondTellerContract.depositWeth(deposit, minAmountOut, depositor, stake, {...gasConfig})
         return tx
     }
 
@@ -273,9 +259,9 @@ export class Bonder {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(depositor), "not an Ethereum address")
         invariant(depositor != ZERO_ADDRESS, "cannot enter zero address policyholder")
-        invariant(this.bondTellerContractData.type === "eth", "function only exists on BondTellerEth")
+        invariant(this.bondTellerType === "eth", "function only exists on BondTellerEth")
 
-        const tx: providers.TransactionResponse = await this.bondTellerContractData.contract.depositWethSigned(deposit, minAmountOut, depositor, stake, deadline, v, r, s, {...gasConfig})
+        const tx: providers.TransactionResponse = await this.bondTellerContract.depositWethSigned(deposit, minAmountOut, depositor, stake, deadline, v, r, s, {...gasConfig})
         return tx
     }
 
@@ -300,9 +286,9 @@ export class Bonder {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(depositor), "not an Ethereum address")
         invariant(depositor != ZERO_ADDRESS, "cannot enter zero address policyholder")
-        invariant(this.bondTellerContractData.type === "matic", "function only exists on BondTellerMatic")
+        invariant(this.bondTellerType === "matic", "function only exists on BondTellerMatic")
 
-        const tx: providers.TransactionResponse = await this.bondTellerContractData.contract.depositMatic(minAmountOut, depositor, stake, {value: deposit, ...gasConfig})
+        const tx: providers.TransactionResponse = await this.bondTellerContract.depositMatic(minAmountOut, depositor, stake, {value: deposit, ...gasConfig})
         return tx
     }
 
@@ -323,10 +309,10 @@ export class Bonder {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(depositor), "not an Ethereum address")
         invariant(depositor != ZERO_ADDRESS, "cannot enter zero address policyholder")
-        invariant(this.bondTellerContractData.type === "matic", "function only exists on BondTellerMatic")
+        invariant(this.bondTellerType === "matic", "function only exists on BondTellerMatic")
 
 
-        const tx: providers.TransactionResponse = await this.bondTellerContractData.contract.depositWmatic(deposit, minAmountOut, depositor, stake, {...gasConfig})
+        const tx: providers.TransactionResponse = await this.bondTellerContract.depositWmatic(deposit, minAmountOut, depositor, stake, {...gasConfig})
         return tx
     }
 
@@ -356,9 +342,9 @@ export class Bonder {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(depositor), "not an Ethereum address")
         invariant(depositor != ZERO_ADDRESS, "cannot enter zero address policyholder")
-        invariant(this.bondTellerContractData.type === "matic", "function only exists on BondTellerMatic")
+        invariant(this.bondTellerType === "matic", "function only exists on BondTellerMatic")
 
-        const tx: providers.TransactionResponse = await this.bondTellerContractData.contract.depositWmaticSigned(deposit, minAmountOut, depositor, stake, deadline, v, r, s, {...gasConfig})
+        const tx: providers.TransactionResponse = await this.bondTellerContract.depositWmaticSigned(deposit, minAmountOut, depositor, stake, deadline, v, r, s, {...gasConfig})
         return tx
     }
 }

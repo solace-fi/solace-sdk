@@ -8,21 +8,21 @@ describe('UndewritingPool', () => {
         jest.setTimeout(30000);
     })
 
-    describe('#getUnderwritingPool_Mainnet - Mainnet', () => {
+    describe('#getBalances_Mainnet', () => {
         it('will return a valid response', async () => {
             const uwp_set = await uwp.getBalances_Mainnet()
             console.log(uwp_set)
         })
     })
 
-    describe('#getUnderwritingPool_Polygon - Polygon', () => {
+    describe('#getBalances_Polygon', () => {
         it('will return a valid response', async () => {
             const uwp_set = await uwp.getBalances_Polygon()
             console.log(uwp_set)
         })
     })
 
-    describe('#getUnderwritingPool_Aurora - Aurora', () => {
+    describe('#getBalances_Aurora', () => {
         it('will return a valid response', async () => {
             const uwp_set = await uwp.getBalances_Aurora()
             console.log(uwp_set)
@@ -38,28 +38,28 @@ describe('UnderwritingPoolUSDBalances', () => {
         jest.setTimeout(30000);
     })
 
-    describe('#getUSDBalances_Mainnet - Mainnet', () => {
+    describe('#getUSDBalances_Mainnet', () => {
         it('will return a valid response', async () => {
             const uwp_set = await uwp.getUSDBalances_Mainnet()
             console.log(uwp_set)
         })
     })
 
-    describe('#getUSDBalances_Polygon - Polygon', () => {
+    describe('#getUSDBalances_Polygon', () => {
         it('will return a valid response', async () => {
             const uwp_set = await uwp.getUSDBalances_Polygon()
             console.log(uwp_set)
         })
     })
 
-    describe('#getUSDBalances_Aurora - Aurora', () => {
+    describe('#getUSDBalances_Aurora', () => {
         it('will return a valid response', async () => {
             const uwp_set = await uwp.getUSDBalances_Aurora()
             console.log(uwp_set)
         })
     })
 
-    describe('#getUSDBalances_All - All', () => {
+    describe('#getUSDBalances_All', () => {
         it('will return a valid response', async () => {
             const uwp_set = await uwp.getUSDBalances_All()
             console.log(uwp_set)

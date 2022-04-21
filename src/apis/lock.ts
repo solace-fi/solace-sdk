@@ -2,14 +2,42 @@ import axios from "axios"
 import { BigNumber, Contract, providers, getDefaultProvider } from 'ethers'
 const { getNetwork } = providers
 import { formatUnits } from "ethers/lib/utils"
-import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS, ZERO_ADDRESS } from "../constants"
+import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS, ZERO_ADDRESS, DEFAULT_ENDPOINT } from "../constants"
 import xsLocker from '../abis/xsLocker.json'
 import stakingRewards from '../abis/StakingRewards.json'
 import { withBackoffRetries } from "../utils"
 import { getProvider } from "../utils/ethers"
 import { LockData, UserLocksInfo, GlobalLockInfo, UserLocksData } from "../types/lock"
+import invariant from "tiny-invariant"
 
 export class Lock {
+
+    provider: providers.Provider
+    chainId: number
+    xslAddr: string
+    srAddr: string
+
+    constructor(chainId: number, provider?: providers.Provider) {
+      const xslAddr = XSLOCKER_ADDRESS[chainId]
+      const srAddr = STAKING_REWARDS_ADDRESS[chainId]
+      invariant(xslAddr, `XSLOCKER_ADDRESS[${chainId}] not found`)
+      invariant(srAddr, `STAKING_REWARDS_ADDRESS[${chainId}] not found`)
+
+      this.xslAddr = xslAddr
+      this.srAddr = srAddr
+
+      if (!provider) {
+        if (DEFAULT_ENDPOINT[chainId]) {
+          this.provider = getProvider(DEFAULT_ENDPOINT[chainId])
+        } else {
+          this.provider = getDefaultProvider(getNetwork(chainId))
+        }
+      } else {
+        this.provider = provider
+      }
+      this.chainId = chainId
+    }
+
     public async getXsLocker() {
         return await axios.get('https://stats.solace.fi/analytics/').then((data: any) => {
             const xsLocker = data.data.xslocker
@@ -117,7 +145,7 @@ export class Lock {
 
       const locks = await Promise.all(
         xsLockIDs.map(async (xsLockID) => {
-          return await withBackoffRetries(async () => xsl.locks(xsLockID, { blockTag: blockTag }))
+          return withBackoffRetries(async () => xsl.locks(xsLockID, { blockTag: blockTag }))
         })
       )
 
@@ -139,35 +167,10 @@ export class Lock {
       }
     }
 
-    public async getUserLocks (chainId: number, address: string): Promise<UserLocksData> {
-      const xslAddr = XSLOCKER_ADDRESS[chainId]
-      const srAddr = STAKING_REWARDS_ADDRESS[chainId]
+    public async getUserLocks (address: string): Promise<UserLocksData> {
 
-      if (!xslAddr || !srAddr) return {
-        user: {
-          pendingRewards: BigNumber.from(0),
-          stakedBalance: BigNumber.from(0),
-          lockedBalance: BigNumber.from(0),
-          unlockedBalance: BigNumber.from(0),
-          yearlyReturns: BigNumber.from(0),
-          apr: BigNumber.from(0),
-        },
-        locks: [],
-        successfulFetch: false,
-      }
-
-      let _provider = null
-
-      if (chainId == 137) {
-          _provider = getProvider("https://polygon-rpc.com")
-      } else if (chainId == 1313161554) {
-          _provider = getProvider("https://mainnet.aurora.dev")
-      } else {
-          _provider = getDefaultProvider(getNetwork(chainId))
-      }
-
-      const xsl = new Contract(xslAddr, xsLocker, _provider)
-      const sr = new Contract(srAddr, stakingRewards, _provider)
+      const xsl = new Contract(this.xslAddr, xsLocker, this.provider)
+      const sr = new Contract(this.srAddr, stakingRewards, this.provider)
 
       const filterLockCreated = xsl.filters.Transfer(ZERO_ADDRESS, address)
       const filterLockBurned = xsl.filters.Transfer(address, ZERO_ADDRESS)
@@ -262,5 +265,54 @@ export class Lock {
       }
 
       return data
+    }
+
+    public async getUserLockerBalances (account: string): Promise<{ stakedBalance: string, lockedBalance: string, unlockedBalance: string }> {
+      const timestamp = Math.floor ( new Date().getTime() / 1000 )
+      const xsl = new Contract(this.xslAddr, xsLocker, this.provider)
+
+      let stakedBalance = BigNumber.from(0) // staked = locked + unlocked
+      let lockedBalance = BigNumber.from(0)
+      let unlockedBalance = BigNumber.from(0)
+      
+      const filterLockCreated = xsl.filters.Transfer(ZERO_ADDRESS, account)
+      const filterLockBurned = xsl.filters.Transfer(account, ZERO_ADDRESS)
+      
+      const [lockCreatedEvents, lockBurnedEvents] = await Promise.all([
+        xsl.queryFilter(filterLockCreated),
+        xsl.queryFilter(filterLockBurned)
+      ])
+
+      const xsLockIDs_burned = []
+
+      for (const event of lockBurnedEvents) {
+        xsLockIDs_burned.push(event.args?.tokenId.toNumber())
+      }
+
+      const xsLockIDs = []
+
+      for (const event of lockCreatedEvents) {
+        if (!xsLockIDs_burned.includes(event.args?.tokenId.toNumber())) {
+          xsLockIDs.push(event.args?.tokenId.toNumber())
+        } 
+      }
+
+      const locks = await Promise.all(
+        xsLockIDs.map(async (xsLockID) => {
+          return await withBackoffRetries(async () => xsl.locks(xsLockID))
+        })
+      )
+
+      locks.forEach((lock) => {
+        stakedBalance = stakedBalance.add(lock.amount)
+        if (lock.end.gt(timestamp)) lockedBalance = lockedBalance.add(lock.amount)
+        else unlockedBalance = unlockedBalance.add(lock.amount)
+      })
+
+      return {
+        stakedBalance: formatUnits(stakedBalance, 18),
+        lockedBalance: formatUnits(lockedBalance, 18),
+        unlockedBalance: formatUnits(unlockedBalance, 18),
+      }
     }
 }

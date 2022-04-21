@@ -1,4 +1,5 @@
-import { BOND_TELLER_ADDRESSES, MasterTokenList, isNetworkSupported } from "../constants";
+import { BOND_TELLER_ADDRESSES, MasterTokenList, isNetworkSupported, DEFAULT_ENDPOINT } from "../constants";
+// import { Contract as MultiCallContract, Provider } from 'ethers-multicall';
 import { getDefaultProvider, providers, Contract, utils, BigNumber } from "ethers";
 
 const { getNetwork } = providers
@@ -26,30 +27,27 @@ import invariant from "tiny-invariant";
 
 
 export class Bond {
-    provider: providers.Provider
+    providerOrSigner: providers.JsonRpcSigner | providers.Provider
     chainId: number
 
-    constructor(chainId: number) {
-        if (chainId == 137) {
-            this.provider = getProvider("https://polygon-rpc.com")
-        } else if (chainId == 80001) {
-            this.provider = getProvider("https://matic-mumbai.chainstacklabs.com")
+    constructor(chainId: number, providerOrSigner?: providers.JsonRpcSigner | providers.Provider) {
+        invariant(isNetworkSupported(chainId),"not a supported chainID")
+        if (!providerOrSigner) {
+            if (DEFAULT_ENDPOINT[chainId]) {
+                this.providerOrSigner = getProvider(DEFAULT_ENDPOINT[chainId])
+            } else {
+                this.providerOrSigner = getDefaultProvider(getNetwork(chainId))
+            }
+        } else {
+            this.providerOrSigner = providerOrSigner
         }
-        else if (chainId == 1313161554) {
-            this.provider = getProvider("https://mainnet.aurora.dev")
-        } 
-        else if (chainId == 1313161555) {
-            this.provider = getProvider("https://testnet.aurora.dev")
-        }
-        else {
-            this.provider = getDefaultProvider(getNetwork(chainId))
-        }
+
         this.chainId = chainId
     }
 
     public async getBondTellerData (apiPriceMapping: {
         [x: string]: number;
-    }) {
+    }): Promise<BondTellerDetails[]> {
         const price_obj = new Price()
         let fetchedPriceMapping: { [x: string]: number } = {}
         let fetchedPriceMappingPromise: Promise<typeof fetchedPriceMapping>
@@ -79,16 +77,20 @@ export class Bond {
 
         const data = await Promise.all(teller.map(async (t) => {
             let bondTellerAbi = null
+            let principalAbi = null
 
             if (t.token == 'eth' && this.chainId == 1 || 4 || 42 || 1313161554 || 1313161555 ) {
                 bondTellerAbi = bondTellerEth
+                principalAbi = WETH9
             } else if (t.token == 'matic' && this.chainId == 137 || 80001) {
                 bondTellerAbi = bondTellerMatic
+                principalAbi = WMATIC
             } else {
                 bondTellerAbi = bondTellerErc20
+                principalAbi = ERC20
             }
     
-            const tellerContract = new Contract(t.addr, bondTellerAbi, this.provider)
+            const tellerContract = new Contract(t.addr, bondTellerAbi, this.providerOrSigner)
 
             const [principalAddr, bondPrice, vestingTermInSeconds, capacity, maxPayout] = await Promise.all([
                 withBackoffRetries(async () => tellerContract.principal()),
@@ -107,17 +109,7 @@ export class Bond {
                 }
             }
 
-            let principalAbi = null
-
-            if (t.token == 'eth' && this.chainId == 1 || 4 || 42 || 1313161554 || 1313161555 ) {
-                principalAbi = WETH9
-            } else if (t.token == 'matic' && this.chainId == 137 || 80001) {
-                principalAbi = WMATIC
-            } else {
-                principalAbi = ERC20
-            }
-
-            const principalContract = new Contract(principalAddr, principalAbi, this.provider)
+            const principalContract = new Contract(principalAddr, principalAbi, this.providerOrSigner)
 
             const {decimals, name, symbol} = MasterTokenList[this.chainId][t.token]
 
@@ -146,7 +138,7 @@ export class Bond {
     
             const d: BondTellerDetails = {
                 tellerData: {
-                  teller: {contract: new Contract(t.addr, bondTellerAbi, this.provider), type: t.type},
+                  teller: {contract: new Contract(t.addr, bondTellerAbi, this.providerOrSigner), type: t.type},
                   bondPrice,
                   usdBondPrice,
                   vestingTermInSeconds,
@@ -171,35 +163,28 @@ export class Bond {
         return data
     }
 
-    public async getUserBondData(bondTellerContract: Contract, account: string, token?: string): Promise<BondToken[]> {
-        invariant(isNetworkSupported(this.chainId),"not a supported chainID")
+    public async getUserBondData(bondTellerContractAddress: string, account: string): Promise<BondToken[]> {
         invariant(utils.isAddress(account),"account must be a valid address")
-        invariant(() => {
-            let found = false
-            Object.keys(BOND_TELLER_ADDRESSES).forEach((key) => {
-                if(BOND_TELLER_ADDRESSES[key][this.chainId] != undefined) {
-                    if(BOND_TELLER_ADDRESSES[key][this.chainId].addr == bondTellerContract.address) {
-                        found = true
-                    }
+        let storedType = 'erc20'
+        let found = false
+        Object.keys(BOND_TELLER_ADDRESSES).forEach((key) => {
+            if(BOND_TELLER_ADDRESSES[key][this.chainId] != undefined) {
+                if(BOND_TELLER_ADDRESSES[key][this.chainId].addr.toLowerCase() == bondTellerContractAddress.toLowerCase()) {
+                    storedType = BOND_TELLER_ADDRESSES[key][this.chainId].type
+                    found = true
                 }
-            })
-            return found
-        }, 'must provide valid bond teller contract')
-        
-        if ( token ) { invariant(token && BOND_TELLER_ADDRESSES[token][this.chainId] ,"not a supported token") }
+            }
+        })
+        invariant(found, 'must provide valid bond teller contract address for this chain')
 
         let bondTeller: Contract | null = null
 
-        if (token) {
-            if (token.toLowerCase() === "eth") {
-                bondTeller = new Contract(BOND_TELLER_ADDRESSES[token][this.chainId].addr, BondTellerEth, this.provider)
-            } else if (token.toLowerCase() === "matic") {
-                bondTeller = new Contract(BOND_TELLER_ADDRESSES[token][this.chainId].addr, BondTellerMatic, this.provider)
-            } else {
-                bondTeller = new Contract(BOND_TELLER_ADDRESSES[token][this.chainId].addr, BondTellerErc20, this.provider)
-            }
+        if (String(storedType) === "eth") {
+            bondTeller = new Contract(bondTellerContractAddress, BondTellerEth, this.providerOrSigner)
+        } else if (String(storedType) === "matic") {
+            bondTeller = new Contract(bondTellerContractAddress, BondTellerMatic, this.providerOrSigner)
         } else {
-            bondTeller = bondTellerContract
+            bondTeller = new Contract(bondTellerContractAddress, BondTellerErc20, this.providerOrSigner)
         }
 
         // 2 consecutive await calls within listTokensOfOwner

@@ -89,6 +89,7 @@ const SCP_ADDRESS: {
 const WMATIC_ADDRESS: { [chainID : number]: string } = {
     [1]: '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0',
     [137] : "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270", // Polygon
+    [80001]: '0xaCCcDcEd4198c837d9A98E870F330697f94208f7',
 }
 
 const WNEAR_ADDRESS: { [chainID : number]: string } = {
@@ -99,6 +100,7 @@ const WNEAR_ADDRESS: { [chainID : number]: string } = {
 const AURORA_ADDRESS: { [chainID : number]: string } = {
     [1]: '0xaaaaaa20d9e0e2461697782ef11675f668207961',
     [1313161554] : "0x8BEc47865aDe3B172A928df8f990Bc7f2A3b9f79", // Aurora
+    [1313161555]: '0x034c971902b0B2EF37abd249c1A5DEc5Dc5bE14B',
 }
 
 const SOLACE_USDC_SLP_ADDRESS: { [chainID : number]: string } = {

@@ -297,7 +297,7 @@ export class Coverage {
      * To fix this issue, if the last two characters of the signature are '00', replace with '0b'.
      * If the last two characters of the signature are '01', replace with '0c'.
      */
-    public async getReferralCode(chainId: number): Promise<string> {
+    public async getReferralCode(): Promise<string> {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot get referral code without a signer")
         
         let domain, value;
@@ -310,11 +310,11 @@ export class Coverage {
 
         // Wanted to use switch (chainId) but Typescript made the type of `chainId: 1` instead of `chainId: number`
         switch (true) {
-            case chainId === 1: {
+            case this.chainID === 1 || this.chainID === 4 : {
                 domain = {
                     name: "Solace.fi-SolaceCoverProduct",
                     version: "1",
-                    chainId: chainId,
+                    chainId: this.chainID,
                     verifyingContract: SOLACE_COVER_PRODUCT_ADDRESS[this.chainID]
                 };
 
@@ -325,11 +325,11 @@ export class Coverage {
                 break;
             }
 
-            case chainId === 137: {
+            case this.chainID === 137 || this.chainID === 80001: {
                 domain = {
                     name: "Solace.fi-SolaceCoverProductV2",
                     version: "2",
-                    chainId: chainId,
+                    chainId: this.chainID,
                     verifyingContract: SOLACE_COVER_PRODUCT_ADDRESS[this.chainID]
                 };   
 
@@ -344,7 +344,7 @@ export class Coverage {
                 domain = {
                     name: "Solace.fi-SolaceCoverProductV2",
                     version: "2",
-                    chainId: chainId,
+                    chainId: this.chainID,
                     verifyingContract: SOLACE_COVER_PRODUCT_ADDRESS[this.chainID]
                 };   
 

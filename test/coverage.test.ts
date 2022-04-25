@@ -153,7 +153,7 @@ describe("Policyholder", () => {
 
     describe("#getReferralCode", () => {
         it("gets the correct referral code", async () => {
-            expect(await coverage.getReferralCode(1)).toEqual("0x5406a8636b0cb38db066f2c87ea88d2d882d3407a5fdbba95cd70df2e43817a75643fa22feaf4b550f153d13c3f2eaa68626194291646b0fc1a06d6ca8c371001b")
+            expect(await coverage.getReferralCode()).toEqual("0x5406a8636b0cb38db066f2c87ea88d2d882d3407a5fdbba95cd70df2e43817a75643fa22feaf4b550f153d13c3f2eaa68626194291646b0fc1a06d6ca8c371001b")
         })
     })
 })

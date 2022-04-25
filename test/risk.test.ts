@@ -8,7 +8,7 @@ describe("Risk API call", () => {
 
     beforeEach(() => {
         // Avoid jest avoid timeout error
-        jest.setTimeout(30000);
+        jest.setTimeout(20000);
     })
 
     describe("#getSolaceRiskBalances - Single Chain", () => {

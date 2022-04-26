@@ -43,8 +43,8 @@ export class Price {
         return price_set
   }
 
-  public async getMainnetPrices(): Promise<{ [key: string]: number }> {
-      const provider = getDefaultProvider(getNetwork(1))
+  public async getMainnetPrices(rpcUrl?: string): Promise<{ [key: string]: number }> {
+      const provider = rpcUrl ? getProvider(rpcUrl) : getDefaultProvider(getNetwork(1))
       const blockTag = await provider.getBlockNumber()
 
       const scp = new Contract("0x501AcEe83a6f269B77c167c6701843D454E2EFA0", vaultAbi, provider)
@@ -69,7 +69,7 @@ export class Price {
       })
   }
 
-  public async getPolygonPrices(): Promise<{ [key: string]: number }> {
+  public async getPolygonPrices(rpcUrl?: string): Promise<{ [key: string]: number }> {
 
       async function fetchGuniPrice(provider: providers.JsonRpcProvider, blockTag: number): Promise<number> {
         const fraxSolacePool = "0x85Efec4ee18a06CE1685abF93e434751C3cb9bA9"
@@ -87,7 +87,7 @@ export class Price {
         })
       }
 
-      const provider = getProvider(DEFAULT_ENDPOINT[137])
+      const provider = getProvider(rpcUrl ?? DEFAULT_ENDPOINT[137])
       const blockTag = await provider.getBlockNumber()
 
       const pools = {
@@ -109,8 +109,8 @@ export class Price {
       })
   }
 
-  public async getAuroraPrices(): Promise<{ [key: string]: number }> {
-      const provider = getProvider(DEFAULT_ENDPOINT[1313161554])
+  public async getAuroraPrices(rpcUrl?: string): Promise<{ [key: string]: number }> {
+      const provider = getProvider(rpcUrl ?? DEFAULT_ENDPOINT[1313161554])
       const blockTag = await provider.getBlockNumber()
 
       const pools = {

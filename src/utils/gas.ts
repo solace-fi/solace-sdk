@@ -15,7 +15,7 @@ export const getGasPrice = async (providerOrSigner: providers.JsonRpcProvider | 
   return Math.ceil(parseFloat(gasString))
 }
 
-export const getGasSettings = async (chainId: number, gasArgs?: GasArgs): Promise<GasConfiguration> => {
+export const getGasSettings = async (chainId: number, rpcUrl?: string, gasArgs?: GasArgs): Promise<GasConfiguration> => {
   invariant(isNetworkSupported(chainId), `Chain ID ${chainId} is not supported`)
 
   const getGasValue = (val: number) => Math.floor(val * Math.pow(10, 9))
@@ -30,10 +30,14 @@ export const getGasSettings = async (chainId: number, gasArgs?: GasArgs): Promis
 
   let provider: providers.Provider
 
-  if (DEFAULT_ENDPOINT[chainId]) {
-    provider = getProvider(DEFAULT_ENDPOINT[chainId])
+  if(rpcUrl) {
+    provider = getProvider(rpcUrl)
   } else {
-    provider = getDefaultProvider(getNetwork(chainId))
+    if (DEFAULT_ENDPOINT[chainId]) {
+      provider = getProvider(DEFAULT_ENDPOINT[chainId])
+    } else {
+      provider = getDefaultProvider(getNetwork(chainId))
+    }
   }
 
   return await provider.getFeeData().then((result: FeeData) => {

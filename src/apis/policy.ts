@@ -8,16 +8,22 @@ import SolaceCoverProduct from "../abis/SolaceCoverProduct.json"
 import SolaceCoverProductV2 from "../abis/SolaceCoverProductV2.json"
 
 export class Policy {
-    public async getTotalActivePolicies(chainId: number): Promise<{ totalPolicies: BigNumber; totalActiveCoverLimit: BigNumber }> {
+    public async getTotalActivePolicies(chainId: number, rpcUrl?: string): Promise<{ totalPolicies: BigNumber; totalActiveCoverLimit: BigNumber }> {
         invariant(SOLACE_COVER_PRODUCT_ADDRESS[chainId],"not a supported chainID")
 
         let provider = null
         let solaceCoverProduct = null
-        if (chainId == ( 137 || 80001 )) {
-            provider = getProvider(DEFAULT_ENDPOINT[chainId])
+
+        if (!rpcUrl) {
+            if (chainId == ( 137 || 80001 )) {
+                provider = getProvider(DEFAULT_ENDPOINT[chainId])
+            } else {
+                provider = getDefaultProvider(getNetwork(chainId))
+            }
         } else {
-            provider = getDefaultProvider(getNetwork(chainId))
+            provider = getProvider(rpcUrl)
         }
+ 
 
         if (chainId == 137 || 80001) {
             // SolaceCoverProductV2 deployed on Polygon mainnet (137) and Mumbai (80001)
@@ -37,10 +43,10 @@ export class Policy {
         }
     }
 
-    public async getTotalActivePolicies_All(): Promise<{ totalPolicies: BigNumber; totalActiveCoverLimit: BigNumber }> {
+    public async getTotalActivePolicies_All(rpcUrlMapping?: {[chain: number] : string}): Promise<{ totalPolicies: BigNumber; totalActiveCoverLimit: BigNumber }> {
         const [res1, res137] = await Promise.all([
-            this.getTotalActivePolicies(1),
-            this.getTotalActivePolicies(137),
+            this.getTotalActivePolicies(1, rpcUrlMapping ? rpcUrlMapping[1] : undefined),
+            this.getTotalActivePolicies(137, rpcUrlMapping ? rpcUrlMapping[137] : undefined),
         ])
 
         return {
@@ -49,7 +55,7 @@ export class Policy {
         }
     }
 
-    public async getExistingPolicy(account: string, includeTestnets?: boolean): Promise<{ policyId: BigNumber, chainId: number }[]> {
+    public async getExistingPolicy(account: string, rpcUrlMapping?: {[chain: number] : string}, includeTestnets?: boolean): Promise<{ policyId: BigNumber, chainId: number }[]> {
         invariant(utils.isAddress(account),"not an Ethereum address")
 
         const supportedChains = [1, 4, 137, 80001]
@@ -61,10 +67,14 @@ export class Policy {
         async function processChain(chainId: number) {
             let provider = null
             let solaceCoverProduct = null
-            if (chainId == ( 137 || 80001 )) {
-                provider = getProvider(DEFAULT_ENDPOINT[chainId])
+            if(rpcUrlMapping && rpcUrlMapping[chainId]) {
+                provider = getProvider(rpcUrlMapping[chainId])
             } else {
-                provider = getDefaultProvider(getNetwork(chainId))
+                if (chainId == ( 137 || 80001 )) {
+                    provider = getProvider(DEFAULT_ENDPOINT[chainId])
+                } else {
+                    provider = getDefaultProvider(getNetwork(chainId))
+                }
             }
             
             if (chainId == ( 137 || 80001 )) {

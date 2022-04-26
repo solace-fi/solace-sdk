@@ -13,20 +13,28 @@ export class SolaceBalance {
     ERC20ABI = ERC20
 
     account: string
+    rpcUrlMapping: {[chain: number]: string} | undefined
 
-    constructor (account: string) {
+    constructor (account: string, rpcUrlMapping?: {[chain: number]: string}) {
         invariant(utils.isAddress(account),"not an Ethereum address")
+        invariant(rpcUrlMapping && Object.keys(rpcUrlMapping).length > 0,"no rpcUrlMapping provided")
         this.account = account
+        this.rpcUrlMapping = rpcUrlMapping
     }
 
     public async getSolaceBalanceOf(chainId: number) {
         invariant(this.CHAIN_IDS.includes(chainId),"not a supported chainID")
 
         let provider = null
-        if (chainId == 137 || chainId == 1313161554) {
-            provider = getProvider(DEFAULT_ENDPOINT[chainId])
+
+        if(this.rpcUrlMapping && this.rpcUrlMapping[chainId]) {
+            provider = getProvider(this.rpcUrlMapping[chainId])
         } else {
-            provider = getDefaultProvider(getNetwork(chainId))
+            if (chainId == 137 || chainId == 1313161554) {
+                provider = getProvider(DEFAULT_ENDPOINT[chainId])
+            } else {
+                provider = getDefaultProvider(getNetwork(chainId))
+            }
         }
         const solace = new Contract(this.SOLACE_ADDRESS, this.ERC20ABI, provider)
         const bal = await solace.balanceOf(this.account)
@@ -59,20 +67,28 @@ export class xSolaceBalance {
     ERC20ABI = ERC20
 
     account: string
+    rpcUrlMapping: {[chain: number]: string} | undefined
 
-    constructor (account: string) {
+    constructor (account: string, rpcUrlMapping?: {[chain: number]: string}) {
         invariant(utils.isAddress(account),"not an Ethereum address")
+        invariant(rpcUrlMapping && Object.keys(rpcUrlMapping).length > 0,"no rpcUrlMapping provided")
         this.account = account
+        this.rpcUrlMapping = rpcUrlMapping
     }
 
     public async getXSolaceBalanceOf(chainId: number) {
         invariant(this.CHAIN_IDS.includes(chainId),"not a supported chainID")
 
         let provider = null
-        if (chainId == 137 || chainId == 1313161554) {
-            provider = getProvider(DEFAULT_ENDPOINT[chainId])
+
+        if(this.rpcUrlMapping && this.rpcUrlMapping[chainId]) {
+            provider = getProvider(this.rpcUrlMapping[chainId])
         } else {
-            provider = getDefaultProvider(getNetwork(chainId))
+            if (chainId == 137 || chainId == 1313161554) {
+                provider = getProvider(DEFAULT_ENDPOINT[chainId])
+            } else {
+                provider = getDefaultProvider(getNetwork(chainId))
+            }
         }
         const xsolace = new Contract(this.XSOLACE_ADDRESS, this.ERC20ABI, provider)
         const bal = await xsolace.balanceOf(this.account)

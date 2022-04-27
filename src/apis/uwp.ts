@@ -218,7 +218,7 @@ export class UnderwritingPoolUSDBalances {
     return USDBalances
   }
 
-  public async getUSDBalances_All(rpcUrlMapping?: { [key: string]: string }) {
+  public async getUSDBalances_All(rpcUrlMapping?: { [chain: number]: string }) {
     const uwpbObj = new UnderwritingPoolBalances()
     const priceObj = new Price()
 

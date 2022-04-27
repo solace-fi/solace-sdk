@@ -17,7 +17,7 @@ export class SolaceBalance {
 
     constructor (account: string, rpcUrlMapping?: {[chain: number]: string}) {
         invariant(utils.isAddress(account),"not an Ethereum address")
-        invariant(rpcUrlMapping && Object.keys(rpcUrlMapping).length > 0,"no rpcUrlMapping provided")
+        // invariant(rpcUrlMapping && Object.keys(rpcUrlMapping).length > 0,"no rpcUrlMapping provided")
         this.account = account
         this.rpcUrlMapping = rpcUrlMapping
     }
@@ -71,7 +71,7 @@ export class xSolaceBalance {
 
     constructor (account: string, rpcUrlMapping?: {[chain: number]: string}) {
         invariant(utils.isAddress(account),"not an Ethereum address")
-        invariant(rpcUrlMapping && Object.keys(rpcUrlMapping).length > 0,"no rpcUrlMapping provided")
+        // invariant(rpcUrlMapping && Object.keys(rpcUrlMapping).length > 0,"no rpcUrlMapping provided")
         this.account = account
         this.rpcUrlMapping = rpcUrlMapping
     }

@@ -46,7 +46,7 @@ describe('xSolaceBalance', () => {
 
     beforeEach(() => {
         // Avoid jest avoid timeout error
-        jest.setTimeout(30000);
+        jest.setTimeout(20000);
     })
 
     describe('#getXSolaceBalanceOf', () => {

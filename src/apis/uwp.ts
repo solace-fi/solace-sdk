@@ -7,9 +7,9 @@ import { getProvider } from '../utils/ethers'
 import { Price } from './price'
 export class UnderwritingPoolBalances {
 
-  public async getBalances_Mainnet() {
+  public async getBalances_Mainnet(rpcUrl?: string) {
 
-    const provider = getDefaultProvider(getNetwork(1))
+    const provider = getDefaultProvider(rpcUrl ?? getNetwork(1))
     const blockTag = await provider.getBlockNumber()
 
     let res = []
@@ -44,8 +44,8 @@ export class UnderwritingPoolBalances {
     return res
   }
 
-  public async getBalances_Polygon() {
-    const provider = getProvider(DEFAULT_ENDPOINT[137])
+  public async getBalances_Polygon(rpcUrl?: string) {
+    const provider = getProvider(rpcUrl ?? DEFAULT_ENDPOINT[137])
     const blockTag = await provider.getBlockNumber()
     let res = []
 
@@ -79,8 +79,8 @@ export class UnderwritingPoolBalances {
     return res
   }
 
-  public async getBalances_Aurora() {
-    const provider = getProvider(DEFAULT_ENDPOINT[1313161554])
+  public async getBalances_Aurora(rpcUrl?: string) {
+    const provider = getProvider(rpcUrl ?? DEFAULT_ENDPOINT[1313161554])
     const blockTag = await provider.getBlockNumber()
     let res = []
 
@@ -118,13 +118,13 @@ export class UnderwritingPoolBalances {
 
 export class UnderwritingPoolUSDBalances {
 
-  public async getUSDBalances_Mainnet() {
+  public async getUSDBalances_Mainnet(rpcUrl?: string) {
     const uwpbObj = new UnderwritingPoolBalances()
     const priceObj = new Price()
     
     const [ balances, prices, tokenPrices ] = await Promise.all([
-      withBackoffRetries(async () => uwpbObj.getBalances_Mainnet()),
-      withBackoffRetries(async () => priceObj.getMainnetPrices()),
+      withBackoffRetries(async () => uwpbObj.getBalances_Mainnet(rpcUrl)),
+      withBackoffRetries(async () => priceObj.getMainnetPrices(rpcUrl)),
       withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices())
     ])
 
@@ -149,7 +149,7 @@ export class UnderwritingPoolUSDBalances {
     return USDBalances
   }
 
-  public async getUSDBalances_Polygon() {
+  public async getUSDBalances_Polygon(rpcUrl?: string) {
     const uwpbObj = new UnderwritingPoolBalances()
     const priceObj = new Price()
     // const balances = await withBackoffRetries(async () => uwpbObj.getBalances_Polygon())
@@ -157,8 +157,8 @@ export class UnderwritingPoolUSDBalances {
     // const tokenPrices = await withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices())
     
     const [balances, prices, tokenPrices] = await Promise.all([
-      withBackoffRetries(async () => uwpbObj.getBalances_Polygon()),
-      withBackoffRetries(async () => priceObj.getPolygonPrices()),
+      withBackoffRetries(async () => uwpbObj.getBalances_Polygon(rpcUrl)),
+      withBackoffRetries(async () => priceObj.getPolygonPrices(rpcUrl)),
       withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices())
     ])
 
@@ -183,7 +183,7 @@ export class UnderwritingPoolUSDBalances {
     return USDBalances
   }
 
-  public async getUSDBalances_Aurora() {
+  public async getUSDBalances_Aurora(rpcUrl?: string) {
     const uwpbObj = new UnderwritingPoolBalances()
     const priceObj = new Price()
     // const balances = await withBackoffRetries(async () => uwpbObj.getBalances_Aurora())
@@ -191,8 +191,8 @@ export class UnderwritingPoolUSDBalances {
     // const tokenPrices = await withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices())
     
     const [balances, prices, tokenPrices] = await Promise.all([
-      withBackoffRetries(async () => uwpbObj.getBalances_Aurora()),
-      withBackoffRetries(async () => priceObj.getAuroraPrices()),
+      withBackoffRetries(async () => uwpbObj.getBalances_Aurora(rpcUrl)),
+      withBackoffRetries(async () => priceObj.getAuroraPrices(rpcUrl)),
       withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices())
     ])
 
@@ -218,18 +218,18 @@ export class UnderwritingPoolUSDBalances {
     return USDBalances
   }
 
-  public async getUSDBalances_All() {
+  public async getUSDBalances_All(rpcUrlMapping?: { [key: string]: string }) {
     const uwpbObj = new UnderwritingPoolBalances()
     const priceObj = new Price()
 
     const [tokenPrices, mainnetPrices, mainnetBalances, polygonPrices, polygonBalances, auroraPrices, auroraBalances] = await Promise.all([
       withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices()),
-      withBackoffRetries(async () => priceObj.getMainnetPrices()),
-      withBackoffRetries(async () => uwpbObj.getBalances_Mainnet()),
-      withBackoffRetries(async () => priceObj.getPolygonPrices()),
-      withBackoffRetries(async () => uwpbObj.getBalances_Polygon()),
-      withBackoffRetries(async () => priceObj.getAuroraPrices()),
-      withBackoffRetries(async () => uwpbObj.getBalances_Aurora())
+      withBackoffRetries(async () => priceObj.getMainnetPrices(rpcUrlMapping ? rpcUrlMapping[1] : undefined)),
+      withBackoffRetries(async () => uwpbObj.getBalances_Mainnet(rpcUrlMapping ? rpcUrlMapping[1] : undefined)),
+      withBackoffRetries(async () => priceObj.getPolygonPrices(rpcUrlMapping ? rpcUrlMapping[137] : undefined)),
+      withBackoffRetries(async () => uwpbObj.getBalances_Polygon(rpcUrlMapping ? rpcUrlMapping[137] : undefined)),
+      withBackoffRetries(async () => priceObj.getAuroraPrices(rpcUrlMapping ? rpcUrlMapping[1313161554] : undefined)),
+      withBackoffRetries(async () => uwpbObj.getBalances_Aurora(rpcUrlMapping ? rpcUrlMapping[1313161554] : undefined))
     ])
 
     const USDBalances_Mainnet = mainnetBalances.map((b: {

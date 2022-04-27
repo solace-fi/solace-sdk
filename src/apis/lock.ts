@@ -86,10 +86,11 @@ export class Lock {
         })
     }
 
-    public async getGlobalLockStats (chainId: number): Promise<GlobalLockInfo> {      
-      const xslAddr = XSLOCKER_ADDRESS[chainId]
-      const srAddr = STAKING_REWARDS_ADDRESS[chainId]
-      if (!xslAddr || !srAddr) return {
+    public async getGlobalLockStats (): Promise<GlobalLockInfo> {      
+      const xsl = new Contract(this.xslAddr, xsLocker, this.provider)
+      const sr = new Contract(this.srAddr, stakingRewards, this.provider)
+
+      if (!xsl || !sr) return {
         solaceStaked: '0',
         valueStaked: '0',
         numLocks: '0',
@@ -98,18 +99,6 @@ export class Lock {
         successfulFetch: false
       }
 
-      let _provider: any = null
-      
-      if (chainId == 137) {
-          _provider = getProvider("https://polygon-rpc.com")
-      } else if (chainId == 1313161554) {
-          _provider = getProvider("https://mainnet.aurora.dev")
-      } else {
-          _provider = getDefaultProvider(getNetwork(chainId))
-      }
-
-      const xsl = new Contract(xslAddr, xsLocker, _provider)
-      const sr = new Contract(srAddr, stakingRewards, _provider)
       let totalSolaceStaked = BigNumber.from(0)
 
       const filterLockCreated = xsl.filters.LockCreated()
@@ -120,7 +109,7 @@ export class Lock {
       // The concern with Promise.all is that we aren't getting info from the same block
       // But surely if you commence all your network requests at the same time, you can be reasonably sure that they will return information for the same block?
       const [blockTag, rewardPerSecond, valueStaked, lockCreatedEvents, lockBurnedEvents] = await Promise.all([
-        _provider.getBlockNumber(),
+        this.provider.getBlockNumber(),
         sr.rewardPerSecond(), // across all locks
         sr.valueStaked(), // across all locks
         xsl.queryFilter(filterLockCreated),

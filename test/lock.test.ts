@@ -24,7 +24,7 @@ describe('Lock', () => {
 
     describe('#getGlobalLockStats', () => {
         it('will return a valid response', async () => {
-            const res = await xsl.getGlobalLockStats(1)
+            const res = await xsl.getGlobalLockStats()
             console.log(res)
         })
     })

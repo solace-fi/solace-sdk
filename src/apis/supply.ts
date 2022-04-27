@@ -13,14 +13,19 @@ export class TotalSupply {
     XSOLACE_ADDRESS = "0x501ACe802447B1Ed4Aae36EA830BFBde19afbbF9"
     ERC20ABI = ERC20
 
-    public async getTotalSupply(chainId: number, token: 'SOLACE' | 'XSOLACE') {
+    public async getTotalSupply(chainId: number, token: 'SOLACE' | 'XSOLACE', providerOrSigner?: providers.Provider | providers.JsonRpcSigner): Promise<string> {
         invariant(this.CHAIN_IDS.includes(chainId), `chainId must be one of ${this.CHAIN_IDS}`)
         let provider = null
-        if (chainId == 137 || chainId == 1313161554) {
-            provider = getProvider(DEFAULT_ENDPOINT[chainId])
+        if (!providerOrSigner) {
+            if (chainId == 137 || chainId == 1313161554) {
+                provider = getProvider(DEFAULT_ENDPOINT[chainId])
+            } else {
+                provider = getDefaultProvider(getNetwork(chainId))
+            }
         } else {
-            provider = getDefaultProvider(getNetwork(chainId))
+            provider = providerOrSigner
         }
+
         const contract = new Contract(token == 'SOLACE' ? this.SOLACE_ADDRESS : this.XSOLACE_ADDRESS, this.ERC20ABI, provider)
         const bal = await contract.totalSupply()
         return formatUnits(bal, 18)
@@ -78,22 +83,27 @@ export class CirculatingSupply {
 
     skipXSolaceAddrs: {[key: string]: any} = {"1":{},"137":{},"1313161554":{}}
 
-    public async getCirculatingSupply(chainId: number, token: 'SOLACE' | 'XSOLACE') {
+    public async getCirculatingSupply(chainId: number, token: 'SOLACE' | 'XSOLACE', provider?: providers.Provider) {
         invariant(this.CHAIN_IDS.includes(chainId), `chainId must be one of ${this.CHAIN_IDS}`)
         invariant(token == 'SOLACE' || 'XSOLACE', `token must be one of 'SOLACE' or 'XSOLACE'`)
 
-        let provider = null
-        if (chainId == 137 || chainId == 1313161554) {
-            provider = new MulticallProvider(getProvider(DEFAULT_ENDPOINT[chainId]), chainId)
+        let _provider = null
+
+        if (!provider) {
+            if (chainId == 137 || chainId == 1313161554) {
+                _provider = new MulticallProvider(getProvider(DEFAULT_ENDPOINT[chainId]), chainId)
+            } else {
+                _provider = new MulticallProvider(getDefaultProvider(getNetwork(chainId)), chainId)
+            }
         } else {
-            provider = new MulticallProvider(getDefaultProvider(getNetwork(chainId)), chainId)
+            _provider = new MulticallProvider(provider, chainId)
         }
 
         const contract = new MulticallContract(token == 'SOLACE' ? this.SOLACE_ADDRESS : this.XSOLACE_ADDRESS, this.ERC20ABI)
         const supplyPromise = contract.totalSupply()
         const balancePromises = Object.keys((token == 'SOLACE' ? this.skipSolaceAddrs : this.skipXSolaceAddrs)[chainId+""]).map(addr => contract.balanceOf(addr))
         let promises = [supplyPromise, ...balancePromises]
-        let [supply, ...balances] = await provider.all(promises)
+        let [supply, ...balances] = await _provider.all(promises)
         balances.forEach(b => supply = supply.sub(b));
         return formatUnits(supply, 18)
     }

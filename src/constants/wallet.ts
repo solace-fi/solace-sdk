@@ -5,6 +5,12 @@ import { Network, WalletConnector } from "../types";
 import { NETWORKS } from ".";
 import { DEFAULT_ENDPOINT } from "./network";
 
+const DEFAULT_ENDPOINT_ETH: { [key: number] : string} = {
+  [1]: "https://mainnet.infura.io/v3",
+  [4]: "https://rinkeby.infura.io/v3",
+  [42]: "https://kovan.infura.io/v3",
+}
+
 export const WALLETS: WalletConnector[] = [
     {
         id: 'metamask',
@@ -37,9 +43,3 @@ export const WALLETS: WalletConnector[] = [
         }),
     },
 ]
-
-const DEFAULT_ENDPOINT_ETH: { [key: number] : string} = {
-    [1]: "https://mainnet.infura.io/v3",
-    [4]: "https://rinkeby.infura.io/v3",
-    [42]: "https://kovan.infura.io/v3",
-}

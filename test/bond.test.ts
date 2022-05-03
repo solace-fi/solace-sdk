@@ -1,6 +1,8 @@
 import { BOND_TELLER_ADDRESSES, Price } from "../src";
 import { Bond } from "../src/apis/bond"
 
+import { BigNumber } from "ethers";
+
 describe('Bond', () => {
     let bond1 = new Bond(1);
     let bond137 = new Bond(137);
@@ -17,6 +19,10 @@ describe('Bond', () => {
         it('will return a valid response - mainnet', async () => {
             const apiPriceMapping = await price.getCoinGeckoTokenPrices()
             const res = await bond1.getBondTellerData(apiPriceMapping)
+            const detail = res.find((r) => r.tellerData.teller.type == 'eth')
+            if(!detail) return
+            await detail.tellerData.teller.contract.estimateGas.depositEth(BigNumber.from(0), bonder, true)
+            await detail.tellerData.teller.contract.estimateGas.depositWeth(BigNumber.from(0), BigNumber.from(0), bonder, true)
             console.log(res)
         })
 
@@ -24,6 +30,10 @@ describe('Bond', () => {
             const bond = new Bond(137);
             const apiPriceMapping = await price.getCoinGeckoTokenPrices()
             const res = await bond.getBondTellerData(apiPriceMapping)
+            const detail = res.find((r) => r.tellerData.teller.type == 'matic')
+            if(!detail) return
+            await detail.tellerData.teller.contract.estimateGas.depositMatic(BigNumber.from(0), bonder, true)
+            await detail.tellerData.teller.contract.estimateGas.depositWmatic(BigNumber.from(0), BigNumber.from(0), bonder, true)
             console.log(res)
         })
 
@@ -31,6 +41,9 @@ describe('Bond', () => {
             const bond = new Bond(1313161554);
             const apiPriceMapping = await price.getCoinGeckoTokenPrices()
             const res = await bond.getBondTellerData(apiPriceMapping)
+            const detail = res.find((r) => r.tellerData.teller.type == 'erc20')
+            if(!detail) return
+            await detail.tellerData.teller.contract.estimateGas.deposit(BigNumber.from(0), BigNumber.from(0), bonder, true)
             console.log(res)
         })
     })

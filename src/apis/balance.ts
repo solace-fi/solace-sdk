@@ -37,14 +37,14 @@ export class SolaceBalance {
         }
         const solace = new Contract(this.SOLACE_ADDRESS, this.ERC20ABI, provider)
         const bal = await solace.balanceOf(this.account)
-        return formatUnits(bal, 18)
+        return parseFloat( formatUnits(bal, 18) )
     }
 
     public async getSolaceBalanceSum() {
         const promises = this.CHAIN_IDS.map(chain => this.getSolaceBalanceOf(chain))
         const balances = await Promise.all(promises)
         let sum = 0
-        balances.forEach(bal => sum += parseFloat(bal))
+        balances.forEach(bal => sum += bal)
         return sum
     }
 
@@ -55,7 +55,7 @@ export class SolaceBalance {
         for(var i = 0; i < this.CHAIN_IDS.length; ++i) {
             res[this.CHAIN_IDS[i]+""] = balances[i]
         }
-        return JSON.stringify(res)    
+        return res
     }
 }
 
@@ -90,14 +90,14 @@ export class xSolaceBalance {
         }
         const xsolace = new Contract(this.XSOLACE_ADDRESS, this.ERC20ABI, provider)
         const bal = await xsolace.balanceOf(this.account)
-        return formatUnits(bal, 18)
+        return parseFloat( formatUnits(bal, 18) )
     }
 
     public async getXSolaceBalanceSum() {
         const promises = this.CHAIN_IDS.map(chain => this.getXSolaceBalanceOf(chain))
         const balances = await Promise.all(promises)
         let sum = 0
-        balances.forEach(bal => sum += parseFloat(bal))
+        balances.forEach(bal => sum += bal)
         return sum
     }
 
@@ -108,6 +108,6 @@ export class xSolaceBalance {
         for(var i = 0; i < this.CHAIN_IDS.length; ++i) {
             res[this.CHAIN_IDS[i]+""] = balances[i]
         }
-        return JSON.stringify(res)    
+        return res
     }
 }

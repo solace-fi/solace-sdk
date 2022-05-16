@@ -1,9 +1,11 @@
-import { BigNumber as BN, Contract, providers, Wallet, utils } from 'ethers'
-import xsLocker from "./abis/xsLocker.json"
-import StakingRewards from "./abis/StakingRewards.json"
+import { BigNumber as BN, Contract, providers, Wallet, utils, getDefaultProvider, BigNumberish } from 'ethers'
+const { getNetwork } = providers
+import xsLocker from "../abis/xsLocker.json"
+import StakingRewards from "../abis/StakingRewards.json"
 import invariant from 'tiny-invariant'
-import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS, ZERO_ADDRESS, isNetworkSupported } from './constants'
-import { GasConfiguration } from './types';
+import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS, ZERO_ADDRESS, isNetworkSupported, DEFAULT_ENDPOINT } from '../constants'
+import { GasConfiguration } from '../types';
+import { getProvider } from '../utils/ethers'
 
 /*
  * Contains methods for accessing Solace staking functionality (xsLocker.sol & StakingRewards.sol).
@@ -15,7 +17,7 @@ export class Staker {
     PROPERTIES
     **************/
     chainID: number;
-    providerOrSigner: Wallet | providers.JsonRpcSigner | providers.Provider;
+    walletOrProviderOrSigner: Wallet | providers.JsonRpcSigner | providers.Provider;
     stakingRewards: Contract;
     xsLocker: Contract;
 
@@ -25,14 +27,25 @@ export class Staker {
 
     /**
      * @param chainID The chainID for the Staker object, 1 for Ethereum Mainnet.
-     * @param providerOrSigner providerOrSigner object - either a Provider (https://docs.ethers.io/v5/api/providers/) or Signer (https://docs.ethers.io/v5/api/signer/)
+     * @param walletOrProviderOrSigner walletOrProviderOrSigner object - a Wallet (https://docs.ethers.io/v5/api/signer/#Wallet) or a Provider (https://docs.ethers.io/v5/api/providers/) or Signer (https://docs.ethers.io/v5/api/signer/)
      */
-    constructor(chainID: number, providerOrSigner: Wallet | providers.JsonRpcSigner | providers.Provider) {
+    constructor(chainID: number, walletOrProviderOrSigner?: Wallet | providers.JsonRpcSigner | providers.Provider) {
         invariant(isNetworkSupported(chainID),"not a supported chainID")
         this.chainID = chainID;
-        this.providerOrSigner = providerOrSigner;
-        this.stakingRewards = new Contract(STAKING_REWARDS_ADDRESS[chainID], StakingRewards, providerOrSigner)
-        this.xsLocker = new Contract(XSLOCKER_ADDRESS[chainID], xsLocker, providerOrSigner)
+        if (typeof(walletOrProviderOrSigner) == 'undefined') {
+            // ethers.js getDefaultProvider method doesn't work for MATIC or Mumbai
+            // Use public RPC endpoints instead
+            if (DEFAULT_ENDPOINT[chainID]) {
+                this.walletOrProviderOrSigner = getProvider(DEFAULT_ENDPOINT[chainID])
+            } else {
+                this.walletOrProviderOrSigner = getDefaultProvider(getNetwork(chainID))
+            }
+        } else {
+            this.walletOrProviderOrSigner = walletOrProviderOrSigner
+        }
+         
+        this.stakingRewards = new Contract(STAKING_REWARDS_ADDRESS[chainID], StakingRewards, walletOrProviderOrSigner)
+        this.xsLocker = new Contract(XSLOCKER_ADDRESS[chainID], xsLocker, walletOrProviderOrSigner)
     }
 
     /**********************************
@@ -47,14 +60,14 @@ export class Staker {
      */
      public async createLock(
         recipient: string,
-        amount: BN,
-        end: BN,
+        amount: BigNumberish,
+        end: BigNumberish,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(recipient), "not an Ethereum address")
         invariant(recipient != ZERO_ADDRESS, "cannot enter zero address policyholder")
-        invariant(amount.gt(0), "cannot enter zero amount")
+        invariant(BN.from(amount).gt(0), "cannot enter zero amount")
 
         const tx: providers.TransactionResponse = await this.xsLocker.createLock(recipient, amount, end, {...gasConfig})
         return tx
@@ -71,16 +84,16 @@ export class Staker {
      * @param s secp256k1 signature
      */
      public async createLockSigned(
-        amount: BN,
-        end: BN,
-        deadline: BN,
+        amount: BigNumberish,
+        end: BigNumberish,
+        deadline: BigNumberish,
         v: utils.BytesLike,
         r: utils.BytesLike,
         s: utils.BytesLike,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
-        invariant(amount.gt(0), "cannot enter zero amount")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
+        invariant(BN.from(amount).gt(0), "cannot enter zero amount")
 
         const tx: providers.TransactionResponse = await this.xsLocker.createLockSigned(amount, end, deadline, v, r, s, {...gasConfig})
         return tx
@@ -94,12 +107,12 @@ export class Staker {
      * @param amount The amount of SOLACE to deposit.
      */
      public async increaseAmount(
-        xsLockID: number,
-        amount: BN,
+        xsLockID: BigNumberish,
+        amount: BigNumberish,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
-        invariant(amount.gt(0), "cannot enter zero amount")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
+        invariant(BN.from(amount).gt(0), "cannot enter zero amount")
 
         const tx: providers.TransactionResponse = await this.xsLocker.increaseAmount(xsLockID, amount, {...gasConfig})
         return tx
@@ -116,16 +129,16 @@ export class Staker {
      * @param s secp256k1 signature
      */
      public async increaseAmountSigned(
-        xsLockID: number,
-        amount: BN,
-        deadline: BN,
+        xsLockID: BigNumberish,
+        amount: BigNumberish,
+        deadline: BigNumberish,
         v: utils.BytesLike,
         r: utils.BytesLike,
         s: utils.BytesLike,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
-        invariant(amount.gt(0), "cannot enter zero amount")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
+        invariant(BN.from(amount).gt(0), "cannot enter zero amount")
 
         const tx: providers.TransactionResponse = await this.xsLocker.increaseAmountSigned(xsLockID, amount, deadline, v, r, s, {...gasConfig})
         return tx
@@ -138,12 +151,12 @@ export class Staker {
      * @param end The new time for the lock to unlock.
      */
      public async extendLock(
-        xsLockID: number,
-        end: BN,
+        xsLockID: BigNumberish,
+        end: BigNumberish,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
-        invariant(end.gt(0), "not extended")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
+        invariant(BN.from(end).gt(0), "not extended")
 
         const tx: providers.TransactionResponse = await this.xsLocker.extendLock(xsLockID, end, {...gasConfig})
         return tx
@@ -157,11 +170,11 @@ export class Staker {
      * @param recipient The user to receive the lock's SOLACE.
      */
      public async withdraw(
-        xsLockID: number,
+        xsLockID: BigNumberish,
         recipient: string,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(recipient), "not an Ethereum address")
         invariant(recipient != ZERO_ADDRESS, "cannot enter zero address policyholder")
 
@@ -178,15 +191,15 @@ export class Staker {
      * @param amount The amount of SOLACE to withdraw.
      */
      public async withdrawInPart(
-        xsLockID: number,
+        xsLockID: BigNumberish,
         recipient: string,
-        amount: BN,
+        amount: BigNumberish,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(recipient), "not an Ethereum address")
         invariant(recipient != ZERO_ADDRESS, "cannot enter zero address policyholder")
-        invariant(amount.gt(0), "cannot enter zero amount")
+        invariant(BN.from(amount).gt(0), "cannot enter zero amount")
 
         const tx: providers.TransactionResponse = await this.xsLocker.withdrawInPart(xsLockID, recipient, amount, {...gasConfig})
         return tx
@@ -200,11 +213,11 @@ export class Staker {
      * @param recipient The user to receive the lock's SOLACE.
      */
      public async withdrawMany(
-        xsLockIDs: number[],
+        xsLockIDs: BigNumberish[],
         recipient: string,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(recipient), "not an Ethereum address")
         invariant(recipient != ZERO_ADDRESS, "cannot enter zero address policyholder")
 
@@ -223,7 +236,7 @@ export class Staker {
      * @param xsLockID The ID of the lock to query.
      * @return lock_ Information about the lock.
      */
-     public async locks(xsLockID: number): Promise<any> {
+     public async locks(xsLockID: BigNumberish): Promise<any> {
         return (await this.xsLocker.locks(xsLockID))
     }
 
@@ -232,7 +245,7 @@ export class Staker {
      * @param xsLockID The ID of the lock to query.
      * @return locked True if the lock is locked, false if unlocked.
      */
-     public async isLocked(xsLockID: number): Promise<boolean> {
+     public async isLocked(xsLockID: BigNumberish): Promise<boolean> {
         return (await this.xsLocker.isLocked(xsLockID))
     }
 
@@ -241,7 +254,7 @@ export class Staker {
      * @param xsLockID The ID of the lock to query.
      * @return time The time left in seconds, 0 if unlocked.
      */
-     public async timeLeft(xsLockID: number): Promise<BN> {
+     public async timeLeft(xsLockID: BigNumberish): Promise<BN> {
         return (await this.xsLocker.timeLeft(xsLockID))
     }
 
@@ -265,10 +278,10 @@ export class Staker {
      * @param xsLockID The ID of the lock to process rewards for.
      */
      public async harvestLock(
-        xsLockID: number,
+        xsLockID: BigNumberish,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         const tx: providers.TransactionResponse = await this.stakingRewards.harvestLock(xsLockID, {...gasConfig})
         return tx
     }
@@ -278,10 +291,10 @@ export class Staker {
      * @param xsLockID The ID of the lock to process rewards for.
      */
      public async harvestLocks(
-        xsLockIDs: number[],
+        xsLockIDs: BigNumberish[],
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         const tx: providers.TransactionResponse = await this.stakingRewards.harvestLock(xsLockIDs, {...gasConfig})
         return tx
     }
@@ -292,10 +305,10 @@ export class Staker {
      * @param xsLockID The ID of the lock to compound.
      */
      public async compoundLock(
-        xsLockID: number,
+        xsLockID: BigNumberish,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         const tx: providers.TransactionResponse = await this.stakingRewards.compoundLock(xsLockID, {...gasConfig})
         return tx
     }
@@ -307,11 +320,11 @@ export class Staker {
      * @param increasedLockID The ID of the lock to deposit into.
      */
      public async compoundLocks(
-        xsLockIDs: number[],
-        increasedLockID: number[],
+        xsLockIDs: BigNumberish[],
+        increasedLockID: BigNumberish,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(providers.JsonRpcSigner.isSigner(this.providerOrSigner), "cannot execute mutator function without a signer")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         const tx: providers.TransactionResponse = await this.stakingRewards.compoundLocks(xsLockIDs, increasedLockID, {...gasConfig})
         return tx
     }
@@ -325,7 +338,7 @@ export class Staker {
      * @param xsLockID The ID of the lock to query.
      * @return StakedLockInfo
      */
-     public async stakedLockInfo(xsLockID: number): Promise<any> {
+     public async stakedLockInfo(xsLockID: BigNumberish): Promise<any> {
         return (await this.stakingRewards.stakedLockInfo(xsLockID))
     }
 
@@ -334,7 +347,7 @@ export class Staker {
      * @param xsLockID The ID of the lock to query rewards for.
      * @return reward Total amount of withdrawable reward tokens.
      */
-     public async pendingRewardsOfLock(xsLockID: number): Promise<BN> {
+     public async pendingRewardsOfLock(xsLockID: BigNumberish): Promise<BN> {
         return (await this.stakingRewards.pendingRewardsOfLock(xsLockID))
     }
 

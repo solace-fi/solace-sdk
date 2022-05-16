@@ -1,6 +1,3 @@
-Note - Unstable nightly build, documentation not up-to-date for nightly build
-
-
 The Solace SDK exists to make it easy for developers to integrate Solace into external protocols and custom scripts. It is designed to run in Javascript environments (browsers, frontend, Node.js). 
 
 
@@ -8,7 +5,7 @@ This SDK is in alpha testing and may contain bugs or change significantly betwee
 
 ### Install npm package
 
-`npm i @solace-fi/sdk-nightly`
+`npm i @solace-fi/sdk`
 
 ### Testing
 
@@ -18,7 +15,7 @@ This SDK is in alpha testing and may contain bugs or change significantly betwee
 
 Get active cover limit of Solace Cover Product on Ethereum mainnet
 ```
-import { Coverage } from "@solace-fi/sdk-nightly"
+import { Coverage } from "@solace-fi/sdk"
 
 // Create new Fetcher instance (contains blockchain read-only methods), connected to Ethereum mainnet (chainID = 1)
 const coverage = new Coverage(1)

@@ -39,7 +39,7 @@ export class Lock {
     }
 
     public async getXsLocker() {
-        return await axios.get('https://stats.solace.fi/analytics/').then((data: any) => {
+        return await axios.get('https://stats-cache.solace.fi/analytics-stats.json').then((data: any) => {
             const xsLocker = data.data.xslocker
             return xsLocker
         })
@@ -65,7 +65,7 @@ export class Lock {
             return base.add(bonus)
           }
 
-        return await axios.get('https://stats.solace.fi/analytics/').then((data: any) => {
+        return await axios.get('https://stats-cache.solace.fi/analytics-stats.json').then((data: any) => {
             const xsLocker = data.data.xslocker
             let keys = Object.keys(xsLocker)
             let now = Math.floor(Date.now()/1000)

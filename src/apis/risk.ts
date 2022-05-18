@@ -12,7 +12,7 @@ export class Risk {
     /**
      * @returns Get Solace risk series data.
      */
-     public async getSolaceRiskSeries(): Promise<SolaceRiskSeries | undefined | unknown > {
+     public async getSolaceRiskSeries(): Promise<SolaceRiskSeries | undefined > {
         return await axios({
             url: 'https://risk-data.solace.fi/series', 
             method: 'GET',

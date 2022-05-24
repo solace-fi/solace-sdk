@@ -6,6 +6,10 @@ const BOND_TELLER_DAI_ADDRESS: BondTellerTokenData = {
     [4]: {addr: "0x501ACe677634Fd09A876E88126076933b686967a", type: 'erc20'},
     [42]: {addr: "0x501ACe677634Fd09A876E88126076933b686967a", type: 'erc20'},
     [137]: {addr: "0x501ACe677634Fd09A876E88126076933b686967a", type: 'erc20'},
+    [250] : {addr: "", type: "erc20"}, // Fantom
+    [4002] : {addr: "", type: "erc20"}, // Fantom Testnet
+    [43113] : {addr: "", type: "erc20"}, // Avalanche Fuji Testnet
+    [43114] : {addr: "", type: "erc20"}, // Avalanche C-chain
     [80001]: {addr: "0x501ACe677634Fd09A876E88126076933b686967a", type: 'erc20'},
     [1313161554]: {addr: "0x501ACe677634Fd09A876E88126076933b686967a", type: 'erc20'},
     [1313161555]: {addr: "0x501acED0B949D96B3289A1b37791cA8bD93B0D65", type: 'erc20'}
@@ -16,6 +20,10 @@ const BOND_TELLER_USDC_ADDRESS: BondTellerTokenData = {
     [4]: {addr: "0x501ACE7E977e06A3Cb55f9c28D5654C9d74d5cA9", type: 'erc20'},
     [42]: {addr: "0x501ACE7E977e06A3Cb55f9c28D5654C9d74d5cA9", type: 'erc20'},
     [137]: {addr: "0x501ACE7E977e06A3Cb55f9c28D5654C9d74d5cA9", type: 'erc20'},
+    [250] : {addr: "", type: "erc20"}, // Fantom
+    [4002] : {addr: "", type: "erc20"}, // Fantom Testnet
+    [43113] : {addr: "", type: "erc20"}, // Avalanche Fuji Testnet
+    [43114] : {addr: "", type: "erc20"}, // Avalanche C-chain
     [80001]: {addr: "0x501ACE7E977e06A3Cb55f9c28D5654C9d74d5cA9", type: 'erc20'},
     [1313161554]: {addr: "0x501ACE7E977e06A3Cb55f9c28D5654C9d74d5cA9", type: 'erc20'},
     [1313161555]: {addr: "0x501AcE2248c1bB34f709f2768263A64A9805cCdB", type: 'erc20'}
@@ -26,6 +34,10 @@ const BOND_TELLER_USDT_ADDRESS: BondTellerTokenData = {
     [4]: {addr: "0x501ACe5CeEc693Df03198755ee80d4CE0b5c55fE", type: 'erc20'},
     [42]: {addr: "0x501ACe5CeEc693Df03198755ee80d4CE0b5c55fE", type: 'erc20'},
     [137]: {addr: "0x501ACe5CeEc693Df03198755ee80d4CE0b5c55fE", type: 'erc20'},
+    [250] : {addr: "", type: "erc20"}, // Fantom
+    [4002] : {addr: "", type: "erc20"}, // Fantom Testnet
+    [43113] : {addr: "", type: "erc20"}, // Avalanche Fuji Testnet
+    [43114] : {addr: "", type: "erc20"}, // Avalanche C-chain
     [80001]: {addr: "0x501ACe5CeEc693Df03198755ee80d4CE0b5c55fE", type: 'erc20'},
     [1313161554]: {addr: "0x501ACe5CeEc693Df03198755ee80d4CE0b5c55fE", type: 'erc20'},
     [1313161555]: {addr: "0x501aCEa6ff6dcE05D108D616cE886AF74f00EAAa", type: 'erc20'}
@@ -36,6 +48,10 @@ const BOND_TELLER_FRAX_ADDRESS: BondTellerTokenData = {
     [4]: {addr: "0x501aCef4F8397413C33B13cB39670aD2f17BfE62", type: 'erc20'},
     [42]: {addr: "0x501aCef4F8397413C33B13cB39670aD2f17BfE62", type: 'erc20'},
     [137]: {addr: "0x501aCef4F8397413C33B13cB39670aD2f17BfE62", type: 'erc20'},
+    [250] : {addr: "", type: "erc20"}, // Fantom
+    [4002] : {addr: "", type: "erc20"}, // Fantom Testnet
+    [43113] : {addr: "", type: "erc20"}, // Avalanche Fuji Testnet
+    [43114] : {addr: "", type: "erc20"}, // Avalanche C-chain
     [80001]: {addr: "0x501aCef4F8397413C33B13cB39670aD2f17BfE62", type: 'erc20'},
     [1313161554]: {addr: "0x501aCef4F8397413C33B13cB39670aD2f17BfE62", type: 'erc20'},
     [1313161555]: {addr: "0x501acE87fF4E7A1498320ABB674a4960A87792E4", type: 'erc20'}
@@ -46,6 +62,10 @@ const BOND_TELLER_WBTC_ADDRESS: BondTellerTokenData = {
     [4]: {addr: "0x501aCEF0d0c73BD103337e6E9Fd49d58c426dC27", type: 'erc20'},
     [42]: {addr: "0x501aCEF0d0c73BD103337e6E9Fd49d58c426dC27", type: 'erc20'},
     [137]: {addr: "0x501aCEF0d0c73BD103337e6E9Fd49d58c426dC27", type: 'erc20'},
+    [250] : {addr: "", type: "erc20"}, // Fantom
+    [4002] : {addr: "", type: "erc20"}, // Fantom Testnet
+    [43113] : {addr: "", type: "erc20"}, // Avalanche Fuji Testnet
+    [43114] : {addr: "", type: "erc20"}, // Avalanche C-chain
     [80001]: {addr: "0x501aCEF0d0c73BD103337e6E9Fd49d58c426dC27", type: 'erc20'},
     [1313161554]: {addr: "0x501aCEF0d0c73BD103337e6E9Fd49d58c426dC27", type: 'erc20'},
     [1313161555]: {addr: "0x501Ace54C7a2Cf564ae37538053902550a859D39", type: 'erc20'}
@@ -61,6 +81,10 @@ const BOND_TELLER_ETH_ADDRESS: BondTellerTokenData = {
 
 const BOND_TELLER_WETH_ADDRESS: BondTellerTokenData = {
     [137]: {addr: "0x501Ace367f1865DEa154236D5A8016B80a49e8a9", type: 'erc20'},
+    [250] : {addr: "", type: "erc20"}, // Fantom
+    [4002] : {addr: "", type: "erc20"}, // Fantom Testnet
+    [43113] : {addr: "", type: "erc20"}, // Avalanche Fuji Testnet
+    [43114] : {addr: "", type: "erc20"}, // Avalanche C-chain
     [80001]: {addr: "0x501Ace367f1865DEa154236D5A8016B80a49e8a9", type: 'erc20'},
 }
 
@@ -171,11 +195,27 @@ const AuroraTestnetTokenList: {[ token: string]: {name: string, symbol: string, 
     ['aurora']: {name: 'Aurora', symbol: 'AURORA', decimals: 18},
 }
 
+const FantomTokenList: {[ token: string]: {name: string, symbol: string, decimals: number} } = {
+}
+
+const FantomTestnetTokenList: {[ token: string]: {name: string, symbol: string, decimals: number} } = {
+}
+
+const AvalancheTokenList: {[ token: string]: {name: string, symbol: string, decimals: number} } = {
+}
+
+const AvalancheTestnetTokenList: {[ token: string]: {name: string, symbol: string, decimals: number} } = {
+}
+
 export const MasterTokenList: { [chainId: number]: {[ token: string]: {name: string, symbol: string, decimals: number}} } = {
     [1]: MainnetTokenList,
     [4]: RinkebyTokenList,
     [42]: KovanTokenList,
     [137]: PolygonTokenList,
+    [250]: FantomTokenList,
+    [4002]: FantomTestnetTokenList,
+    [43113]: AvalancheTestnetTokenList,
+    [43114]: AvalancheTokenList,
     [80001]: MumbaiTokenList,
     [1313161554]: AuroraTokenList,
     [1313161555]: AuroraTestnetTokenList,

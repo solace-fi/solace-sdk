@@ -16,6 +16,18 @@ export const NETWORKS: Network[] = [
         chainId: 137,
         supportedTxTypes: [0, 2]
     },{
+        chainId: 250,
+        supportedTxTypes: [0]
+    },{
+        chainId: 4002,
+        supportedTxTypes: [0]
+    },{
+        chainId: 43113,
+        supportedTxTypes: [0, 2]
+    },{
+        chainId: 43114,
+        supportedTxTypes: [0, 2]
+    },{
         chainId: 80001,
         supportedTxTypes: [0, 2],
         isTestnet: true,
@@ -36,8 +48,12 @@ export const isNetworkSupported = (chainID: number): boolean => {
 }
 
 export const DEFAULT_ENDPOINT: { [chainID : number]: string } = {
-    [137] : "https://polygon-rpc.com", // Polygon
-    [80001] : "https://matic-mumbai.chainstacklabs.com", // Polygon Testnet
-    [1313161554] : "https://mainnet.aurora.dev/", // Aurora
-    [1313161555] : "https://testnet.aurora.dev/", // Aurora Testnet
+    [137]: "https://polygon-rpc.com",
+    [250]: "https://rpc.ftm.tools/",
+    [4002]: "https://rpc.testnet.fantom.network/",
+    [43113]: "https://api.avax-test.network/ext/bc/C/rpc",
+    [43114]: "https://api.avax.network/ext/bc/C/rpc",
+    [80001]: "https://rpc-mumbai.matic.today",
+    [1313161554]: "https://mainnet.aurora.dev",
+    [1313161555]: "https://testnet.aurora.dev/"
 } 

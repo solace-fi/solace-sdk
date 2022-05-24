@@ -1,9 +1,8 @@
 import { BigNumber as BN, providers, Wallet, Contract, getDefaultProvider, utils, BigNumberish } from 'ethers'
 const { getNetwork } = providers
 import invariant from 'tiny-invariant'
-import SolaceCoverProduct from "../abis/SolaceCoverProduct.json"
-import SolaceCoverProductV2 from "../abis/SolaceCoverProductV2.json"
-import { SOLACE_COVER_PRODUCT_ADDRESS, ZERO_ADDRESS, isNetworkSupported, DEFAULT_ENDPOINT } from '../constants'
+import SolaceCoverProductV3 from "../abis/SolaceCoverProductV3.json"
+import { SOLACE_COVER_PRODUCT_V3_ADDRESS, ZERO_ADDRESS, DEFAULT_ENDPOINT } from '../constants'
 import { GasConfiguration } from '../types';
 import { getProvider } from '../utils/ethers'
 
@@ -14,26 +13,17 @@ export class CoverageV3 {
 
     // TO-DO add Fantom connection
     constructor(chainID: number, walletOrProviderOrSigner?: Wallet | providers.JsonRpcSigner | providers.Provider) {
-        invariant(SOLACE_COVER_PRODUCT_ADDRESS[chainID],"not a supported chainID")
+        invariant(SOLACE_COVER_PRODUCT_V3_ADDRESS[chainID],"not a supported chainID")
         this.chainID = chainID;
 
         if (typeof(walletOrProviderOrSigner) == 'undefined') {
-            
-            if (chainID == (137 || 80001) ) {
-                this.walletOrProviderOrSigner = getProvider(DEFAULT_ENDPOINT[chainID])
-            } else {
-                this.walletOrProviderOrSigner = getDefaultProvider(getNetwork(chainID))
-            }
+            if (chainID == (1 || 4 || 42)) {this.walletOrProviderOrSigner = getDefaultProvider(getNetwork(chainID))}
+            else {this.walletOrProviderOrSigner = getProvider(DEFAULT_ENDPOINT[chainID])}
         } else {
             this.walletOrProviderOrSigner = walletOrProviderOrSigner
         }
 
-        if (chainID == 137 || 80001) {
-            // SolaceCoverProductV2 deployed on Polygon mainnet (137) and Mumbai (80001)
-            this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProductV2, this.walletOrProviderOrSigner)
-        } else {
-            this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProduct, this.walletOrProviderOrSigner)
-        }
+        this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V3_ADDRESS[chainID], SolaceCoverProductV3, this.walletOrProviderOrSigner)
     }
 
     /*****************************************************************
@@ -41,7 +31,7 @@ export class CoverageV3 {
     *****************************************************************/
     
     /**
-     * @notice Activates policy for `msg.sender`.
+     * @notice Activates policy for provided `_user`.
      * @param _user The account to purchase policy. 
      * @param _coverLimit The maximum value to cover in **USD**.
      * @return policyID The ID of the newly minted policy.
@@ -53,6 +43,7 @@ export class CoverageV3 {
     ): Promise<providers.TransactionResponse> {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(_user), "not an Ethereum address")
+        invariant(_user == ZERO_ADDRESS, "cannot enter zero address")
         const tx: providers.TransactionResponse = await this.solaceCoverProduct.purchaseFor(_user, _coverLimit, {...gasConfig})
         return tx
     }
@@ -72,8 +63,7 @@ export class CoverageV3 {
     }
 
     /**
-     * @notice Cancels the policy.
-     * The function cancels the policy of the policyholder.
+     * @notice Cancels the policy for `msg.sender`.
      */
      public async cancel(
         gasConfig?: GasConfiguration
@@ -131,6 +121,7 @@ export class CoverageV3 {
      */
      public async minScpRequired(policyholder: string): Promise<BN> {
         invariant(utils.isAddress(policyholder), 'not an Ethereum address')
+        invariant(policyholder == ZERO_ADDRESS, "cannot enter zero address")
         return (await this.solaceCoverProduct.minScpRequired(policyholder))
     }
 
@@ -197,6 +188,7 @@ export class CoverageV3 {
      */
      public async policyOf(policyholder: string): Promise<BN> {
         invariant(utils.isAddress(policyholder), 'not an Ethereum address')
+        invariant(policyholder == ZERO_ADDRESS, "cannot enter zero address")
         return (await this.solaceCoverProduct.policyOf(policyholder))
     }
 
@@ -206,7 +198,7 @@ export class CoverageV3 {
      */
      public async debtOf(policyholder: string): Promise<BN> {
         invariant(utils.isAddress(policyholder), 'not an Ethereum address')
+        invariant(policyholder == ZERO_ADDRESS, "cannot enter zero address")
         return (await this.solaceCoverProduct.debtOf(policyholder))
     }
-
 }

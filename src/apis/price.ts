@@ -1,6 +1,6 @@
 import { Contract, providers, getDefaultProvider } from 'ethers'
 const { getNetwork } = providers
-import axios from "axios"
+import axios, { AxiosResponse } from "axios"
 import { fetchSupplyOrZero, fetchReservesOrZero, fetchUniswapV2PriceOrZero, fetchScpPpsOrZero, fetchUniswapV3PriceOrZero, fetchBalanceOrZero, withBackoffRetries } from '../utils'
 const ethers = require('ethers')
 const formatUnits = ethers.utils.formatUnits
@@ -172,12 +172,12 @@ export class Price {
         const prices = await withBackoffRetries(async () => fetchCoingeckoTokenPriceById(uniqueIds, 'usd'))
         const array: { id: string; price: number }[] = []
         uniqueIds.forEach((uniqueId) => {
-          if (!prices.find((p: any) => (p.id = uniqueId.toLowerCase()))) {
+          if (!prices.find((p: any) => (p.id == uniqueId.toLowerCase()))) {
             array.push({ id: uniqueId.toLowerCase(), price: -1 })
           } else {
             array.push({
               id: uniqueId.toLowerCase(),
-              price: prices.find((p: any) => (p.id = uniqueId.toLowerCase())).current_price,
+              price: prices.find((p: any) => (p.id == uniqueId.toLowerCase())).current_price,
             })
           }
         })
@@ -219,6 +219,9 @@ export class Price {
               case 'wmatic':
                 tokenId = 'matic-network'
                 break
+              case 'wftm':
+                tokenId = 'fantom'
+                break
               case 'eth':
               default:
                   tokenId = 'ethereum'
@@ -232,5 +235,22 @@ export class Price {
     const priceMapById = tokenids.length > 0 ? await getPricesById(tokenids) : {}
     const consolidatedPriceMapping = { ...priceMapByAddress, ...priceMapById }
     return consolidatedPriceMapping
+  }
+
+  public async getMirrorCoingeckoPrices (): Promise<{ [key: string]: number }> {
+    const prices = await axios({
+      url: 'https://price-feed.solace.fi/bond_prices/', 
+      method: 'GET',
+      headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+      },
+    }).then((response: AxiosResponse<any, any>) => {return response.data})
+    .catch((error: AxiosResponse<any, any>) => {
+      console.error('Error getSolaceRiskSeries', error)
+      return undefined
+    })
+
+    return prices
   }
 }

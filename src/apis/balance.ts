@@ -8,7 +8,7 @@ import { getProvider } from "../utils/ethers";
 
 export class SolaceBalance {
 
-    CHAIN_IDS = [1,137,1313161554] // mainnet, polygon, aurora
+    CHAIN_IDS = [1, 137, 250, 1313161554]
     SOLACE_ADDRESS = "0x501acE9c35E60f03A2af4d484f49F9B1EFde9f40"
     ERC20ABI = ERC20
 
@@ -29,7 +29,7 @@ export class SolaceBalance {
         if(this.rpcUrlMapping && this.rpcUrlMapping[chainId]) {
             provider = getProvider(this.rpcUrlMapping[chainId])
         } else {
-            if (chainId == 137 || chainId == 1313161554) {
+            if (DEFAULT_ENDPOINT[chainId]) {
                 provider = getProvider(DEFAULT_ENDPOINT[chainId])
             } else {
                 provider = getDefaultProvider(getNetwork(chainId))
@@ -61,7 +61,7 @@ export class SolaceBalance {
 
 export class xSolaceBalance {
 
-    CHAIN_IDS = [1,137,1313161554] // mainnet, polygon, aurora
+    CHAIN_IDS = [1, 137, 250, 1313161554]
     XSOLACE_ADDRESS = "0x501ACe802447B1Ed4Aae36EA830BFBde19afbbF9"
     ERC20ABI = ERC20
 
@@ -82,7 +82,7 @@ export class xSolaceBalance {
         if(this.rpcUrlMapping && this.rpcUrlMapping[chainId]) {
             provider = getProvider(this.rpcUrlMapping[chainId])
         } else {
-            if (chainId == 137 || chainId == 1313161554) {
+            if (DEFAULT_ENDPOINT[chainId]) {
                 provider = getProvider(DEFAULT_ENDPOINT[chainId])
             } else {
                 provider = getDefaultProvider(getNetwork(chainId))

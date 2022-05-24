@@ -5,7 +5,7 @@ import BondTellerEth from "../abis/BondTellerEth.json"
 import BondTellerMatic from "../abis/BondTellerMatic.json"
 import invariant from 'tiny-invariant'
 import { BOND_TELLER_ADDRESSES, ZERO_ADDRESS, isNetworkSupported, DEFAULT_ENDPOINT } from '../constants'
-import { GasConfiguration } from '../types';
+import { BondTellerType, GasConfiguration } from '../types';
 import { getProvider } from '../utils/ethers'
 
 /*
@@ -20,7 +20,7 @@ export class Bonder {
     chainID: number;
     walletOrProviderOrSigner: Wallet | providers.JsonRpcSigner | providers.Provider;
     bondTellerContract: Contract;
-    bondTellerType: 'erc20' | 'eth' | 'matic'
+    bondTellerType: BondTellerType
 
     /**************
     CONSTRUCTOR
@@ -33,7 +33,7 @@ export class Bonder {
      */
      constructor(chainID: number, bondTellerContractAddress: string, walletOrProviderOrSigner?: Wallet | providers.JsonRpcSigner | providers.Provider) {
         invariant(isNetworkSupported(chainID),"not a supported chainID")
-        let storedType: 'erc20' | 'eth' | 'matic' = 'erc20'
+        let storedType: BondTellerType = 'erc20'
         let found = false
         Object.keys(BOND_TELLER_ADDRESSES).forEach((key) => {
             if(BOND_TELLER_ADDRESSES[key][chainID] != undefined) {

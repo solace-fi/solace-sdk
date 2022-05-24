@@ -3,8 +3,8 @@ export const XSLOCKER_ADDRESS: { [chainID: number]: string } = {
     [4]: "0x501Ace47c5b0C2099C4464f681c3fa2ECD3146C1",
     [42]: '0x501Ace47c5b0C2099C4464f681c3fa2ECD3146C1',
     [137]: "0x501Ace47c5b0C2099C4464f681c3fa2ECD3146C1",
-    [250] : "", // Fantom
-    [4002] : "", // Fantom Testnet
+    [250]: "0x501Ace47c5b0C2099C4464f681c3fa2ECD3146C1",
+    [4002]: "0x501ACebF0918c99546b65cEdCD430e0D4A8E9167",
     [43113] : "", // Avalanche Testnet
     [43114] : "", // Avalanche C-chain
     [80001]: "0x501Ace47c5b0C2099C4464f681c3fa2ECD3146C1",
@@ -17,8 +17,8 @@ export const STAKING_REWARDS_ADDRESS: { [chainID: number]: string } = {
     [4]: "0x501ace3D42f9c8723B108D4fBE29989060a91411",
     [42]: '0x501ace3D42f9c8723B108D4fBE29989060a91411',
     [137]: "0x501ace3D42f9c8723B108D4fBE29989060a91411",
-    [250] : "", // Fantom
-    [4002] : "", // Fantom Testnet
+    [250]: "0x501ace3D42f9c8723B108D4fBE29989060a91411",
+    [4002]: "0x501ACe4D89f596296C66f14D087a4BbB53Ed2049",
     [43113] : "", // Avalanche Testnet
     [43114] : "", // Avalanche C-chain
     [80001]: "0x501ace3D42f9c8723B108D4fBE29989060a91411",

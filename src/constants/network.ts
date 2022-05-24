@@ -49,11 +49,11 @@ export const isNetworkSupported = (chainID: number): boolean => {
 
 export const DEFAULT_ENDPOINT: { [chainID : number]: string } = {
     [137]: "https://polygon-rpc.com",
-    [250]: "https://rpc.ftm.tools/",
+    [250]: "'https://rpcapi.fantom.network/rpc",
     [4002]: "https://rpc.testnet.fantom.network/",
     [43113]: "https://api.avax-test.network/ext/bc/C/rpc",
     [43114]: "https://api.avax.network/ext/bc/C/rpc",
-    [80001]: "https://rpc-mumbai.matic.today",
+    [80001]: "https://matic-mumbai.chainstacklabs.com",
     [1313161554]: "https://mainnet.aurora.dev",
     [1313161555]: "https://testnet.aurora.dev/"
 } 

@@ -1,5 +1,4 @@
-import { BOND_TELLER_ADDRESSES, MasterTokenList, isNetworkSupported, DEFAULT_ENDPOINT } from "../constants";
-// import { Contract as MultiCallContract, Provider } from 'ethers-multicall';
+import { BOND_TELLER_ADDRESSES, MasterTokenList, isNetworkSupported, DEFAULT_ENDPOINT, WrappedTokenToMasterToken } from "../constants";
 import { getDefaultProvider, providers, Contract, utils, BigNumber } from "ethers";
 
 const { getNetwork } = providers
@@ -9,18 +8,15 @@ const formatUnits = ethers.utils.formatUnits
 import bondTellerEth from '../abis/BondTellerEth.json'
 import bondTellerMatic from '../abis/BondTellerMatic.json'
 import bondTellerErc20 from '../abis/BondTellerErc20.json'
+import bondTellerFtm from '../abis/BondTellerFtm.json'
 
 import ERC20 from '../abis/ERC20.json'
 import WETH9 from '../abis/WETH9.json'
 import WMATIC from '../abis/WMATIC.json'
-
-import BondTellerErc20 from "../abis/BondTellerErc20.json"
-import BondTellerEth from "../abis/BondTellerEth.json"
-import BondTellerMatic from "../abis/BondTellerMatic.json"
+import WFTM from '../abis/WFTM.json'
 
 import { withBackoffRetries } from "../utils";
-import { BondTellerDetails, BondToken } from "../types/bond";
-import { Price } from "./price";
+import { BondTellerDetails, BondToken, BondTellerType } from "../types/bond";
 import { getProvider } from "../utils/ethers";
 import { listTokensOfOwner } from "../utils/contract";
 import invariant from "tiny-invariant";
@@ -48,34 +44,16 @@ export class Bond {
     public async getBondTellerData (apiPriceMapping: {
         [x: string]: number;
     }): Promise<BondTellerDetails[]> {
-        const price_obj = new Price()
-        let fetchedPriceMapping: { [x: string]: number } = {}
-        let fetchedPriceMappingPromise: Promise<typeof fetchedPriceMapping>
 
-        if (this.chainId == 137) {
-            fetchedPriceMappingPromise = withBackoffRetries(async () => price_obj.getPolygonPrices())
-        } else if (this.chainId == 80001) {
-            fetchedPriceMappingPromise = withBackoffRetries(async () => price_obj.getPolygonPrices())
-        }
-        else if (this.chainId == 1313161554) {
-            fetchedPriceMappingPromise = withBackoffRetries( async () => price_obj.getAuroraPrices())
-        } 
-        else if (this.chainId == 1313161555) {
-            fetchedPriceMappingPromise = withBackoffRetries( async () => price_obj.getAuroraPrices())
-        }
-        else {
-            fetchedPriceMappingPromise = withBackoffRetries( async () => price_obj.getMainnetPrices())
-        }
-
-        let teller: {addr: string, type: 'erc20' | 'matic' | 'eth', token: string}[] = []
+        let tellers: {addr: string, type: BondTellerType, token: string}[] = []
 
         Object.keys(BOND_TELLER_ADDRESSES).forEach((key) => {
             if(BOND_TELLER_ADDRESSES[key][this.chainId] != undefined) {
-                teller.push({addr: BOND_TELLER_ADDRESSES[key][this.chainId].addr, type: BOND_TELLER_ADDRESSES[key][this.chainId].type, token: key})
+                tellers.push({addr: BOND_TELLER_ADDRESSES[key][this.chainId].addr, type: BOND_TELLER_ADDRESSES[key][this.chainId].type, token: key})
             }
         })
 
-        const data = await Promise.all(teller.map(async (t) => {
+        const data = await Promise.all(tellers.map(async (t) => {
             let bondTellerAbi = null
             let principalAbi = null
 
@@ -85,6 +63,10 @@ export class Bond {
             } else if ((t.token == 'matic') && (this.chainId == 137 || 80001)) {
                 bondTellerAbi = bondTellerMatic
                 principalAbi = WMATIC
+            }
+            else if ((t.token == 'ftm') && (this.chainId == 250 || 4002)) {
+                bondTellerAbi = bondTellerFtm
+                principalAbi = WFTM
             } else {
                 bondTellerAbi = bondTellerErc20
                 principalAbi = ERC20
@@ -98,16 +80,7 @@ export class Bond {
                 withBackoffRetries(async () => tellerContract.globalVestingTerm()),
                 withBackoffRetries(async () => tellerContract.capacity()),
                 withBackoffRetries(async () => tellerContract.maxPayout()),
-                fetchPriceMappingCache()
             ])
-
-            async function fetchPriceMappingCache() {
-                if (Object.keys(fetchedPriceMapping).length === 0) {
-                    fetchedPriceMapping = await fetchedPriceMappingPromise
-                } else {
-                    return
-                }
-            }
 
             const principalContract = new Contract(principalAddr, principalAbi, this.providerOrSigner)
 
@@ -116,23 +89,10 @@ export class Bond {
             let usdBondPrice = 0
             let solacePrice = 0
 
-            // Why do we are we repeating network calls: 
-            // getCoingeckoPrice() to obtain the parameter - apiPriceMapping
-            // Then getMainnetPrices/getAuroraPrices/getPolygonPrices again within this function
-            if(fetchedPriceMapping[symbol.toLowerCase()]) {
-                const price: number = fetchedPriceMapping[symbol.toLowerCase()]
-                usdBondPrice = price * parseFloat(formatUnits(bondPrice, decimals))
-            } else {
-                const price: number = apiPriceMapping[symbol.toLowerCase()]
-                usdBondPrice = price * parseFloat(formatUnits(bondPrice, decimals))
-            }
-    
-            if(fetchedPriceMapping['solace']) {
-                solacePrice = fetchedPriceMapping['solace']
-            }
-            else {
-                solacePrice = apiPriceMapping['solace']
-            }
+            const price: number = apiPriceMapping[WrappedTokenToMasterToken[symbol.toLowerCase()] ?? symbol.toLowerCase()]
+            usdBondPrice = price * parseFloat(formatUnits(bondPrice, decimals))
+
+            solacePrice = apiPriceMapping['solace']
     
             const bondRoi = usdBondPrice > 0 ? ((solacePrice - usdBondPrice) * 100) / usdBondPrice : 0
     
@@ -180,11 +140,13 @@ export class Bond {
         let bondTeller: Contract | null = null
 
         if (String(storedType) === "eth") {
-            bondTeller = new Contract(bondTellerContractAddress, BondTellerEth, this.providerOrSigner)
+            bondTeller = new Contract(bondTellerContractAddress, bondTellerEth, this.providerOrSigner)
         } else if (String(storedType) === "matic") {
-            bondTeller = new Contract(bondTellerContractAddress, BondTellerMatic, this.providerOrSigner)
+            bondTeller = new Contract(bondTellerContractAddress, bondTellerMatic, this.providerOrSigner)
+        } else if (String(storedType) === "ftm") {
+            bondTeller = new Contract(bondTellerContractAddress, bondTellerFtm, this.providerOrSigner)
         } else {
-            bondTeller = new Contract(bondTellerContractAddress, BondTellerErc20, this.providerOrSigner)
+            bondTeller = new Contract(bondTellerContractAddress, bondTellerErc20, this.providerOrSigner)
         }
 
         // 2 consecutive await calls within listTokensOfOwner

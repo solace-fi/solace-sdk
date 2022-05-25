@@ -27,7 +27,10 @@ export const WrappedTokenToMasterToken: { [token: string]: MasterToken } = {
 }
 
 export const COVERAGE_SCP_ADDRESS: { [chainId : number]: string } = {
-    [4002]: '0x501acE6a7022727f62ffC95558a3359E900C506D'
+    [250]: '',
+    [4002]: '0x501acE6a7022727f62ffC95558a3359E900C506D',
+    [43113] : "", // Avalanche Testnet
+    [43114] : "", // Avalanche C-chain
 }
 
 const SOLACE_ADDRESS: { [chainID : number]: string } = {

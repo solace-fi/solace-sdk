@@ -1,7 +1,7 @@
 import { Lock } from "../src/apis/lock"
 
 describe('Lock', () => {
-    let xsl = new Lock(1);
+    let xsl = new Lock(4002);
 
     beforeEach(() => {
         // Avoid jest avoid timeout error

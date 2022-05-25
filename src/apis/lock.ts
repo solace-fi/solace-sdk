@@ -71,7 +71,6 @@ export class Lock {
             let now = Math.floor(Date.now()/1000)
             let owners: any = {}
             keys.forEach(chainID => {
-                console.log(chainID, typeof(chainID), xsLocker[chainID])
                 xsLocker[chainID].forEach((xslock: any) => {
                   if(!owners.hasOwnProperty(xslock.owner)) owners[xslock.owner] = BigNumber.from(0)
                   owners[xslock.owner] = owners[xslock.owner].add(votePowerOfLock(xslock, now))

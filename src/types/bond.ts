@@ -6,7 +6,7 @@ export type BondTellerDetails = {
   principalData: BondPrincipalData
 }
 
-export type BondTellerTokenData = { [chainId: number]: { addr: string; type: 'erc20' | 'eth' | 'matic' } }
+export type BondTellerTokenData = { [chainId: number]: { addr: string; type: BondTellerType } }
   
 export type BondTellerData = {
   teller: BondTellerContractData
@@ -19,7 +19,9 @@ export type BondTellerData = {
   bondRoi: number
 }
 
-export type BondTellerContractData = { contract: Contract; type: 'erc20' | 'eth' | 'matic' }
+export type BondTellerType = 'erc20' | 'eth' | 'matic' | 'ftm'
+
+export type BondTellerContractData = { contract: Contract; type: BondTellerType }
 
 export type BondPrincipalData = {
   principal: Contract

@@ -94,7 +94,7 @@ describe("Bonder", () => {
             expect(await bond_teller_matic_contract.calculateAmountIn(BOND_DEPOSIT, false)).toEqual(await bonder.calculateAmountIn(BOND_DEPOSIT, false));
         })
     })
-
+ 
     /**********************************
     Aurora Mainnet View Functions
     **********************************/

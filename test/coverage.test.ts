@@ -1,10 +1,9 @@
 import { BigNumber as BN, Contract, getDefaultProvider, providers, Wallet } from "ethers"
 const { getNetwork } = providers
-import { DEFAULT_ENDPOINT, SOLACE_COVER_PRODUCT_ADDRESS, SOLACE_COVER_PRODUCT_V3_ADDRESS } from "../src"
+import { SOLACE_COVER_PRODUCT_ADDRESS } from "../src"
 import { Coverage } from "../src/contracts/coverage"
 import SolaceCoverProduct from "../src/abis/SolaceCoverProduct.json"
 import SolaceCoverProductV2 from "../src/abis/SolaceCoverProductV2.json"
-import SolaceCoverProductV3 from "../src/abis/SolaceCoverProductV3.json"
 
 describe("Coverage Fetcher", () => {
     const provider = getDefaultProvider(getNetwork(1)) // Note using default provider gets rate-limit notification
@@ -14,10 +13,6 @@ describe("Coverage Fetcher", () => {
     const provider_matic = new providers.JsonRpcProvider("https://polygon-rpc.com")
     const solaceCoverProductV2 = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[137], SolaceCoverProductV2, provider_matic)
     let coverage_matic = new Coverage(137);
-
-    const provider_fantom = new providers.JsonRpcProvider(DEFAULT_ENDPOINT[4002])
-    const solaceCoverProductV3 = new Contract(SOLACE_COVER_PRODUCT_V3_ADDRESS[4002], SolaceCoverProductV3, provider_fantom)
-    let coverage_fantom = new Coverage(4002);
 
     const POLICYHOLDER_ADDRESS = "0xfb5cAAe76af8D3CE730f3D62c6442744853d43Ef" // Use first policy minted
     const POLICY_ID = 1;
@@ -147,28 +142,6 @@ describe("Coverage Fetcher", () => {
     describe("#getNumSupportedChains", () => {
         it("gets the same value as directly querying matic contract", async () => {
             expect(await coverage_matic.numSupportedChains()).toEqual(await solaceCoverProductV2.numSupportedChains());
-        })
-    })
-
-    /****************************
-    SOLACECOVERPRODUCTV3 METHODS
-    ****************************/
-
-    describe("#activeCoverLimit", () => {
-        it("gets the same value as directly querying mainnet contract", async () => {
-            expect(await coverage_fantom.activeCoverLimit()).toEqual(await solaceCoverProductV3.activeCoverLimit());
-        })
-    })
-
-    describe("#availableCoverCapacity", () => {
-        it("gets the same value as directly querying mainnet contract", async () => {
-            expect(await coverage_fantom.availableCoverCapacity()).toEqual(await solaceCoverProductV3.availableCoverCapacity());
-        })
-    })
-
-    describe("#maxCover", () => {
-        it("gets the same value as directly querying mainnet contract", async () => {
-            expect(await coverage_fantom.maxCover()).toEqual(await solaceCoverProductV3.maxCover());
         })
     })
 })

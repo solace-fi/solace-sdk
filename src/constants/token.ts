@@ -26,13 +26,6 @@ export const WrappedTokenToMasterToken: { [token: string]: MasterToken } = {
     ['wmatic']: MasterToken.matic
 }
 
-export const COVERAGE_SCP_ADDRESS: { [chainId : number]: string } = {
-    [250]: '',
-    [4002]: '0x501acE6a7022727f62ffC95558a3359E900C506D',
-    [43113] : "", // Avalanche Testnet
-    [43114] : "", // Avalanche C-chain
-}
-
 const SOLACE_ADDRESS: { [chainID : number]: string } = {
     [1] : "0x501acE9c35E60f03A2af4d484f49F9B1EFde9f40", // Eth Mainnet
     [4] : "0x501acE9c35E60f03A2af4d484f49F9B1EFde9f40", // Rinkeby

@@ -1,15 +1,16 @@
 import { BigNumber, Contract, getDefaultProvider, providers, utils } from 'ethers'
 import invariant from 'tiny-invariant'
-import { DEFAULT_ENDPOINT, SOLACE_COVER_PRODUCT_ADDRESS } from '../constants'
+import { DEFAULT_ENDPOINT, SOLACE_COVER_PRODUCT_ADDRESS, SOLACE_COVER_PRODUCT_V3_ADDRESS } from '../constants'
 import { getProvider } from '../utils/ethers'
 const { getNetwork } = providers
 
 import SolaceCoverProduct from "../abis/SolaceCoverProduct.json"
 import SolaceCoverProductV2 from "../abis/SolaceCoverProductV2.json"
+import SolaceCoverProductV3 from "../abis/SolaceCoverProductV3.json"
 
 export class Policy {
     public async getTotalActivePolicies(chainId: number, rpcUrl?: string): Promise<{ totalPolicies: BigNumber; totalActiveCoverLimit: BigNumber }> {
-        invariant(SOLACE_COVER_PRODUCT_ADDRESS[chainId],"not a supported chainID")
+        invariant(SOLACE_COVER_PRODUCT_ADDRESS[chainId] || SOLACE_COVER_PRODUCT_V3_ADDRESS[chainId],"not a supported chainID")
 
         let provider = null
         let solaceCoverProduct = null
@@ -28,6 +29,9 @@ export class Policy {
         if (chainId == 137 || 80001) {
             // SolaceCoverProductV2 deployed on Polygon mainnet (137) and Mumbai (80001)
             solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainId], SolaceCoverProductV2, provider)
+        }
+        else if (chainId == 250 || 4002) {
+            solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V3_ADDRESS[chainId], SolaceCoverProductV3, provider)
         } else {
             solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainId], SolaceCoverProduct, provider)
         }
@@ -80,6 +84,8 @@ export class Policy {
             if (chainId == ( 137 || 80001 )) {
                 // SolaceCoverProductV2 deployed on Polygon mainnet (137) and Mumbai (80001)
                 solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainId], SolaceCoverProductV2, provider)
+            } else if (chainId == 250 || 4002) {
+                solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V3_ADDRESS[chainId], SolaceCoverProductV3, provider)
             } else {
                 solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainId], SolaceCoverProduct, provider)
             }

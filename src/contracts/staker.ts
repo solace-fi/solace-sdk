@@ -350,6 +350,7 @@ export class Staker {
         signature: utils.BytesLike,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
+        invariant(STAKING_REWARDS_V2_ADDRESS[this.chainID], "StakingRewardsV2 not deployed on chain")
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         const tx: providers.TransactionResponse = await this.stakingRewards.harvestLockForScp(xsLockID, price, priceDeadline, signature, {...gasConfig})
         return tx
@@ -369,6 +370,7 @@ export class Staker {
         signature: utils.BytesLike,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
+        invariant(STAKING_REWARDS_V2_ADDRESS[this.chainID], "StakingRewardsV2 not deployed on chain")
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         const tx: providers.TransactionResponse = await this.stakingRewards.harvestLocksForScp(xsLockIDs, price, priceDeadline, signature, {...gasConfig})
         return tx

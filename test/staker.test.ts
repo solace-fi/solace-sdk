@@ -28,6 +28,13 @@ describe("Staker", () => {
         })
     })
 
+    describe("can construct object for fantom testnet", () => {
+        it("will fail for invalid chainID", async () => {
+            staker = new Staker(4002, provider)
+            staker = new Staker(chainId, provider)
+        })
+    })
+
     /**********************************
     xsLocker View Functions
     **********************************/
@@ -46,7 +53,15 @@ describe("Staker", () => {
 
     describe("#timeLeft", () => {
         it("gets the same value as directly querying mainnet contract", async () => {
-            expect(await staker.timeLeft(LOCKER_ID)).toEqual(await xsLocker_contract.timeLeft(LOCKER_ID));
+            const [timeLeft1, timeLeft2] = await Promise.all([
+                staker.timeLeft(LOCKER_ID),
+                xsLocker_contract.timeLeft(LOCKER_ID)
+            ])
+
+            expect(timeLeft1.toNumber()).toBeLessThan(timeLeft2.toNumber() * 1.01)
+            expect(timeLeft1.toNumber()).toBeGreaterThan(timeLeft2.toNumber() * 0.99)
+            
+            // expect(await staker.timeLeft(LOCKER_ID)).toEqual(await xsLocker_contract.timeLeft(LOCKER_ID));
         })
     })
 

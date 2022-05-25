@@ -27,5 +27,8 @@ export const STAKING_REWARDS_ADDRESS: { [chainID: number]: string } = {
 }
 
 export const STAKING_REWARDS_V2_ADDRESS: { [chainID: number]: string } = {
-    [4002]: '0x501Ace28Efa3f0A7ab10Eb80034fB26cBd07e02A'
+    [250]: '',
+    [4002]: '0x501Ace28Efa3f0A7ab10Eb80034fB26cBd07e02A',
+    [43113] : "", // Avalanche Testnet
+    [43114] : "", // Avalanche C-chain
 }

@@ -43,7 +43,7 @@ export class CoverageV3 {
     ): Promise<providers.TransactionResponse> {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(_user), "not an Ethereum address")
-        invariant(_user == ZERO_ADDRESS, "cannot enter zero address")
+        invariant(_user !== ZERO_ADDRESS, "cannot enter zero address")
         const tx: providers.TransactionResponse = await this.solaceCoverProduct.purchaseFor(_user, _coverLimit, {...gasConfig})
         return tx
     }
@@ -121,7 +121,7 @@ export class CoverageV3 {
      */
      public async minScpRequired(policyholder: string): Promise<BN> {
         invariant(utils.isAddress(policyholder), 'not an Ethereum address')
-        invariant(policyholder == ZERO_ADDRESS, "cannot enter zero address")
+        invariant(policyholder !== ZERO_ADDRESS, "cannot enter zero address")
         return (await this.solaceCoverProduct.minScpRequired(policyholder))
     }
 
@@ -188,7 +188,7 @@ export class CoverageV3 {
      */
      public async policyOf(policyholder: string): Promise<BN> {
         invariant(utils.isAddress(policyholder), 'not an Ethereum address')
-        invariant(policyholder == ZERO_ADDRESS, "cannot enter zero address")
+        invariant(policyholder !== ZERO_ADDRESS, "cannot enter zero address")
         return (await this.solaceCoverProduct.policyOf(policyholder))
     }
 
@@ -198,7 +198,7 @@ export class CoverageV3 {
      */
      public async debtOf(policyholder: string): Promise<BN> {
         invariant(utils.isAddress(policyholder), 'not an Ethereum address')
-        invariant(policyholder == ZERO_ADDRESS, "cannot enter zero address")
+        invariant(policyholder !== ZERO_ADDRESS, "cannot enter zero address")
         return (await this.solaceCoverProduct.debtOf(policyholder))
     }
 }

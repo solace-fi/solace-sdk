@@ -17,7 +17,7 @@ export const UWP_ADDRESS: { [chainID : number]: string } = {
 
 export const SOLACE_COVER_PRODUCT_V3_ADDRESS: { [chainID: number]: string } = {
     [250] : "", // Fantom
-    [4002] : "", // Fantom Testnet
+    [4002] : "0x501aCE7271065019707Fad7DEbDcCE78bd10F7AC", // Fantom Testnet
     [43113] : "", // Avalanche Testnet
     [43114] : "" // Avalanche C-chain
 }

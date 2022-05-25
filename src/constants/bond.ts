@@ -107,7 +107,7 @@ const BOND_TELLER_FTM_TELLER: BondTellerTokenData = {
     [4002]: { addr: "0x501acEDb97de787b1A760AbD0e0FC1E5DfC033D8", type: 'ftm' },
 }
 
-const BOND_TELLER_SCP_ADDRESS: BondTellerTokenData = {
+const BOND_TELLER_SCP_ADDRESS_VAULT: BondTellerTokenData = {
     [1]: {addr: "0x501ACe00FD8e5dB7C3be5e6D254ba4995e1B45b7", type: 'erc20'},
     [4]: {addr: "0x501ACe00FD8e5dB7C3be5e6D254ba4995e1B45b7", type: 'erc20'},
     [42]: {addr: "0x501ACe00FD8e5dB7C3be5e6D254ba4995e1B45b7", type: 'erc20'}
@@ -124,6 +124,6 @@ export const BOND_TELLER_ADDRESSES: { [token: string]: BondTellerTokenData } = {
     [MasterToken.matic]: BOND_TELLER_MATIC_ADDRESS,
     [MasterToken.wnear]: BOND_TELLER_WNEAR_ADDRESS,
     [MasterToken.aurora]: BOND_TELLER_AURORA_ADDRESS,
-    [MasterToken.scp]: BOND_TELLER_SCP_ADDRESS,
+    [MasterToken.scp]: BOND_TELLER_SCP_ADDRESS_VAULT,
     [MasterToken.ftm]: BOND_TELLER_FTM_TELLER
 }

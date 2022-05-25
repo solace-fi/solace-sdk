@@ -25,3 +25,7 @@ export const STAKING_REWARDS_ADDRESS: { [chainID: number]: string } = {
     [1313161554]: "0x501ace3D42f9c8723B108D4fBE29989060a91411",
     [1313161555]: "0x501ACe4D89f596296C66f14D087a4BbB53Ed2049",
 }
+
+export const STAKING_REWARDS_V2_ADDRESS: { [chainID: number]: string } = {
+    [4002]: '0x501Ace28Efa3f0A7ab10Eb80034fB26cBd07e02A'
+}

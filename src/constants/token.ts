@@ -26,6 +26,10 @@ export const WrappedTokenToMasterToken: { [token: string]: MasterToken } = {
     ['wmatic']: MasterToken.matic
 }
 
+export const COVERAGE_SCP_ADDRESS: { [chainId : number]: string } = {
+    [4002]: '0x501acE6a7022727f62ffC95558a3359E900C506D'
+}
+
 const SOLACE_ADDRESS: { [chainID : number]: string } = {
     [1] : "0x501acE9c35E60f03A2af4d484f49F9B1EFde9f40", // Eth Mainnet
     [4] : "0x501acE9c35E60f03A2af4d484f49F9B1EFde9f40", // Rinkeby
@@ -138,7 +142,7 @@ const FRAX_ADDRESS: { [chainID : number]: string } = {
     [1313161555]: '0x5405059004A74d191a07badC3e32501ac8A39788',
 }
 
-const SCP_ADDRESS: {
+const SCP_ADDRESS_VAULT: {
     [chainId: number]: string
   } = {
     [1]: '0x501AcEe83a6f269B77c167c6701843D454E2EFA0',
@@ -187,7 +191,7 @@ export const TOKEN_ADDRESSES: { [token: string]: {[chainID: number]: string} }  
     [MasterToken.solace]: SOLACE_ADDRESS,
     [MasterToken.xsolace]: XSOLACE_ADDRESS,
     [MasterToken.slp]: SOLACE_USDC_SLP_ADDRESS,
-    [MasterToken.scp]: SCP_ADDRESS,
+    [MasterToken.scp]: SCP_ADDRESS_VAULT,
     [MasterToken.ftm]: WFTM_ADDRESS,
 }
 

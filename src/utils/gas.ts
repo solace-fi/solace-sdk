@@ -1,13 +1,13 @@
 import { getDefaultProvider, providers, BigNumber } from "ethers";
 const { getNetwork } = providers
-import { FeeData, GasArgs, GasConfiguration } from '../types'
+import { GasArgs, GasConfiguration } from '../types'
 import { NETWORKS, WALLETS } from '..'
 import { formatUnits } from 'ethers/lib/utils'
 
 import { getProvider } from "../utils/ethers";
 import { DEFAULT_ENDPOINT, isNetworkSupported } from "../constants";
 import invariant from "tiny-invariant";
-
+import { FeeData } from '@ethersproject/providers'
 
 export const getGasPrice = async (providerOrSigner: providers.JsonRpcProvider | providers.JsonRpcSigner): Promise<number> => {
   const bnGasVal = await providerOrSigner.getGasPrice()
@@ -40,6 +40,26 @@ export const getGasSettings = async (chainId: number, rpcUrl?: string, gasArgs?:
     }
   }
 
+  const { gasPrice, maxFeePerGas, maxPriorityFeePerGas } = await getGasFeeData(provider)
+
+  if(foundWallet.supportedTxTypes.includes(2) && foundNetwork.supportedTxTypes.includes(2)){
+    return {
+      maxFeePerGas: getGasValue(maxFeePerGas),
+      maxPriorityFeePerGas: getGasValue(maxPriorityFeePerGas),
+      type: 2,
+      ...gasLimitObj
+    }
+  }
+
+  return {
+    gasPrice: getGasValue(gasPrice),
+    ...gasLimitObj
+  }
+}
+
+export const getGasFeeData = async (provider: providers.Provider) => {
+  const getGasValue = (val: number) => Math.floor(val * Math.pow(10, 9))
+
   return await provider.getFeeData().then((result: FeeData) => {
     const gasPriceStr = formatUnits(result.gasPrice ?? BigNumber.from(0), 'gwei')
     const gasPrice = Math.ceil(parseFloat(gasPriceStr))
@@ -49,19 +69,11 @@ export const getGasSettings = async (chainId: number, rpcUrl?: string, gasArgs?:
 
     const maxPriorityFeePerGasStr = formatUnits(result.maxPriorityFeePerGas ?? BigNumber.from(0), 'gwei')
     const maxPriorityFeePerGas = Math.ceil(parseFloat(maxPriorityFeePerGasStr))
-    
-    if(foundWallet.supportedTxTypes.includes(2) && foundNetwork.supportedTxTypes.includes(2)){
-      return {
-        maxFeePerGas: getGasValue(maxFeePerGas),
-        maxPriorityFeePerGas: getGasValue(maxPriorityFeePerGas),
-        type: 2,
-        ...gasLimitObj
-      }
-    }
 
     return {
       gasPrice: getGasValue(gasPrice),
-      ...gasLimitObj
+      maxFeePerGas: getGasValue(maxFeePerGas),
+      maxPriorityFeePerGas: getGasValue(maxPriorityFeePerGas)
     }
   })
 }

@@ -189,7 +189,7 @@ export class SCP {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(recipient), 'not an Ethereum address')
         invariant(recipient !== ZERO_ADDRESS, "cannot enter zero address for recipient")
-        const tx: providers.TransactionResponse = await this.coverPaymentManager.withdraw(amount, recipient, amount, price, priceDeadline, signature, {...gasConfig})
+        const tx: providers.TransactionResponse = await this.coverPaymentManager.withdraw(amount, recipient, price, priceDeadline, signature, {...gasConfig})
         return tx
     }
 }

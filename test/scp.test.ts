@@ -4,7 +4,7 @@ import { SCP } from "../src/contracts"
 import SCP_ABI from "../src/abis/SCP.json"
 // import CoverPaymentManager from "../src/abis/CoverPaymentManager.json"
 
-describe("Coverage V3", () => {
+describe("SCP", () => {
     const provider = new providers.JsonRpcProvider("https://rpc.testnet.fantom.network/")
     const scp_ethers = new Contract(COVERAGE_SCP_ADDRESS[4002], SCP_ABI, provider)
     // const coverage_payment_manager = new Contract(COVER_PAYMENT_MANAGER_ADDRESS[4002], CoverPaymentManager, provider)
@@ -42,6 +42,8 @@ describe("Coverage V3", () => {
     })
 
     // TO-DO
+    // Requires addPriceSigner() to be called and for us to have access to the private keys for the added signer
+
     // describe("#getRefundableSOLACEAmount", () => {
     //     it("gets the same value as directly querying mainnet contract", async () => {
     //         expect(await scp_sdk.getRefundableSOLACEAmount(POLICYHOLDER_ADDRESS)).toEqual(await scp_ethers.balanceOf(POLICYHOLDER_ADDRESS));

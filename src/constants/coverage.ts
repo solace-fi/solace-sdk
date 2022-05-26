@@ -21,3 +21,17 @@ export const SOLACE_COVER_PRODUCT_V3_ADDRESS: { [chainID: number]: string } = {
     [43113] : "", // Avalanche Testnet
     [43114] : "" // Avalanche C-chain
 }
+
+export const COVERAGE_SCP_ADDRESS: { [chainId : number]: string } = {
+    [250]: '',
+    [4002]: '0x501acE6a7022727f62ffC95558a3359E900C506D',
+    [43113] : "", // Avalanche Testnet
+    [43114] : "", // Avalanche C-chain
+}
+
+export const COVER_PAYMENT_MANAGER_ADDRESS: { [chainId : number]: string } = {
+    [250]: '',
+    [4002]: '0x501AcE6f3aa5898909E1D490A0ACcDf5580201Df',
+    [43113] : "", // Avalanche Testnet
+    [43114] : "", // Avalanche C-chain
+}

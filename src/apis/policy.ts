@@ -80,11 +80,11 @@ export class Policy {
                     provider = getDefaultProvider(getNetwork(chainId))
                 }
             }
-            
+             
             if (chainId == ( 137 || 80001 )) {
                 // SolaceCoverProductV2 deployed on Polygon mainnet (137) and Mumbai (80001)
                 solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainId], SolaceCoverProductV2, provider)
-            } else if (chainId == 250 || 4002) {
+            } else if (chainId == (250 || 4002)) {
                 solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V3_ADDRESS[chainId], SolaceCoverProductV3, provider)
             } else {
                 solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainId], SolaceCoverProduct, provider)

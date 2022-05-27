@@ -27,7 +27,7 @@ export class Coverage {
             this.walletOrProviderOrSigner = walletOrProviderOrSigner
         }
 
-        if (chainID == 137 || 80001 || 4002) {
+        if (chainID == ( 137 || 80001 || 4002) ) {
             // SolaceCoverProductV2 deployed on Polygon mainnet (137, Mumbai (80001), and Fantom Testnet (4002)
             this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProductV2, this.walletOrProviderOrSigner)
         } else {

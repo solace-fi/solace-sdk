@@ -1,5 +1,5 @@
 import { getProvider } from './ethers';
-import { getGasPrice, getGasSettings } from './gas';
+import { getGasPrice, getGasSettings, getGasFeeData } from './gas';
 
 export * from './price'
 export * from './contract'
@@ -8,7 +8,8 @@ export * from './api'
 export const solaceUtils = {
   getProvider,
   getGasPrice,
-  getGasSettings
+  getGasSettings,
+  getGasFeeData
 }
 
 

@@ -20,7 +20,7 @@ type Metadata = {
     provenance: string
 }
 
-type SolaceRiskProtocol = {
+export type SolaceRiskProtocol = {
     appId: string
     balanceUSD: number
     category: string

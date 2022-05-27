@@ -2,7 +2,7 @@ import axios from "axios"
 import { BigNumber, Contract, providers, getDefaultProvider } from 'ethers'
 const { getNetwork } = providers
 import { formatUnits } from "ethers/lib/utils"
-import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS, ZERO_ADDRESS, DEFAULT_ENDPOINT } from "../constants"
+import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS, ZERO_ADDRESS, DEFAULT_ENDPOINT, STAKING_REWARDS_V2_ADDRESS } from "../constants"
 import xsLocker from '../abis/xsLocker.json'
 import stakingRewards from '../abis/StakingRewards.json'
 import { withBackoffRetries } from "../utils"
@@ -19,9 +19,9 @@ export class Lock {
 
     constructor(chainId: number, provider?: providers.Provider) {
       const xslAddr = XSLOCKER_ADDRESS[chainId]
-      const srAddr = STAKING_REWARDS_ADDRESS[chainId]
+      const srAddr = STAKING_REWARDS_V2_ADDRESS[chainId] || STAKING_REWARDS_ADDRESS[chainId]
       invariant(xslAddr, `XSLOCKER_ADDRESS[${chainId}] not found`)
-      invariant(srAddr, `STAKING_REWARDS_ADDRESS[${chainId}] not found`)
+      invariant(srAddr, `STAKING_REWARDS_V2_ADDRESS[${chainId}] or STAKING_REWARDS_ADDRESS[${chainId}] not found`)
 
       this.xslAddr = xslAddr
       this.srAddr = srAddr

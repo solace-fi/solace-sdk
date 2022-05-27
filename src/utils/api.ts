@@ -36,3 +36,54 @@ export const fetchCoingeckoTokenPriceById = async (ids: string[], quote: string)
   })
   return data
 }
+
+export function processProtocolName(str: string): string {
+  // remove hyphen & capitalize first letter of each word
+  return str
+    .split('-')
+    .map((word) => {
+      switch (word.toLowerCase()) {
+        case 'amm':
+        case 'apy':
+          return word.toUpperCase()
+        case 'defi':
+          return 'DeFi'
+        case 'defisaver':
+          return 'DeFi Saver'
+        case 'deversifi':
+          return 'DeversiFi'
+        case 'derivadex':
+          return 'DerivaDEX'
+        case 'dao':
+          return 'DAO'
+        case 'liquiddriver':
+          return 'LiquidDriver'
+        case 'tokensets':
+          return 'TokenSets'
+        case 'wepiggy':
+          return 'WePiggy'
+        case 'waultswap':
+          return 'WaultSwap'
+        case 'stormswap':
+          return 'StormSwap'
+        case 'spiritswap':
+          return 'SpiritSwap'
+        case 'spookyswap':
+          return 'SpookySwap'
+        case 'snowswap':
+          return 'SnowSwap'
+        case 'shapeshift':
+          return 'ShapeShift'
+        case 'yieldyak':
+          return 'Yield Yak'
+        default:
+          return capitalizeFirstLetter(word)
+      }
+    })
+    .join(' ')
+}
+
+export const capitalizeFirstLetter = (str: string): string => {
+  if (str.length == 0) return str
+  return str.charAt(0).toUpperCase().concat(str.slice(1))
+}

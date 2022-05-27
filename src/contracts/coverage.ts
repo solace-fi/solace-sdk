@@ -27,8 +27,8 @@ export class Coverage {
             this.walletOrProviderOrSigner = walletOrProviderOrSigner
         }
 
-        if (chainID == 137 || 80001) {
-            // SolaceCoverProductV2 deployed on Polygon mainnet (137) and Mumbai (80001)
+        if (chainID == ( 137 || 80001 || 4002) ) {
+            // SolaceCoverProductV2 deployed on Polygon mainnet (137, Mumbai (80001), and Fantom Testnet (4002)
             this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProductV2, this.walletOrProviderOrSigner)
         } else {
             this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProduct, this.walletOrProviderOrSigner)
@@ -325,7 +325,7 @@ export class Coverage {
                 break;
             }
 
-            case this.chainID === 137 || this.chainID === 80001: {
+            case this.chainID === 137 || this.chainID === 80001 || this.chainID === 4002: {
                 domain = {
                     name: "Solace.fi-SolaceCoverProductV2",
                     version: "2",

@@ -20,7 +20,8 @@ export const NETWORKS: Network[] = [
         supportedTxTypes: [0]
     },{
         chainId: 4002,
-        supportedTxTypes: [0]
+        supportedTxTypes: [0],
+        isTestnet: true,
     },{
         chainId: 43113,
         supportedTxTypes: [0, 2]
@@ -49,7 +50,7 @@ export const isNetworkSupported = (chainID: number): boolean => {
 
 export const DEFAULT_ENDPOINT: { [chainID : number]: string } = {
     [137]: "https://polygon-rpc.com",
-    [250]: "'https://rpcapi.fantom.network/rpc",
+    [250]: "https://rpcapi.fantom.network/",
     [4002]: "https://rpc.testnet.fantom.network/",
     [43113]: "https://api.avax-test.network/ext/bc/C/rpc",
     [43114]: "https://api.avax.network/ext/bc/C/rpc",

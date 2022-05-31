@@ -9,6 +9,7 @@ describe('Bond', () => {
     let bond1 = new Bond(1);
     let bond137 = new Bond(137);
     let bond4002 = new Bond(4002);
+    let bond1313161554 = new Bond(1313161554);
 
     let price = new Price();
     const bonder = "0xe7aba95073a85abd4ce82487c7fdfa860024b6cc"
@@ -30,9 +31,8 @@ describe('Bond', () => {
         })
 
         it('will return a valid response - matic', async () => {
-            const bond = new Bond(137);
             const apiPriceMapping = await price.getMirrorCoingeckoPrices()
-            const res = await bond.getBondTellerData(apiPriceMapping)
+            const res = await bond137.getBondTellerData(apiPriceMapping)
             const detail = res.find((r) => r.tellerData.teller.type == 'matic')
             if(!detail) return
             await detail.tellerData.teller.contract.estimateGas.depositMatic(BigNumber.from(0), bonder, true)
@@ -41,9 +41,8 @@ describe('Bond', () => {
         })
 
         it('will return a valid response - aurora', async () => {
-            const bond = new Bond(1313161554);
             const apiPriceMapping = await price.getMirrorCoingeckoPrices()
-            const res = await bond.getBondTellerData(apiPriceMapping)
+            const res = await bond1313161554.getBondTellerData(apiPriceMapping)
             const detail = res.find((r) => r.tellerData.teller.type == 'erc20')
             if(!detail) return
             await detail.tellerData.teller.contract.estimateGas.deposit(BigNumber.from(0), BigNumber.from(0), bonder, true)

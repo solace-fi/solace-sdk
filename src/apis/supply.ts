@@ -17,7 +17,7 @@ export class TotalSupply {
         invariant(this.CHAIN_IDS.includes(chainId), `chainId must be one of ${this.CHAIN_IDS}`)
         let provider = null
         if (!providerOrSigner) {
-            if (chainId == 137 || chainId == 1313161554) {
+            if (DEFAULT_ENDPOINT[chainId]) {
                 provider = getProvider(DEFAULT_ENDPOINT[chainId])
             } else {
                 provider = getDefaultProvider(getNetwork(chainId))
@@ -90,7 +90,7 @@ export class CirculatingSupply {
         let _provider = null
 
         if (!provider) {
-            if (chainId == 137 || chainId == 1313161554) {
+            if (DEFAULT_ENDPOINT[chainId]) {
                 _provider = new MulticallProvider(getProvider(DEFAULT_ENDPOINT[chainId]), chainId)
             } else {
                 _provider = new MulticallProvider(getDefaultProvider(getNetwork(chainId)), chainId)

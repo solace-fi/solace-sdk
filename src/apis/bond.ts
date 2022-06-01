@@ -57,14 +57,14 @@ export class Bond {
             let bondTellerAbi = null
             let principalAbi = null
 
-            if ((t.token == 'eth') && (this.chainId == 1 || 4 || 42 || 1313161554 || 1313161555)) {
+            if ((t.token == 'eth') && ([1, 4, 42, 1313161554, 1313161555].includes(this.chainId))) {
                 bondTellerAbi = bondTellerEth
                 principalAbi = WETH9
-            } else if ((t.token == 'matic') && (this.chainId == 137 || 80001)) {
+            } else if ((t.token == 'matic') && ([137, 80001].includes(this.chainId))) {
                 bondTellerAbi = bondTellerMatic
                 principalAbi = WMATIC
             }
-            else if ((t.token == 'ftm') && (this.chainId == 250 || 4002)) {
+            else if ((t.token == 'ftm') && ([250, 4002].includes(this.chainId))) {
                 bondTellerAbi = bondTellerFtm
                 principalAbi = WFTM
             } else {

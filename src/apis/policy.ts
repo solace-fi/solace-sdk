@@ -1,6 +1,6 @@
 import { BigNumber, Contract, getDefaultProvider, providers, utils } from 'ethers'
 import invariant from 'tiny-invariant'
-import { DEFAULT_ENDPOINT, SOLACE_COVER_PRODUCT_ADDRESS, SOLACE_COVER_PRODUCT_V2_ADDRESS, SOLACE_COVER_PRODUCT_V3_ADDRESS } from '../constants'
+import { DEFAULT_ENDPOINT, NETWORKS, SOLACE_COVER_PRODUCT_ADDRESS, SOLACE_COVER_PRODUCT_V2_ADDRESS, SOLACE_COVER_PRODUCT_V3_ADDRESS } from '../constants'
 import { getProvider } from '../utils/ethers'
 const { getNetwork } = providers
 
@@ -62,9 +62,12 @@ export class Policy {
     public async getExistingPolicy_V2(account: string, rpcUrlMapping?: {[chain: number] : string}, includeTestnets?: boolean): Promise<{ policyId: BigNumber, chainId: number, coverLimit: BigNumber }[]> {
         invariant(utils.isAddress(account),"not an Ethereum address")
 
-        const supportedChains = [1, 4, 137, 80001, 250, 4002]
+        const supportedChains = NETWORKS.filter((n) => {
+            const f = n.features.general
+            return f.coverageV1 || f.coverageV2
+        })
 
-        const conditionedChains = includeTestnets ? supportedChains : [1, 137, 250]
+        const conditionedChains = includeTestnets ? supportedChains : supportedChains.filter((n) => !n.isTestnet)
 
         let res: { policyId: BigNumber, chainId: number, coverLimit: BigNumber }[] = []
 
@@ -74,7 +77,7 @@ export class Policy {
             if(rpcUrlMapping && rpcUrlMapping[chainId]) {
                 provider = getProvider(rpcUrlMapping[chainId])
             } else {
-                if (chainId == ( 137 || 80001 )) {
+                if (DEFAULT_ENDPOINT[chainId]) {
                     provider = getProvider(DEFAULT_ENDPOINT[chainId])
                 } else {
                     provider = getDefaultProvider(getNetwork(chainId))
@@ -97,7 +100,7 @@ export class Policy {
             }
         }
 
-        await Promise.all(conditionedChains.map((chain) => {return processChain(chain)}))
+        await Promise.all(conditionedChains.map((chain) => {return processChain(chain.chainId)}))
 
         res.sort((a, b) => a.chainId - b.chainId)
 

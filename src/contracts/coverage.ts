@@ -28,7 +28,6 @@ export class Coverage {
         }
 
         if (SOLACE_COVER_PRODUCT_V2_ADDRESS[chainID]) {
-            // SolaceCoverProductV2 deployed on Polygon mainnet (137, Mumbai (80001), and Fantom and fantom testnet
             this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V2_ADDRESS[chainID], SolaceCoverProductV2, this.walletOrProviderOrSigner)
         } else {
             this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProduct, this.walletOrProviderOrSigner)
@@ -203,7 +202,7 @@ export class Coverage {
      * @returns The policy chain information
      */
     public async getPolicyChainInfo(policyID: BigNumberish): Promise<boolean> {
-        invariant(SOLACE_COVER_PRODUCT_V2_ADDRESS[this.chainID], 'cannot call this function for chainId other than 137 or 80001 or 250 or 4002')
+        invariant(SOLACE_COVER_PRODUCT_V2_ADDRESS[this.chainID], 'cannot call this function for this chainId')
         return (await this.solaceCoverProduct.getPolicyChainInfo(policyID))
     }
 
@@ -212,7 +211,7 @@ export class Coverage {
      * @returns The chain at the given index
      */
     public async getChain(chainIndex: BigNumberish): Promise<boolean> {
-        invariant(SOLACE_COVER_PRODUCT_V2_ADDRESS[this.chainID], 'cannot call this function for chainId other than 137 or 80001 or 250 or 4002')
+        invariant(SOLACE_COVER_PRODUCT_V2_ADDRESS[this.chainID], 'cannot call this function for this chainId')
         return (await this.solaceCoverProduct.getChain(chainIndex))
     }
 
@@ -221,7 +220,7 @@ export class Coverage {
      * @returns The number of supported chains
      */
     public async numSupportedChains(): Promise<boolean> {
-        invariant(SOLACE_COVER_PRODUCT_V2_ADDRESS[this.chainID], 'cannot call this function for chainId other than 137 or 80001 or 250 or 4002')
+        invariant(SOLACE_COVER_PRODUCT_V2_ADDRESS[this.chainID], 'cannot call this function for this chainId')
         return (await this.solaceCoverProduct.numSupportedChains())
     }
 
@@ -325,21 +324,7 @@ export class Coverage {
                 break;
             }
 
-            case SOLACE_COVER_PRODUCT_V2_ADDRESS[this.chainID] != undefined: {
-                domain = {
-                    name: "Solace.fi-SolaceCoverProductV2",
-                    version: "2",
-                    chainId: this.chainID,
-                    verifyingContract: SOLACE_COVER_PRODUCT_V2_ADDRESS[this.chainID]
-                };   
-
-                value = {
-                    version: 2
-                };   
-
-                break;
-            }
-
+            case SOLACE_COVER_PRODUCT_V2_ADDRESS[this.chainID] != undefined: 
             default: {
                 domain = {
                     name: "Solace.fi-SolaceCoverProductV2",

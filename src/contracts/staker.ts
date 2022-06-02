@@ -4,7 +4,7 @@ import xsLocker from "../abis/xsLocker.json"
 import StakingRewards from "../abis/StakingRewards.json"
 import StakingRewardsV2 from "../abis/StakingRewardsV2.json"
 import invariant from 'tiny-invariant'
-import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS, ZERO_ADDRESS, isNetworkSupported, DEFAULT_ENDPOINT, STAKING_REWARDS_V2_ADDRESS } from '../constants'
+import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS, ZERO_ADDRESS, isNetworkSupported, DEFAULT_ENDPOINT, STAKING_REWARDS_V2_ADDRESS, foundNetwork } from '../constants'
 import { GasConfiguration } from '../types';
 import { getProvider } from '../utils/ethers'
 
@@ -31,11 +31,14 @@ export class Staker {
      * @param walletOrProviderOrSigner walletOrProviderOrSigner object - a Wallet (https://docs.ethers.io/v5/api/signer/#Wallet) or a Provider (https://docs.ethers.io/v5/api/providers/) or Signer (https://docs.ethers.io/v5/api/signer/)
      */
     constructor(chainID: number, walletOrProviderOrSigner?: Wallet | providers.JsonRpcSigner | providers.Provider) {
-        invariant(isNetworkSupported(chainID),"not a supported chainID")
+
+        const xslAddr = XSLOCKER_ADDRESS[chainID]
+        const srAddr = foundNetwork(chainID)?.features.general.stakingRewardsV2 ? STAKING_REWARDS_V2_ADDRESS[chainID] : STAKING_REWARDS_ADDRESS[chainID]
+        invariant(xslAddr, `XSLOCKER_ADDRESS[${chainID}] not found`)
+        invariant(srAddr, `STAKING_REWARDS_V2_ADDRESS[${chainID}] or STAKING_REWARDS_ADDRESS[${chainID}] not found`)
+  
         this.chainID = chainID;
         if (typeof(walletOrProviderOrSigner) == 'undefined') {
-            // ethers.js getDefaultProvider method doesn't work for MATIC or Mumbai
-            // Use public RPC endpoints instead
             if (DEFAULT_ENDPOINT[chainID]) {
                 this.walletOrProviderOrSigner = getProvider(DEFAULT_ENDPOINT[chainID])
             } else {
@@ -45,10 +48,14 @@ export class Staker {
             this.walletOrProviderOrSigner = walletOrProviderOrSigner
         }
          
-        if(this.chainID == (250 || 4002)) {this.stakingRewards = new Contract(STAKING_REWARDS_V2_ADDRESS[chainID], StakingRewardsV2, walletOrProviderOrSigner)}
-        else {this.stakingRewards = new Contract(STAKING_REWARDS_ADDRESS[chainID], StakingRewards, walletOrProviderOrSigner)}
+        if (foundNetwork(chainID)?.features.general.stakingRewardsV2) {
+            this.stakingRewards = new Contract(STAKING_REWARDS_V2_ADDRESS[chainID], StakingRewardsV2, walletOrProviderOrSigner)
+        }
+        else {
+            this.stakingRewards = new Contract(STAKING_REWARDS_ADDRESS[chainID], StakingRewards, walletOrProviderOrSigner)
+        }
 
-        this.xsLocker = new Contract(XSLOCKER_ADDRESS[chainID], xsLocker, walletOrProviderOrSigner)
+        this.xsLocker = new Contract(xslAddr, xsLocker, walletOrProviderOrSigner)
     }
 
     /**********************************

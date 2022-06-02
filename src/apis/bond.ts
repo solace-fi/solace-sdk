@@ -1,4 +1,4 @@
-import { BOND_TELLER_ADDRESSES, MasterTokenList, isNetworkSupported, DEFAULT_ENDPOINT, WrappedTokenToMasterToken } from "../constants";
+import { BOND_TELLER_ADDRESSES, MasterTokenList, DEFAULT_ENDPOINT, WrappedTokenToMasterToken, mainnetChains, foundNetwork } from "../constants";
 import { getDefaultProvider, providers, Contract, utils, BigNumber } from "ethers";
 
 const { getNetwork } = providers
@@ -27,7 +27,7 @@ export class Bond {
     chainId: number
 
     constructor(chainId: number, providerOrSigner?: providers.JsonRpcSigner | providers.Provider) {
-        invariant(isNetworkSupported(chainId),"not a supported chainID")
+        invariant(foundNetwork(chainId)?.features.general.bondingV2,"not a supported chainID")
         if (!providerOrSigner) {
             if (DEFAULT_ENDPOINT[chainId]) {
                 this.providerOrSigner = getProvider(DEFAULT_ENDPOINT[chainId])
@@ -57,17 +57,19 @@ export class Bond {
             let bondTellerAbi = null
             let principalAbi = null
 
-            if ((t.token == 'eth') && ([1, 4, 42, 1313161554, 1313161555].includes(this.chainId))) {
+            if ((t.token == 'eth') && (mainnetChains.filter((c) => c.nativeCurrency.symbol == 'eth').map((c) => c.chainId).includes(this.chainId))) {
                 bondTellerAbi = bondTellerEth
                 principalAbi = WETH9
-            } else if ((t.token == 'matic') && ([137, 80001].includes(this.chainId))) {
+            }
+            if ((t.token == 'matic') && (mainnetChains.filter((c) => c.nativeCurrency.symbol == 'matic').map((c) => c.chainId).includes(this.chainId))) {
                 bondTellerAbi = bondTellerMatic
                 principalAbi = WMATIC
             }
-            else if ((t.token == 'ftm') && ([250, 4002].includes(this.chainId))) {
+            if ((t.token == 'ftm') && (mainnetChains.filter((c) => c.nativeCurrency.symbol == 'ftm').map((c) => c.chainId).includes(this.chainId))) {
                 bondTellerAbi = bondTellerFtm
                 principalAbi = WFTM
-            } else {
+            } 
+            if (bondTellerAbi == null || principalAbi == null) {
                 bondTellerAbi = bondTellerErc20
                 principalAbi = ERC20
             }

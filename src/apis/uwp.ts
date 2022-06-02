@@ -183,9 +183,6 @@ export class UnderwritingPoolUSDBalances {
   public async getUSDBalances_Polygon(rpcUrl?: string) {
     const uwpbObj = new UnderwritingPoolBalances()
     const priceObj = new Price()
-    // const balances = await withBackoffRetries(async () => uwpbObj.getBalances_Polygon())
-    // const prices = await withBackoffRetries(async () => priceObj.getPolygonPrices())
-    // const tokenPrices = await withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices())
     
     const [balances, prices, tokenPrices] = await Promise.all([
       withBackoffRetries(async () => uwpbObj.getBalances_Polygon(rpcUrl)),
@@ -217,9 +214,6 @@ export class UnderwritingPoolUSDBalances {
   public async getUSDBalances_Aurora(rpcUrl?: string) {
     const uwpbObj = new UnderwritingPoolBalances()
     const priceObj = new Price()
-    // const balances = await withBackoffRetries(async () => uwpbObj.getBalances_Aurora())
-    // const prices = await withBackoffRetries(async () => priceObj.getAuroraPrices())
-    // const tokenPrices = await withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices())
     
     const [balances, prices, tokenPrices] = await Promise.all([
       withBackoffRetries(async () => uwpbObj.getBalances_Aurora(rpcUrl)),

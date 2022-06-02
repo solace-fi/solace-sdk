@@ -38,6 +38,8 @@ export class Price {
             price_set.push({ chainId: 137, price: set137[set137.length - 1].polygon})
             const set1313161554 = reformatData(markets['1313161554'], "aurora")
             price_set.push({ chainId: 1313161554, price: set1313161554[set1313161554.length - 1].aurora})
+            const set250 = reformatData(markets['250'], "fantom")
+            price_set.push({ chainId: 250, price: set250[set250.length - 1].aurora})
         })
 
         return price_set

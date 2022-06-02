@@ -17,8 +17,12 @@ export class CoverageV3 {
         this.chainID = chainID;
 
         if (typeof(walletOrProviderOrSigner) == 'undefined') {
-            if (chainID == (1 || 4 || 42)) {this.walletOrProviderOrSigner = getDefaultProvider(getNetwork(chainID))}
-            else {this.walletOrProviderOrSigner = getProvider(DEFAULT_ENDPOINT[chainID])}
+            if(DEFAULT_ENDPOINT[chainID]){
+                this.walletOrProviderOrSigner = getProvider(DEFAULT_ENDPOINT[chainID])
+            }
+            else{
+                this.walletOrProviderOrSigner = getDefaultProvider(getNetwork(chainID))
+            }
         } else {
             this.walletOrProviderOrSigner = walletOrProviderOrSigner
         }

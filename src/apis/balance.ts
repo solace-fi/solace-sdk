@@ -3,12 +3,12 @@ import { formatUnits } from "ethers/lib/utils";
 import invariant from "tiny-invariant";
 const { getNetwork } = providers
 import ERC20 from "../abis/ERC20.json";
-import { DEFAULT_ENDPOINT } from "../constants";
+import { DEFAULT_ENDPOINT, mainnetChains } from "../constants";
 import { getProvider } from "../utils/ethers";
 
 export class SolaceBalance {
 
-    CHAIN_IDS = [1, 137, 1313161554, 250]
+    CHAIN_IDS = mainnetChains.map((n) => n.chainId)
     SOLACE_ADDRESS = "0x501acE9c35E60f03A2af4d484f49F9B1EFde9f40"
     ERC20ABI = ERC20
 
@@ -61,7 +61,7 @@ export class SolaceBalance {
 
 export class xSolaceBalance {
 
-    CHAIN_IDS = [1, 137, 1313161554, 250]
+    CHAIN_IDS = mainnetChains.map((n) => n.chainId)
     XSOLACE_ADDRESS = "0x501ACe802447B1Ed4Aae36EA830BFBde19afbbF9"
     ERC20ABI = ERC20
 

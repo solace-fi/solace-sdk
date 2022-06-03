@@ -89,16 +89,20 @@ export class CoverageV3 {
     }
 
     /**
-     * @notice Activates policy for `msg.sender`.
+     * @notice Activates policy for provided _user.
+     * @param _user The intended policy owner.
      * @param _coverLimit The maximum value to cover in **USD**.
      * @return policyID The ID of the newly minted policy.
      */
      public async purchase(
+         _user: string,
         _coverLimit: BigNumberish,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
-        const tx: providers.TransactionResponse = await this.solaceCoverProduct.purchase(_coverLimit, {...gasConfig})
+        invariant(utils.isAddress(_user), "not an Ethereum address")
+        invariant(_user !== ZERO_ADDRESS, "cannot enter zero address")
+        const tx: providers.TransactionResponse = await this.solaceCoverProduct.purchase(_user, _coverLimit, {...gasConfig})
         return tx
     }
 

@@ -35,20 +35,56 @@ export class CoverageV3 {
     *****************************************************************/
     
     /**
-     * @notice Activates policy for provided `_user`.
-     * @param _user The account to purchase policy. 
+     * @notice Purchases policy for provided `_user`.
+     * @param _user The policy owner.
      * @param _coverLimit The maximum value to cover in **USD**.
+     * @param _token The token to deposit.
+     * @param _amount Amount of token to deposit.
      * @return policyID The ID of the newly minted policy.
-     */
-     public async purchaseFor(
+    */
+     public async purchaseWithStable(
         _user: string,
         _coverLimit: BigNumberish,
+        _token: string,
+        _amount: BigNumberish,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(_user), "not an Ethereum address")
         invariant(_user !== ZERO_ADDRESS, "cannot enter zero address")
-        const tx: providers.TransactionResponse = await this.solaceCoverProduct.purchaseFor(_user, _coverLimit, {...gasConfig})
+        invariant(utils.isAddress(_token), "_token - not an Ethereum address")
+        invariant(_token !== ZERO_ADDRESS, "_token - cannot enter zero address")
+        const tx: providers.TransactionResponse = await this.solaceCoverProduct.purchaseWithStable(_user, _coverLimit, _token, _amount, {...gasConfig})
+        return tx
+    }
+
+    /**
+     * @notice Purchases policy for the user.
+     * @param _user The policy owner.
+     * @param _coverLimit The maximum value to cover in **USD**.
+     * @param _token The token to deposit.
+     * @param _amount Amount of token to deposit.
+     * @param _price The `SOLACE` price in wei(usd).
+     * @param _priceDeadline The `SOLACE` price in wei(usd).
+     * @param _signature The `SOLACE` price signature.
+     * @return policyID The ID of the newly minted policy.
+     */
+     public async purchaseWithNonStable(
+        _user: string,
+        _coverLimit: BigNumberish,
+        _token: string,
+        _amount: BigNumberish,
+        _price: BigNumberish,
+        _priceDeadline: BigNumberish,
+        _signature: utils.BytesLike,
+        gasConfig?: GasConfiguration
+    ): Promise<providers.TransactionResponse> {
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
+        invariant(utils.isAddress(_user), "_user - not an Ethereum address")
+        invariant(_user !== ZERO_ADDRESS, "_user - cannot enter zero address")
+        invariant(utils.isAddress(_token), "_token - not an Ethereum address")
+        invariant(_token !== ZERO_ADDRESS, "_token - cannot enter zero address")
+        const tx: providers.TransactionResponse = await this.solaceCoverProduct.purchaseWithStable(_user, _coverLimit, _token, _amount, _price, _priceDeadline, _signature, {...gasConfig})
         return tx
     }
 
@@ -135,15 +171,6 @@ export class CoverageV3 {
      */
      public async tokenURI(policyID: BigNumberish): Promise<string> {
         return (await this.solaceCoverProduct.tokenURI(policyID))
-    }
-
-    /**
-     * @notice Calculates the policy cancellation fee.
-     * @param policyID The policy id.
-     * @return fee The cancellation fee.
-     */
-     public async calculateCancelFee(policyID: BigNumberish): Promise<BN> {
-        return (await this.solaceCoverProduct.calculateCancelFee(policyID))
     }
 
     /**********************************************

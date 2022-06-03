@@ -53,12 +53,6 @@ describe("Coverage V3", () => {
         })
     })
 
-    describe("#calculateCancelFee", () => {
-        it("gets the same value as directly querying mainnet contract", async () => {
-            expect(await coverage.calculateCancelFee(POLICY_ID)).toEqual(await solaceCoverProduct.calculateCancelFee(POLICY_ID));
-        })
-    })
-
     // tokenURI call will revert with Solidity error string - "invalid policy"
     // describe("#tokenURI", () => {
     //     it("gets the same value as directly querying mainnet contract", async () => {

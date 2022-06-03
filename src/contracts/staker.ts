@@ -4,7 +4,7 @@ import xsLocker from "../abis/xsLocker.json"
 import StakingRewards from "../abis/StakingRewards.json"
 import StakingRewardsV2 from "../abis/StakingRewardsV2.json"
 import invariant from 'tiny-invariant'
-import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS, ZERO_ADDRESS, isNetworkSupported, DEFAULT_ENDPOINT, STAKING_REWARDS_V2_ADDRESS, foundNetwork } from '../constants'
+import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS, ZERO_ADDRESS, DEFAULT_ENDPOINT, STAKING_REWARDS_V2_ADDRESS, foundNetwork } from '../constants'
 import { GasConfiguration } from '../types';
 import { getProvider } from '../utils/ethers'
 

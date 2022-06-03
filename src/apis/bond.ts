@@ -1,4 +1,4 @@
-import { BOND_TELLER_ADDRESSES, MasterTokenList, DEFAULT_ENDPOINT, WrappedTokenToMasterToken, mainnetChains, foundNetwork } from "../constants";
+import { BOND_TELLER_ADDRESSES, MasterTokenList, DEFAULT_ENDPOINT, WrappedTokenToMasterToken, foundNetwork, NETWORKS } from "../constants";
 import { getDefaultProvider, providers, Contract, utils, BigNumber } from "ethers";
 
 const { getNetwork } = providers
@@ -57,15 +57,15 @@ export class Bond {
             let bondTellerAbi = null
             let principalAbi = null
 
-            if ((t.token == 'eth') && (mainnetChains.filter((c) => c.nativeCurrency.symbol == 'eth').map((c) => c.chainId).includes(this.chainId))) {
+            if ((t.token == 'eth') && (NETWORKS.filter((c) => c.nativeCurrency.symbol == 'eth').map((c) => c.chainId).includes(this.chainId))) {
                 bondTellerAbi = bondTellerEth
                 principalAbi = WETH9
             }
-            if ((t.token == 'matic') && (mainnetChains.filter((c) => c.nativeCurrency.symbol == 'matic').map((c) => c.chainId).includes(this.chainId))) {
+            if ((t.token == 'matic') && (NETWORKS.filter((c) => c.nativeCurrency.symbol == 'matic').map((c) => c.chainId).includes(this.chainId))) {
                 bondTellerAbi = bondTellerMatic
                 principalAbi = WMATIC
             }
-            if ((t.token == 'ftm') && (mainnetChains.filter((c) => c.nativeCurrency.symbol == 'ftm').map((c) => c.chainId).includes(this.chainId))) {
+            if ((t.token == 'ftm') && (NETWORKS.filter((c) => c.nativeCurrency.symbol == 'ftm').map((c) => c.chainId).includes(this.chainId))) {
                 bondTellerAbi = bondTellerFtm
                 principalAbi = WFTM
             } 

@@ -49,15 +49,15 @@ describe('Bond', () => {
             console.log(res)
         })
 
-        // it('will return a valid response - fantom testnet', async () => {
-        //     const apiPriceMapping = await price.getMirrorCoingeckoPrices()
-        //     const res = await bond4002.getBondTellerData(apiPriceMapping)
-        //     const detail = res.find((r) => r.tellerData.teller.type == 'ftm')
-        //     if(!detail) return
-        //     await detail.tellerData.teller.contract.estimateGas.depositFtm(BigNumber.from(0), bonder, true)
-        //     await detail.tellerData.teller.contract.estimateGas.depositWftm(BigNumber.from(0), BigNumber.from(0), bonder, true)
-        //     console.log(res)
-        // })
+        it('will return a valid response - fantom testnet', async () => {
+            const apiPriceMapping = await price.getMirrorCoingeckoPrices()
+            const res = await bond4002.getBondTellerData(apiPriceMapping)
+            const detail = res.find((r) => r.tellerData.teller.type == 'ftm')
+            if(!detail) return
+            await detail.tellerData.teller.contract.estimateGas.depositFtm(BigNumber.from(0), bonder, true)
+            await detail.tellerData.teller.contract.estimateGas.depositWftm(BigNumber.from(0), BigNumber.from(0), bonder, true)
+            console.log(res)
+        })
     })
 
     describe('#getUserBondData', () => {

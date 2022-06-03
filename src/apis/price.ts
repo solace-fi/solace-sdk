@@ -241,7 +241,7 @@ export class Price {
 
   public async getMirrorCoingeckoPrices (): Promise<{ [key: string]: number }> {
     const prices = await axios({
-      url: 'https://price-feed.solace.fi/bond_prices/', 
+      url: 'https://price-feed.solace.fi/bondPrices.json', 
       method: 'GET',
       headers: {
           Accept: 'application/json',

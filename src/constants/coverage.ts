@@ -11,6 +11,7 @@ export const SOLACE_COVER_PRODUCT_V2_ADDRESS: { [chainID: number]: string } = {
 }
 
 export const SOLACE_COVER_PRODUCT_V3_ADDRESS: { [chainID: number]: string } = {
+    [4] : "0x501aCeCca80Dc357CC8840c7bB74e8BdD465F663", // Fantom
     [250] : "", // Fantom
     [4002] : "0x501aCE7271065019707Fad7DEbDcCE78bd10F7AC", // Fantom Testnet
     [43113] : "", // Avalanche Testnet
@@ -28,6 +29,7 @@ export const UWP_ADDRESS: { [chainID : number]: string } = {
 }
 
 export const COVERAGE_SCP_ADDRESS: { [chainId : number]: string } = {
+    [4]: '0x501aCE6F99075239fb4431CbbDF13bB0224A7dfF',
     [250]: '',
     [4002]: '0x501acE6a7022727f62ffC95558a3359E900C506D',
     [43113] : "", // Avalanche Testnet
@@ -35,6 +37,7 @@ export const COVERAGE_SCP_ADDRESS: { [chainId : number]: string } = {
 }
 
 export const COVER_PAYMENT_MANAGER_ADDRESS: { [chainId : number]: string } = {
+    [4]: '0x501ACEEf4ED46E49BdE84173E76AADa913855f16',
     [250]: '',
     [4002]: '0x501AcE6f3aa5898909E1D490A0ACcDf5580201Df',
     [43113] : "", // Avalanche Testnet

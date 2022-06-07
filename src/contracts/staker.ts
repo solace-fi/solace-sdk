@@ -31,7 +31,7 @@ export class Staker {
      * @param walletOrProviderOrSigner walletOrProviderOrSigner object - a Wallet (https://docs.ethers.io/v5/api/signer/#Wallet) or a Provider (https://docs.ethers.io/v5/api/providers/) or Signer (https://docs.ethers.io/v5/api/signer/)
      */
     constructor(chainID: number, walletOrProviderOrSigner?: Wallet | providers.JsonRpcSigner | providers.Provider) {
-
+        invariant(foundNetwork(chainID)?.features.general.stakingV2, 'stakingV2 not supported on this chain')
         const xslAddr = XSLOCKER_ADDRESS[chainID]
         const srAddr = foundNetwork(chainID)?.features.general.stakingRewardsV2 ? STAKING_REWARDS_V2_ADDRESS[chainID] : STAKING_REWARDS_ADDRESS[chainID]
         invariant(xslAddr, `XSLOCKER_ADDRESS[${chainID}] not found`)

@@ -2,7 +2,7 @@ import { BigNumber as BN, providers, Wallet, Contract, getDefaultProvider, utils
 const { getNetwork } = providers
 import invariant from 'tiny-invariant'
 import SolaceCoverProductV3 from "../abis/SolaceCoverProductV3.json"
-import { SOLACE_COVER_PRODUCT_V3_ADDRESS, ZERO_ADDRESS, DEFAULT_ENDPOINT } from '../constants'
+import { SOLACE_COVER_PRODUCT_V3_ADDRESS, ZERO_ADDRESS, DEFAULT_ENDPOINT, foundNetwork } from '../constants'
 import { GasConfiguration } from '../types';
 import { getProvider } from '../utils/ethers'
 
@@ -13,7 +13,7 @@ export class CoverageV3 {
 
     // TO-DO add Fantom connection
     constructor(chainID: number, walletOrProviderOrSigner?: Wallet | providers.JsonRpcSigner | providers.Provider) {
-        invariant(SOLACE_COVER_PRODUCT_V3_ADDRESS[chainID],"not a supported chainID")
+        invariant(foundNetwork(chainID)?.features.general.coverageV3 && SOLACE_COVER_PRODUCT_V3_ADDRESS[chainID],"not a supported chainID")
         this.chainID = chainID;
 
         if (typeof(walletOrProviderOrSigner) == 'undefined') {

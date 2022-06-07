@@ -1,17 +1,8 @@
-import { getProvider } from './ethers';
-import { getGasPrice, getGasSettings, getGasFeeData } from './gas';
-
 export * from './price'
 export * from './contract'
 export * from './api'
-
-export const solaceUtils = {
-  getProvider,
-  getGasPrice,
-  getGasSettings,
-  getGasFeeData
-}
-
+export * from './gas'
+export * from './ethers'
 
 export const withBackoffRetries = async (f: any, retryCount = 3, jitter = 250) => {
   let nextWaitTime = 1000

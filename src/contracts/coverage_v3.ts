@@ -84,7 +84,7 @@ export class CoverageV3 {
         invariant(_user !== ZERO_ADDRESS, "_user - cannot enter zero address")
         invariant(utils.isAddress(_token), "_token - not an Ethereum address")
         invariant(_token !== ZERO_ADDRESS, "_token - cannot enter zero address")
-        const tx: providers.TransactionResponse = await this.solaceCoverProduct.purchaseWithStable(_user, _coverLimit, _token, _amount, _price, _priceDeadline, _signature, {...gasConfig})
+        const tx: providers.TransactionResponse = await this.solaceCoverProduct.purchaseWithNonStable(_user, _coverLimit, _token, _amount, _price, _priceDeadline, _signature, {...gasConfig})
         return tx
     }
 

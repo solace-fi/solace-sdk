@@ -249,10 +249,27 @@ export class Price {
       },
     }).then((response: AxiosResponse<any, any>) => {return response.data})
     .catch((error: AxiosResponse<any, any>) => {
-      console.error('Error getSolaceRiskSeries', error)
+      console.error('Error getMirrorCoingeckoPrices', error)
       return undefined
     })
 
     return prices
+  }
+
+  public async getPriceInfo () {
+    const info = await axios({
+      url: 'https://price-feed.solace.fi/solacePrice.json', 
+      method: 'GET',
+      headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+      },
+    }).then((response: AxiosResponse<any, any>) => {return response.data})
+    .catch((error: AxiosResponse<any, any>) => {
+      console.error('Error getPriceInfo', error)
+      return undefined
+    })
+
+     return info
   }
 }

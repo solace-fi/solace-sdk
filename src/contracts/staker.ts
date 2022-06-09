@@ -383,6 +383,21 @@ export class Staker {
         return tx
     }
 
+    /**
+     * @notice Adds a one time boost to rewards.
+     * Paid in [**SOLACE**](./../../SOLACE) by `msg.sender`.
+     * @param amount Amount of rewards to distribute.
+     */
+     public async postRewards(
+        amount: BigNumberish,
+        gasConfig?: GasConfiguration
+    ): Promise<providers.TransactionResponse> {
+        invariant(STAKING_REWARDS_V2_ADDRESS[this.chainID], "StakingRewardsV2 not deployed on chain")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
+        const tx: providers.TransactionResponse = await this.stakingRewards.postRewards(amount, {...gasConfig})
+        return tx
+    }
+
     /**********************************
     StakingRewards View Functions
     **********************************/

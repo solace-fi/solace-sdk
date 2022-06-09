@@ -32,7 +32,8 @@ const rinkeby: Network = {
             bondingV2: true,
             coverageV1: true,
             coverageV3: true,
-            stakingV2: true
+            stakingV2: true,
+            stakingRewardsV2: true,
         },
         special: {}
     },
@@ -159,6 +160,7 @@ const fantomTestnet = {
             coverageV2: true,
             coverageV3: true,
             stakingV2: true,
+            stakingRewardsV2: true,
         },
         special: {}
     },

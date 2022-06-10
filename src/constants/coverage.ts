@@ -11,7 +11,7 @@ export const SOLACE_COVER_PRODUCT_V2_ADDRESS: { [chainID: number]: string } = {
 }
 
 export const SOLACE_COVER_PRODUCT_V3_ADDRESS: { [chainID: number]: string } = {
-    [4] : "0x501aCECa15AAc77201Fa90fE6F8E6A25C40A3E04", // Rinkeby
+    [4] : "0x501Ace53b8e92f66C5f9d3A41FC348b0A4a02067", // Rinkeby
     [250] : "", // Fantom
     [4002] : "0x501aCE7271065019707Fad7DEbDcCE78bd10F7AC", // Fantom Testnet
     [43113] : "", // Avalanche Testnet
@@ -37,7 +37,7 @@ export const COVERAGE_SCP_ADDRESS: { [chainId : number]: string } = {
 }
 
 export const COVER_PAYMENT_MANAGER_ADDRESS: { [chainId : number]: string } = {
-    [4]: '0x501ace93C22B1a260633eF4Ecc5baCd66d3C2E28',
+    [4]: '0x501AcEe5De9F2bB34b315a7A97cE184565fa5609',
     [250]: '',
     [4002]: '0x501AcE6f3aa5898909E1D490A0ACcDf5580201Df',
     [43113] : "", // Avalanche Testnet

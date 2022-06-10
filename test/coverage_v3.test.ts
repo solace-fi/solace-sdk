@@ -78,12 +78,6 @@ describe("Coverage V3", () => {
         })
     })
 
-    describe("#debtOf", () => {
-        it("gets the same value as directly querying mainnet contract", async () => {
-            expect(await coverage.debtOf(POLICYHOLDER_ADDRESS)).toEqual(await solaceCoverProduct.debtOf(POLICYHOLDER_ADDRESS));
-        })
-    })
-
     describe("#policyCount", () => {
         it("gets the same value as directly querying mainnet contract", async () => {
             expect(await coverage.policyCount()).toEqual(await solaceCoverProduct.policyCount());

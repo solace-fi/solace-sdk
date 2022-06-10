@@ -107,13 +107,23 @@ export class CoverageV3 {
     }
 
     /**
-     * @notice Cancels the policy for `msg.sender`.
+     * @notice Cancels the policy for `policyholder`.
+     * @param _premium The premium amount to verify.
+     * @param _policyholder The policyholder address.
+     * @param _deadline The deadline for the signature.
+     * @param _signature The premium data signature.
      */
      public async cancel(
+        _premium: BigNumberish,
+        _policyholder: string,
+        _deadline: BigNumberish,
+        _signature: utils.BytesLike,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
+        invariant(utils.isAddress(_policyholder), "not an Ethereum address")
+        invariant(_policyholder !== ZERO_ADDRESS, "cannot enter zero address")
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
-        const tx: providers.TransactionResponse = await this.solaceCoverProduct.cancel({...gasConfig})
+        const tx: providers.TransactionResponse = await this.solaceCoverProduct.cancel(_premium, _policyholder, _deadline, _signature, {...gasConfig})
         return tx
     }
 
@@ -225,15 +235,5 @@ export class CoverageV3 {
         invariant(utils.isAddress(policyholder), 'not an Ethereum address')
         invariant(policyholder !== ZERO_ADDRESS, "cannot enter zero address")
         return (await this.solaceCoverProduct.policyOf(policyholder))
-    }
-
-    /**
-     * @param policyholder The policyholder address.
-     * @returns debt Policy debt.
-     */
-     public async debtOf(policyholder: string): Promise<BN> {
-        invariant(utils.isAddress(policyholder), 'not an Ethereum address')
-        invariant(policyholder !== ZERO_ADDRESS, "cannot enter zero address")
-        return (await this.solaceCoverProduct.debtOf(policyholder))
     }
 }

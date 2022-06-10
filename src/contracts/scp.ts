@@ -223,7 +223,7 @@ export class SCP {
     }
 
     /**
-     * @notice Withdraws some of the user's deposit and sends it to `recipient`.
+     * @notice Withdraws some of 'msg.sender's deposit and sends it to `recipient`.
      * User must have deposited `SOLACE` in at least that amount in the past.
      * User must have sufficient Solace Cover Points to withdraw.
      * Token must be refundable.
@@ -246,6 +246,35 @@ export class SCP {
         invariant(utils.isAddress(recipient), 'not an Ethereum address')
         invariant(recipient !== ZERO_ADDRESS, "cannot enter zero address for recipient")
         const tx: providers.TransactionResponse = await this.coverPaymentManager.withdraw(amount, recipient, price, priceDeadline, signature, {...gasConfig})
+        return tx
+    }
+
+    /**
+     * @notice Withdraws some of 'from' deposit and sends it to `recipient`.
+     * User must have deposited `SOLACE` in at least that amount in the past.
+     * User must have sufficient Solace Cover Points to withdraw.
+     * Token must be refundable.
+     * Premium pool must have the tokens to return.
+     * @param from The SCP balance holder address.
+     * @param amount The amount of to withdraw.
+     * @param recipient The receiver of funds.
+     * @param price The `SOLACE` price in wei(usd).
+     * @param priceDeadline The `SOLACE` price in wei(usd).
+     * @param signature The `SOLACE` price signature.
+     */
+     public async withdrawFrom(
+        from: string,
+        amount: BigNumberish,
+        recipient: string,
+        price: BigNumberish,
+        priceDeadline: BigNumberish,
+        signature: utils.BytesLike,
+        gasConfig?: GasConfiguration
+    ): Promise<providers.TransactionResponse> {
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
+        invariant(utils.isAddress(recipient), 'not an Ethereum address')
+        invariant(recipient !== ZERO_ADDRESS, "cannot enter zero address for recipient")
+        const tx: providers.TransactionResponse = await this.coverPaymentManager.withdrawFrom(from, amount, recipient, price, priceDeadline, signature, {...gasConfig})
         return tx
     }
 }

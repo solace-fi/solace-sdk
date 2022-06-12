@@ -78,9 +78,9 @@ describe("Coverage V3", () => {
         })
     })
 
-    describe("#policyCount", () => {
+    describe("#totalSupply", () => {
         it("gets the same value as directly querying mainnet contract", async () => {
-            expect(await coverage.policyCount()).toEqual(await solaceCoverProduct.policyCount());
+            expect(await coverage.totalSupply()).toEqual(await solaceCoverProduct.totalSupply());
         })
     })
 

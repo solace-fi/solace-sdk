@@ -167,6 +167,39 @@ export class SCP {
     }
 
     /**
+     * @notice Deposits tokens from depositor using permit.
+     * @param token The token to deposit.
+     * @param from The depositor of the token.
+     * @param depositor The depositor and recipient of Solace Cover Points.
+     * @param amount Amount of token to deposit.
+     * @param deadline Time the transaction must go through before.
+     * @param v secp256k1 signature
+     * @param r secp256k1 signature
+     * @param s secp256k1 signature
+     */
+     public async depositSignedStableFrom(
+        token: string,
+        from: string,
+        depositor: string,
+        amount: BigNumberish,
+        deadline: BigNumberish,
+        v: BigNumberish,
+        r: utils.BytesLike,
+        s: utils.BytesLike,
+        gasConfig?: GasConfiguration
+    ): Promise<providers.TransactionResponse> {
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
+        invariant(utils.isAddress(token), 'not an Ethereum address')
+        invariant(utils.isAddress(from), 'not an Ethereum address')
+        invariant(utils.isAddress(depositor), 'not an Ethereum address')
+        invariant(token !== ZERO_ADDRESS, "cannot enter zero address for token")
+        invariant(from !== ZERO_ADDRESS, "cannot enter zero address for token")
+        invariant(depositor !== ZERO_ADDRESS, "cannot enter zero address for recipient")
+        const tx: providers.TransactionResponse = await this.coverPaymentManager.depositSignedStableFrom(token, from, depositor, amount, deadline, v, r, s, {...gasConfig})
+        return tx
+    }
+
+    /**
      * @notice Deposits tokens from 'from' and credits them to recipient.
      * @param token The token to deposit.
      * @param from The depositor of the token.

@@ -90,19 +90,19 @@ export class CoverageV3 {
 
     /**
      * @notice Activates policy for provided _user.
-     * @param _user The intended policy owner.
-     * @param _coverLimit The maximum value to cover in **USD**.
+     * @param _users Array of intended policy owners.
+     * @param _coverLimits Array of intended maximum values to cover in **USD**.
      * @return policyID The ID of the newly minted policy.
      */
      public async purchase(
-         _user: string,
-        _coverLimit: BigNumberish,
+         _users: string[],
+        _coverLimits: BigNumberish[],
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
-        invariant(utils.isAddress(_user), "not an Ethereum address")
-        invariant(_user !== ZERO_ADDRESS, "cannot enter zero address")
-        const tx: providers.TransactionResponse = await this.solaceCoverProduct.purchase(_user, _coverLimit, {...gasConfig})
+        _users.forEach((user) => invariant(utils.isAddress(user), "not an Ethereum address"))
+        _users.forEach((user) => invariant(user !== ZERO_ADDRESS, "cannot enter zero address"))
+        const tx: providers.TransactionResponse = await this.solaceCoverProduct.purchase(_users, _coverLimits, {...gasConfig})
         return tx
     }
 
@@ -199,10 +199,10 @@ export class CoverageV3 {
     }
 
     /**
-     * @returns The policy count (amount of policies that have been purchased, includes inactive policies).
+     * @returns The total supply of policies (amount of policies that have been purchased, includes inactive policies).
      */
-     public async policyCount(): Promise<BN> {
-        return (await this.solaceCoverProduct.policyCount())
+     public async totalSupply(): Promise<BN> {
+        return (await this.solaceCoverProduct.totalSupply())
     }
 
     /**

@@ -1,6 +1,6 @@
 import { Contract, providers, getDefaultProvider } from 'ethers'
 const { getNetwork } = providers
-import ERC20 from '../abis/ERC20.json'
+import {ERC20_ABI} from '../'
 import { DEFAULT_ENDPOINT, UWP_ADDRESS, WrappedTokenToMasterToken } from "../constants"
 import { fetchBalances, withBackoffRetries } from "../utils"
 import { getProvider } from '../utils/ethers'
@@ -28,7 +28,7 @@ export class UnderwritingPoolBalances {
     ]
 
     const activatedTokenList = tokenList.map((t) => {
-      const contract = new Contract(t.address, ERC20, provider)
+      const contract = new Contract(t.address, ERC20_ABI, provider)
       return {
         ...t,
         contract
@@ -63,7 +63,7 @@ export class UnderwritingPoolBalances {
     ]
 
     const activatedTokenList = tokenList.map((t) => {
-      const contract = new Contract(t.address, ERC20, provider)
+      const contract = new Contract(t.address, ERC20_ABI, provider)
       return {
         ...t,
         contract
@@ -99,7 +99,7 @@ export class UnderwritingPoolBalances {
     ]
 
     const activatedTokenList = tokenList.map((t) => {
-      const contract = new Contract(t.address, ERC20, provider)
+      const contract = new Contract(t.address, ERC20_ABI, provider)
       return {
         ...t,
         contract
@@ -131,7 +131,7 @@ export class UnderwritingPoolBalances {
     ]
     
     const activatedTokenList = tokenList.map((t) => {
-      const contract = new Contract(t.address, ERC20, provider)
+      const contract = new Contract(t.address, ERC20_ABI, provider)
       return {
         ...t,
         contract

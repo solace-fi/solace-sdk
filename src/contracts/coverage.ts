@@ -1,8 +1,12 @@
 import { BigNumber as BN, providers, Wallet, Contract, getDefaultProvider, utils, BigNumberish } from 'ethers'
 const { getNetwork } = providers
 import invariant from 'tiny-invariant'
-import SolaceCoverProduct from "../abis/SolaceCoverProduct.json"
-import SolaceCoverProductV2 from "../abis/SolaceCoverProductV2.json"
+
+import {
+    SolaceCoverProduct_ABI,
+    SolaceCoverProductV2_ABI,
+} from "../"
+
 import { SOLACE_COVER_PRODUCT_ADDRESS, ZERO_ADDRESS, isNetworkSupported, DEFAULT_ENDPOINT, SOLACE_COVER_PRODUCT_V2_ADDRESS } from '../constants'
 import { GasConfiguration } from '../types';
 import { getProvider } from '../utils/ethers'
@@ -28,9 +32,9 @@ export class Coverage {
         }
 
         if (SOLACE_COVER_PRODUCT_V2_ADDRESS[chainID]) {
-            this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V2_ADDRESS[chainID], SolaceCoverProductV2, this.walletOrProviderOrSigner)
+            this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V2_ADDRESS[chainID], SolaceCoverProductV2_ABI, this.walletOrProviderOrSigner)
         } else {
-            this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProduct, this.walletOrProviderOrSigner)
+            this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProduct_ABI, this.walletOrProviderOrSigner)
         }
     }
 

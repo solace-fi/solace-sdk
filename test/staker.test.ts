@@ -1,17 +1,22 @@
 import { BigNumber, Contract, getDefaultProvider, providers } from "ethers"
 const { getNetwork } = providers
-import { DEFAULT_ENDPOINT, Staker, STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS } from "../src"
+import { 
+    DEFAULT_ENDPOINT, 
+    Staker, 
+    STAKING_REWARDS_ADDRESS, 
+    XSLOCKER_ADDRESS,
+    xsLocker_ABI,
+    StakingRewards_ABI,
+} from "../src"
 
-import xsLocker from "../src/abis/xsLocker.json"
-import StakingRewards from "../src/abis/StakingRewards.json"
 import { getProvider } from "../src/utils/ethers"
 
 describe("Staker", () => {
     const chainId = 1      
 
     const provider = DEFAULT_ENDPOINT[chainId] ? getProvider(DEFAULT_ENDPOINT[chainId]) : getDefaultProvider(getNetwork(chainId)) // Note using default provider gets rate-limit notification
-    const xsLocker_contract = new Contract(XSLOCKER_ADDRESS[chainId], xsLocker, provider)
-    const stakingRewards_contract = new Contract(STAKING_REWARDS_ADDRESS[chainId], StakingRewards, provider)
+    const xsLocker_contract = new Contract(XSLOCKER_ADDRESS[chainId], xsLocker_ABI, provider)
+    const stakingRewards_contract = new Contract(STAKING_REWARDS_ADDRESS[chainId], StakingRewards_ABI, provider)
     let staker = new Staker(chainId, provider);
 
     const STAKER_ADDRESS = "0xA400f843f0E577716493a3B0b8bC654C6EE8a8A3" // Use first policy minted

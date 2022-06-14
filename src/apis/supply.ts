@@ -2,7 +2,7 @@ import { getDefaultProvider, providers, Contract } from "ethers";
 import { formatUnits } from "ethers/lib/utils";
 import invariant from "tiny-invariant";
 const { getNetwork } = providers
-import ERC20 from "../abis/ERC20.json";
+import { ERC20_ABI } from "../";
 import { DEFAULT_ENDPOINT, mainnetChains } from "../constants";
 import { getProvider } from "../utils/ethers";
 import { MulticallContract, MulticallProvider } from "../utils/multicall";
@@ -11,7 +11,7 @@ export class TotalSupply {
     CHAIN_IDS = mainnetChains.map((n) => n.chainId)
     SOLACE_ADDRESS = "0x501acE9c35E60f03A2af4d484f49F9B1EFde9f40"
     XSOLACE_ADDRESS = "0x501ACe802447B1Ed4Aae36EA830BFBde19afbbF9"
-    ERC20ABI = ERC20
+    ERC20ABI = ERC20_ABI
 
     public async getTotalSupply(chainId: number, token: 'SOLACE' | 'XSOLACE', providerOrSigner?: providers.Provider | providers.JsonRpcSigner): Promise<string> {
         invariant(this.CHAIN_IDS.includes(chainId), `chainId must be one of ${this.CHAIN_IDS}`)
@@ -56,7 +56,7 @@ export class CirculatingSupply {
     CHAIN_IDS = [1,137,1313161554] // mainnet, polygon, aurora
     SOLACE_ADDRESS = "0x501acE9c35E60f03A2af4d484f49F9B1EFde9f40"
     XSOLACE_ADDRESS = "0x501ACe802447B1Ed4Aae36EA830BFBde19afbbF9"
-    ERC20ABI = ERC20
+    ERC20ABI = ERC20_ABI
 
     skipSolaceAddrs: {[key: string]: any} = {
         "1": {

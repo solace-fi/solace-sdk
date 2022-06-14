@@ -1,9 +1,13 @@
 import { BigNumber as BN, Contract, providers, Wallet, utils, getDefaultProvider, BigNumberish } from 'ethers'
 const { getNetwork } = providers
-import BondTellerErc20 from "../abis/BondTellerErc20.json"
-import BondTellerEth from "../abis/BondTellerEth.json"
-import BondTellerMatic from "../abis/BondTellerMatic.json"
-import BondTellerFtm from '../abis/BondTellerFtm.json'
+
+import {
+    BondTellerErc20_ABI,
+    BondTellerEth_ABI,
+    BondTellerMatic_ABI,
+    BondTellerFtm_ABI,
+} from "../"
+
 import invariant from 'tiny-invariant'
 import { BOND_TELLER_ADDRESSES, ZERO_ADDRESS, DEFAULT_ENDPOINT, foundNetwork } from '../constants'
 import { BondTellerType, GasConfiguration } from '../types';
@@ -60,13 +64,13 @@ export class Bonder {
         }
 
         if (String(storedType) === 'eth') {
-            this.bondTellerContract = new Contract(bondTellerContractAddress, BondTellerEth, walletOrProviderOrSigner)
+            this.bondTellerContract = new Contract(bondTellerContractAddress, BondTellerEth_ABI, walletOrProviderOrSigner)
         } else if (String(storedType) === 'matic') {
-            this.bondTellerContract = new Contract(bondTellerContractAddress, BondTellerMatic, walletOrProviderOrSigner)
+            this.bondTellerContract = new Contract(bondTellerContractAddress, BondTellerMatic_ABI, walletOrProviderOrSigner)
         } else if (String(storedType) === 'ftm') {
-            this.bondTellerContract = new Contract(bondTellerContractAddress, BondTellerFtm, walletOrProviderOrSigner)
+            this.bondTellerContract = new Contract(bondTellerContractAddress, BondTellerFtm_ABI, walletOrProviderOrSigner)
         } else {
-            this.bondTellerContract = new Contract(bondTellerContractAddress, BondTellerErc20, walletOrProviderOrSigner)
+            this.bondTellerContract = new Contract(bondTellerContractAddress, BondTellerErc20_ABI, walletOrProviderOrSigner)
         }
 
         this.chainID = chainID;

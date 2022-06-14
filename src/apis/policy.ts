@@ -4,9 +4,11 @@ import { DEFAULT_ENDPOINT, NETWORKS, SOLACE_COVER_PRODUCT_ADDRESS, SOLACE_COVER_
 import { getProvider } from '../utils/ethers'
 const { getNetwork } = providers
 
-import SolaceCoverProduct from "../abis/SolaceCoverProduct.json"
-import SolaceCoverProductV2 from "../abis/SolaceCoverProductV2.json"
-import SolaceCoverProductV3 from "../abis/SolaceCoverProductV3.json"
+import {
+    SolaceCoverProduct_ABI,
+    SolaceCoverProductV2_ABI,
+    SolaceCoverProductV3_ABI,
+} from "../"
 
 export class Policy {
     public async getTotalActivePolicies(chainId: number, rpcUrl?: string): Promise<{ totalPolicies: BigNumber; totalActiveCoverLimit: BigNumber }> {
@@ -27,12 +29,12 @@ export class Policy {
  
 
         if (SOLACE_COVER_PRODUCT_V2_ADDRESS[chainId]) {
-            solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V2_ADDRESS[chainId], SolaceCoverProductV2, provider)
+            solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V2_ADDRESS[chainId], SolaceCoverProductV2_ABI, provider)
         }
         else if (SOLACE_COVER_PRODUCT_V3_ADDRESS[chainId]) {
-            solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V3_ADDRESS[chainId], SolaceCoverProductV3, provider)
+            solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V3_ADDRESS[chainId], SolaceCoverProductV3_ABI, provider)
         } else {
-            solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainId], SolaceCoverProduct, provider)
+            solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainId], SolaceCoverProduct_ABI, provider)
         }
 
         const [policyCount, coverLimit] = await Promise.all([
@@ -85,11 +87,11 @@ export class Policy {
             }
              
             if (SOLACE_COVER_PRODUCT_V2_ADDRESS[chainId]) {
-                solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V2_ADDRESS[chainId], SolaceCoverProductV2, provider)
+                solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V2_ADDRESS[chainId], SolaceCoverProductV2_ABI, provider)
             } else if (SOLACE_COVER_PRODUCT_V3_ADDRESS[chainId]) {
-                solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V3_ADDRESS[chainId], SolaceCoverProductV3, provider)
+                solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V3_ADDRESS[chainId], SolaceCoverProductV3_ABI, provider)
             } else {
-                solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainId], SolaceCoverProduct, provider)
+                solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainId], SolaceCoverProduct_ABI, provider)
             }
 
             const policyId = await solaceCoverProduct.policyOf(account)

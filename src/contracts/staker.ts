@@ -1,8 +1,12 @@
 import { BigNumber as BN, Contract, providers, Wallet, utils, getDefaultProvider, BigNumberish } from 'ethers'
 const { getNetwork } = providers
-import xsLocker from "../abis/xsLocker.json"
-import StakingRewards from "../abis/StakingRewards.json"
-import StakingRewardsV2 from "../abis/StakingRewardsV2.json"
+
+import {
+    xsLocker_ABI,
+    StakingRewards_ABI,
+    StakingRewardsV2_ABI,
+} from "../"
+
 import invariant from 'tiny-invariant'
 import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS, ZERO_ADDRESS, DEFAULT_ENDPOINT, STAKING_REWARDS_V2_ADDRESS, foundNetwork } from '../constants'
 import { GasConfiguration } from '../types';
@@ -49,13 +53,13 @@ export class Staker {
         }
          
         if (foundNetwork(chainID)?.features.general.stakingRewardsV2) {
-            this.stakingRewards = new Contract(STAKING_REWARDS_V2_ADDRESS[chainID], StakingRewardsV2, walletOrProviderOrSigner)
+            this.stakingRewards = new Contract(STAKING_REWARDS_V2_ADDRESS[chainID], StakingRewardsV2_ABI, walletOrProviderOrSigner)
         }
         else {
-            this.stakingRewards = new Contract(STAKING_REWARDS_ADDRESS[chainID], StakingRewards, walletOrProviderOrSigner)
+            this.stakingRewards = new Contract(STAKING_REWARDS_ADDRESS[chainID], StakingRewards_ABI, walletOrProviderOrSigner)
         }
 
-        this.xsLocker = new Contract(xslAddr, xsLocker, walletOrProviderOrSigner)
+        this.xsLocker = new Contract(xslAddr, xsLocker_ABI, walletOrProviderOrSigner)
     }
 
     /**********************************

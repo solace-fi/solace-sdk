@@ -5,15 +5,26 @@ const { getNetwork } = providers
 const ethers = require('ethers')
 const formatUnits = ethers.utils.formatUnits
 
-import bondTellerEth from '../abis/BondTellerEth.json'
-import bondTellerMatic from '../abis/BondTellerMatic.json'
-import bondTellerErc20 from '../abis/BondTellerErc20.json'
-import bondTellerFtm from '../abis/BondTellerFtm.json'
+import {
+    BondTellerEth_ABI,
+    BondTellerMatic_ABI,
+    BondTellerErc20_ABI,
+    BondTellerFtm_ABI,
+    ERC20_ABI,
+    WETH9_ABI,
+    WMATIC_ABI,
+    WFTM_ABI,
+} from "../"
 
-import ERC20 from '../abis/ERC20.json'
-import WETH9 from '../abis/WETH9.json'
-import WMATIC from '../abis/WMATIC.json'
-import WFTM from '../abis/WFTM.json'
+// import bondTellerEth from '../abis/BondTellerEth.json'
+// import bondTellerMatic from '../abis/BondTellerMatic.json'
+// import bondTellerErc20 from '../abis/BondTellerErc20.json'
+// import bondTellerFtm from '../abis/BondTellerFtm.json'
+
+// import ERC20 from '../abis/ERC20.json'
+// import WETH9 from '../abis/WETH9.json'
+// import WMATIC from '../abis/WMATIC.json'
+// import WFTM from '../abis/WFTM.json'
 
 import { withBackoffRetries } from "../utils";
 import { BondTellerDetails, BondToken, BondTellerType } from "../types/bond";
@@ -58,20 +69,20 @@ export class Bond {
             let principalAbi = null
 
             if ((t.token == 'eth') && (NETWORKS.filter((c) => c.nativeCurrency.symbol == 'eth').map((c) => c.chainId).includes(this.chainId))) {
-                bondTellerAbi = bondTellerEth
-                principalAbi = WETH9
+                bondTellerAbi = BondTellerEth_ABI
+                principalAbi = WETH9_ABI
             }
             if ((t.token == 'matic') && (NETWORKS.filter((c) => c.nativeCurrency.symbol == 'matic').map((c) => c.chainId).includes(this.chainId))) {
-                bondTellerAbi = bondTellerMatic
-                principalAbi = WMATIC
+                bondTellerAbi = BondTellerMatic_ABI
+                principalAbi = WMATIC_ABI
             }
             if ((t.token == 'ftm') && (NETWORKS.filter((c) => c.nativeCurrency.symbol == 'ftm').map((c) => c.chainId).includes(this.chainId))) {
-                bondTellerAbi = bondTellerFtm
-                principalAbi = WFTM
+                bondTellerAbi = BondTellerFtm_ABI
+                principalAbi = WFTM_ABI
             } 
             if (bondTellerAbi == null || principalAbi == null) {
-                bondTellerAbi = bondTellerErc20
-                principalAbi = ERC20
+                bondTellerAbi = BondTellerErc20_ABI
+                principalAbi = ERC20_ABI
             }
     
             const tellerContract = new Contract(t.addr, bondTellerAbi, this.providerOrSigner)
@@ -142,13 +153,13 @@ export class Bond {
         let bondTeller: Contract | null = null
 
         if (String(storedType) === "eth") {
-            bondTeller = new Contract(bondTellerContractAddress, bondTellerEth, this.providerOrSigner)
+            bondTeller = new Contract(bondTellerContractAddress, BondTellerEth_ABI, this.providerOrSigner)
         } else if (String(storedType) === "matic") {
-            bondTeller = new Contract(bondTellerContractAddress, bondTellerMatic, this.providerOrSigner)
+            bondTeller = new Contract(bondTellerContractAddress, BondTellerMatic_ABI, this.providerOrSigner)
         } else if (String(storedType) === "ftm") {
-            bondTeller = new Contract(bondTellerContractAddress, bondTellerFtm, this.providerOrSigner)
+            bondTeller = new Contract(bondTellerContractAddress, BondTellerFtm_ABI, this.providerOrSigner)
         } else {
-            bondTeller = new Contract(bondTellerContractAddress, bondTellerErc20, this.providerOrSigner)
+            bondTeller = new Contract(bondTellerContractAddress, BondTellerErc20_ABI, this.providerOrSigner)
         }
 
         // 2 consecutive await calls within listTokensOfOwner

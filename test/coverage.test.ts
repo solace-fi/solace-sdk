@@ -1,17 +1,21 @@
 import { BigNumber as BN, Contract, getDefaultProvider, providers, Wallet } from "ethers"
 const { getNetwork } = providers
-import { SOLACE_COVER_PRODUCT_ADDRESS, SOLACE_COVER_PRODUCT_V2_ADDRESS } from "../src"
+import { 
+    SOLACE_COVER_PRODUCT_ADDRESS, 
+    SOLACE_COVER_PRODUCT_V2_ADDRESS,
+    SolaceCoverProduct_ABI,
+    SolaceCoverProductV2_ABI,
+} 
+from "../src"
 import { Coverage } from "../src/contracts/coverage"
-import SolaceCoverProduct from "../src/abis/SolaceCoverProduct.json"
-import SolaceCoverProductV2 from "../src/abis/SolaceCoverProductV2.json"
 
 describe("Coverage Fetcher", () => {
     const provider = getDefaultProvider(getNetwork(1)) // Note using default provider gets rate-limit notification
-    const solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[1], SolaceCoverProduct, provider)
+    const solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[1], SolaceCoverProduct_ABI, provider)
     let coverage = new Coverage(1);
 
     const provider_matic = new providers.JsonRpcProvider("https://polygon-rpc.com")
-    const solaceCoverProductV2 = new Contract(SOLACE_COVER_PRODUCT_V2_ADDRESS[137], SolaceCoverProductV2, provider_matic)
+    const solaceCoverProductV2 = new Contract(SOLACE_COVER_PRODUCT_V2_ADDRESS[137], SolaceCoverProductV2_ABI, provider_matic)
     let coverage_matic = new Coverage(137);
 
     const POLICYHOLDER_ADDRESS = "0xfb5cAAe76af8D3CE730f3D62c6442744853d43Ef" // Use first policy minted

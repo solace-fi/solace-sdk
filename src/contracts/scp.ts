@@ -1,8 +1,7 @@
 import { BigNumber as BN, providers, Wallet, Contract, getDefaultProvider, utils, BigNumberish } from 'ethers'
 const { getNetwork } = providers
 import invariant from 'tiny-invariant'
-import SCP_ABI from "../abis/SCP.json"
-import CoverPaymentManager from "../abis/CoverPaymentManager.json"
+import {SCP_ABI, CoverPaymentManager_ABI} from "../"
 import { COVERAGE_SCP_ADDRESS, COVER_PAYMENT_MANAGER_ADDRESS, ZERO_ADDRESS, DEFAULT_ENDPOINT } from '../constants'
 import { getProvider } from '../utils/ethers'
 import { GasConfiguration } from '../types';
@@ -30,7 +29,7 @@ export class SCP {
         }
 
         this.scp = new Contract(COVERAGE_SCP_ADDRESS[chainID], SCP_ABI, this.walletOrProviderOrSigner)
-        this.coverPaymentManager = new Contract(COVER_PAYMENT_MANAGER_ADDRESS[chainID], CoverPaymentManager, this.walletOrProviderOrSigner)
+        this.coverPaymentManager = new Contract(COVER_PAYMENT_MANAGER_ADDRESS[chainID], CoverPaymentManager_ABI, this.walletOrProviderOrSigner)
     }
 
 

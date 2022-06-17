@@ -29,7 +29,7 @@ export const UWP_ADDRESS: { [chainID : number]: string } = {
 }
 
 export const COVERAGE_SCP_ADDRESS: { [chainId : number]: string } = {
-    [4]: '0x501ACE1c6Ef23cE52398324145853B8e742EBfCc',
+    [4]: '0x501ACE72166956F57b44dbBcc531A8E741449997',
     [250]: '',
     [4002]: '0x501acE6a7022727f62ffC95558a3359E900C506D',
     [43113] : "", // Avalanche Testnet
@@ -37,7 +37,7 @@ export const COVERAGE_SCP_ADDRESS: { [chainId : number]: string } = {
 }
 
 export const COVER_PAYMENT_MANAGER_ADDRESS: { [chainId : number]: string } = {
-    [4]: '0x501aCEBE1a99d4DCfec0E6ca62B41a2766884EC2',
+    [4]: '0x501aCe8EA57c0f83De8aEB179f32951181e36Fc1',
     [250]: '',
     [4002]: '0x501AcE6f3aa5898909E1D490A0ACcDf5580201Df',
     [43113] : "", // Avalanche Testnet

@@ -95,14 +95,14 @@ export class CoverageV3 {
      * @return policyID The ID of the newly minted policy.
      */
      public async purchase(
-         _users: string[],
-        _coverLimits: BigNumberish[],
+        _user: string,
+        _coverLimit: BigNumberish,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
-        _users.forEach((user) => invariant(utils.isAddress(user), "not an Ethereum address"))
-        _users.forEach((user) => invariant(user !== ZERO_ADDRESS, "cannot enter zero address"))
-        const tx: providers.TransactionResponse = await this.solaceCoverProduct.purchase(_users, _coverLimits, {...gasConfig})
+        invariant(utils.isAddress(_user), "not an Ethereum address")
+        invariant(_user !== ZERO_ADDRESS, "cannot enter zero address")
+        const tx: providers.TransactionResponse = await this.solaceCoverProduct.purchase(_user, _coverLimit, {...gasConfig})
         return tx
     }
 
@@ -115,15 +115,12 @@ export class CoverageV3 {
      */
      public async cancel(
         _premium: BigNumberish,
-        _policyholder: string,
         _deadline: BigNumberish,
         _signature: utils.BytesLike,
         gasConfig?: GasConfiguration
     ): Promise<providers.TransactionResponse> {
-        invariant(utils.isAddress(_policyholder), "not an Ethereum address")
-        invariant(_policyholder !== ZERO_ADDRESS, "cannot enter zero address")
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
-        const tx: providers.TransactionResponse = await this.solaceCoverProduct.cancel(_premium, _policyholder, _deadline, _signature, {...gasConfig})
+        const tx: providers.TransactionResponse = await this.solaceCoverProduct.cancel(_premium, _deadline, _signature, {...gasConfig})
         return tx
     }
 

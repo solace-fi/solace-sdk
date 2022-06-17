@@ -11,7 +11,7 @@ export const SOLACE_COVER_PRODUCT_V2_ADDRESS: { [chainID: number]: string } = {
 }
 
 export const SOLACE_COVER_PRODUCT_V3_ADDRESS: { [chainID: number]: string } = {
-    [4] : "0x501aceF3384175fE9bA78E0fd93494F280F6265F", // Rinkeby
+    [4] : "0x501ACeB72d62C9875825b71d9f78a27780B5624d", // Rinkeby
     [250] : "", // Fantom
     [4002] : "0x501aCE7271065019707Fad7DEbDcCE78bd10F7AC", // Fantom Testnet
     [43113] : "", // Avalanche Testnet

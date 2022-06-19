@@ -12,10 +12,13 @@ export const SOLACE_COVER_PRODUCT_V2_ADDRESS: { [chainID: number]: string } = {
 
 export const SOLACE_COVER_PRODUCT_V3_ADDRESS: { [chainID: number]: string } = {
     [4] : "0x501ACeB72d62C9875825b71d9f78a27780B5624d", // Rinkeby
+    [42]: '0x501ACeB72d62C9875825b71d9f78a27780B5624d',
     [250] : "", // Fantom
-    [4002] : "0x501aCE7271065019707Fad7DEbDcCE78bd10F7AC", // Fantom Testnet
+    [4002] : "0x501aCeAe7Cc16A145C88EE581d03D37068254e90", // Fantom Testnet
     [43113] : "", // Avalanche Testnet
-    [43114] : "" // Avalanche C-chain
+    [43114] : "", // Avalanche C-chain
+    [80001]: "0x501ACeB72d62C9875825b71d9f78a27780B5624d",
+    [1313161555]: "0x501aCeAe7Cc16A145C88EE581d03D37068254e90",
 }
 
 export const UWP_ADDRESS: { [chainID : number]: string } = {
@@ -30,16 +33,22 @@ export const UWP_ADDRESS: { [chainID : number]: string } = {
 
 export const COVERAGE_SCP_ADDRESS: { [chainId : number]: string } = {
     [4]: '0x501ACE72166956F57b44dbBcc531A8E741449997',
+    [42]: '0x501ACE72166956F57b44dbBcc531A8E741449997',
     [250]: '',
-    [4002]: '0x501acE6a7022727f62ffC95558a3359E900C506D',
+    [4002]: '0x501acE73cF81312D02d40A02a9a6e656038aa9A3',
     [43113] : "", // Avalanche Testnet
     [43114] : "", // Avalanche C-chain
+    [80001]: "0x501ACE72166956F57b44dbBcc531A8E741449997",
+    [1313161555]: "0x501acE73cF81312D02d40A02a9a6e656038aa9A3",
 }
 
 export const COVER_PAYMENT_MANAGER_ADDRESS: { [chainId : number]: string } = {
     [4]: '0x501aCe8EA57c0f83De8aEB179f32951181e36Fc1',
+    [42]: '0x501aCe8EA57c0f83De8aEB179f32951181e36Fc1',
     [250]: '',
-    [4002]: '0x501AcE6f3aa5898909E1D490A0ACcDf5580201Df',
+    [4002]: '0x501acEDC954141420C4FD1ac64552A9Cd5D9e684',
     [43113] : "", // Avalanche Testnet
     [43114] : "", // Avalanche C-chain
+    [80001]: "0x501aCe8EA57c0f83De8aEB179f32951181e36Fc1",
+    [1313161555]: "0x501acEDC954141420C4FD1ac64552A9Cd5D9e684",
 }

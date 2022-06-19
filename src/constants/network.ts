@@ -51,6 +51,8 @@ const kovan: Network = {
         general: {
             bondingV2: true,
             stakingV2: true,
+            coverageV3: true,
+            stakingRewardsV2: true,
         },
         special: {}
     },
@@ -87,6 +89,8 @@ const polygonTestnet = {
             bondingV2: true,
             coverageV2: true,
             stakingV2: true,
+            coverageV3: true,
+            stakingRewardsV2: true,
         },
         special: {}
     },
@@ -122,6 +126,8 @@ const auroraTestnet = {
         general: {
             bondingV2: true,
             stakingV2: true,
+            coverageV3: true,
+            stakingRewardsV2: true,
         },
         special: {}
     },

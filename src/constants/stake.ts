@@ -28,8 +28,11 @@ export const STAKING_REWARDS_ADDRESS: { [chainID: number]: string } = {
 
 export const STAKING_REWARDS_V2_ADDRESS: { [chainID: number]: string } = {
     [4]: '0x501ACee6350BB566EBE4A0dABDC9901100B8c445',
+    [42]: '0x501ACee6350BB566EBE4A0dABDC9901100B8c445',
     [250]: '',
-    [4002]: '0x501Ace28Efa3f0A7ab10Eb80034fB26cBd07e02A',
+    [4002]: '0x501aCE9157A96f31b97A3FDeb012F4D563e2dF1E',
     [43113] : "", // Avalanche Testnet
     [43114] : "", // Avalanche C-chain
+    [80001]: "0x501ACee6350BB566EBE4A0dABDC9901100B8c445",
+    [1313161555]: "0x501aCE9157A96f31b97A3FDeb012F4D563e2dF1E",
 }

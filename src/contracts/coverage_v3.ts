@@ -109,7 +109,6 @@ export class CoverageV3 {
     /**
      * @notice Cancels the policy for `policyholder`.
      * @param _premium The premium amount to verify.
-     * @param _policyholder The policyholder address.
      * @param _deadline The deadline for the signature.
      * @param _signature The premium data signature.
      */

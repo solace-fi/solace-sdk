@@ -12,7 +12,9 @@ const ethmainnet: Network = {
         general: {
             bondingV2: true,
             coverageV1: true,
-            stakingV2: true
+            coverageV3: true,
+            stakingRewardsV2: true,
+            stakingV2: true,
         },
         special: {}
     },
@@ -32,8 +34,8 @@ const rinkeby: Network = {
             bondingV2: true,
             coverageV1: true,
             coverageV3: true,
-            stakingV2: true,
             stakingRewardsV2: true,
+            stakingV2: true,
         },
         special: {}
     },
@@ -50,9 +52,9 @@ const kovan: Network = {
     features: {
         general: {
             bondingV2: true,
-            stakingV2: true,
             coverageV3: true,
             stakingRewardsV2: true,
+            stakingV2: true,
         },
         special: {}
     },
@@ -69,6 +71,8 @@ const polygon = {
         general: {
             bondingV2: true,
             coverageV2: true,
+            coverageV3: true,
+            stakingRewardsV2: true,
             stakingV2: true,
         },
         special: {}
@@ -88,9 +92,9 @@ const polygonTestnet = {
         general: {
             bondingV2: true,
             coverageV2: true,
-            stakingV2: true,
             coverageV3: true,
             stakingRewardsV2: true,
+            stakingV2: true,
         },
         special: {}
     },
@@ -107,6 +111,8 @@ const aurora = {
     features: {
         general: {
             bondingV2: true,
+            coverageV3: true,
+            stakingRewardsV2: true,
             stakingV2: true,
         },
         special: {}
@@ -125,9 +131,9 @@ const auroraTestnet = {
     features: {
         general: {
             bondingV2: true,
-            stakingV2: true,
             coverageV3: true,
             stakingRewardsV2: true,
+            stakingV2: true,
         },
         special: {}
     },
@@ -145,6 +151,8 @@ const fantom = {
         general: {
             bondingV2: true,
             coverageV2: true,
+            coverageV3: true,
+            stakingRewardsV2: true,
             stakingV2: true,
         },
         special: {}
@@ -165,8 +173,8 @@ const fantomTestnet = {
             bondingV2: true,
             coverageV2: true,
             coverageV3: true,
-            stakingV2: true,
             stakingRewardsV2: true,
+            stakingV2: true,
         },
         special: {}
     },

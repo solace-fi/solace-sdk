@@ -57,6 +57,32 @@ export class Risk {
             return undefined
         })
     }  
+
+    /**
+     * @param policyholder Ethereum address of policy holder.
+     * @param chainId DeFi protocol chain ID.
+     * @returns Get annual premium for current account
+     */
+
+    public async getSolaceRiskPremiumData(policyholder: string, chainId: number) {
+       return await axios({
+           url: 'https://risk-data.solace.fi/premium-data',
+           method: 'GET',
+           headers: {
+               Accept: 'application/json',
+               'Content-Type': 'application/json',
+           },
+           params: {
+               policyholder: policyholder,
+               chain_id: chainId,
+           }
+       })
+       .then((response: AxiosResponse<any, any>) => {return response.data})
+       .catch((error: AxiosResponse<any, any>) => {
+           console.error('Error getSolaceRiskPremiumData', error)
+           return undefined
+       })
+    }  
     
     /**
      * @param address Ethereum address.

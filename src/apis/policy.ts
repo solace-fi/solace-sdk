@@ -26,7 +26,6 @@ export class Policy {
         } else {
             provider = getProvider(rpcUrl)
         }
- 
 
         if (SOLACE_COVER_PRODUCT_V2_ADDRESS[chainId]) {
             solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V2_ADDRESS[chainId], SolaceCoverProductV2_ABI, provider)
@@ -37,10 +36,26 @@ export class Policy {
             solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainId], SolaceCoverProduct_ABI, provider)
         }
 
-        const [policyCount, coverLimit] = await Promise.all([
-            solaceCoverProduct.policyCount(),
-            solaceCoverProduct.activeCoverLimit()
-        ])
+        let policyCount;
+        let coverLimit;
+
+        if (SOLACE_COVER_PRODUCT_V2_ADDRESS[chainId]) {
+            [policyCount, coverLimit] = await Promise.all([
+                solaceCoverProduct.policyCount(),
+                solaceCoverProduct.activeCoverLimit()
+            ])
+        }
+        else if (SOLACE_COVER_PRODUCT_V3_ADDRESS[chainId]) {
+            [policyCount, coverLimit] = await Promise.all([
+                solaceCoverProduct.totalSupply(),
+                solaceCoverProduct.activeCoverLimit()
+            ])
+        } else {
+            [policyCount, coverLimit] = await Promise.all([
+                solaceCoverProduct.policyCount(),
+                solaceCoverProduct.activeCoverLimit()
+            ])
+        }
 
         return {
             totalPolicies: policyCount,

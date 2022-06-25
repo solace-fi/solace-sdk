@@ -3,7 +3,7 @@ const { getNetwork } = providers
 import { 
     DEFAULT_ENDPOINT, 
     Staker, 
-    STAKING_REWARDS_ADDRESS, 
+    STAKING_REWARDS_V2_ADDRESS, 
     XSLOCKER_ADDRESS,
     xsLocker_ABI,
     StakingRewards_ABI,
@@ -16,7 +16,7 @@ describe("Staker", () => {
 
     const provider = DEFAULT_ENDPOINT[chainId] ? getProvider(DEFAULT_ENDPOINT[chainId]) : getDefaultProvider(getNetwork(chainId)) // Note using default provider gets rate-limit notification
     const xsLocker_contract = new Contract(XSLOCKER_ADDRESS[chainId], xsLocker_ABI, provider)
-    const stakingRewards_contract = new Contract(STAKING_REWARDS_ADDRESS[chainId], StakingRewards_ABI, provider)
+    const stakingRewards_contract = new Contract(STAKING_REWARDS_V2_ADDRESS[chainId], StakingRewards_ABI, provider)
     let staker = new Staker(chainId, provider);
 
     const STAKER_ADDRESS = "0xA400f843f0E577716493a3B0b8bC654C6EE8a8A3" // Use first policy minted

@@ -10,22 +10,25 @@ describe('UndewritingPool', () => {
 
     describe('#getBalances_Mainnet', () => {
         it('will return a valid response', async () => {
-            const uwp_set = await uwp.getBalances_Mainnet()
-            console.log(uwp_set)
+            await uwp.getBalances_Mainnet()
+            // const uwp_set = await uwp.getBalances_Mainnet()
+            // console.log(uwp_set)
         })
     })
 
     describe('#getBalances_Polygon', () => {
         it('will return a valid response', async () => {
-            const uwp_set = await uwp.getBalances_Polygon()
-            console.log(uwp_set)
+            await uwp.getBalances_Polygon()
+            // const uwp_set = await uwp.getBalances_Polygon()
+            // console.log(uwp_set)
         })
     })
 
     describe('#getBalances_Aurora', () => {
         it('will return a valid response', async () => {
-            const uwp_set = await uwp.getBalances_Aurora()
-            console.log(uwp_set)
+            await uwp.getBalances_Aurora()
+            // const uwp_set = await uwp.getBalances_Aurora()
+            // console.log(uwp_set)
         })
     })
 })
@@ -40,29 +43,33 @@ describe('UnderwritingPoolUSDBalances', () => {
 
     describe('#getUSDBalances_Mainnet', () => {
         it('will return a valid response', async () => {
-            const uwp_set = await uwp.getUSDBalances_Mainnet()
-            console.log(uwp_set)
+            await uwp.getUSDBalances_Mainnet()
+            // const uwp_set = await uwp.getUSDBalances_Mainnet()
+            // console.log(uwp_set)
         })
     })
 
     describe('#getUSDBalances_Polygon', () => {
         it('will return a valid response', async () => {
-            const uwp_set = await uwp.getUSDBalances_Polygon()
-            console.log(uwp_set)
+            await uwp.getUSDBalances_Polygon()
+            // const uwp_set = await uwp.getUSDBalances_Polygon()
+            // console.log(uwp_set)
         })
     })
 
     describe('#getUSDBalances_Aurora', () => {
         it('will return a valid response', async () => {
-            const uwp_set = await uwp.getUSDBalances_Aurora()
-            console.log(uwp_set)
+            await uwp.getUSDBalances_Aurora()
+            // const uwp_set = await uwp.getUSDBalances_Aurora()
+            // console.log(uwp_set)
         })
     })
 
     describe('#getUSDBalances_All', () => {
         it('will return a valid response', async () => {
-            const uwp_set = await uwp.getUSDBalances_All()
-            console.log(uwp_set)
+            await uwp.getUSDBalances_All()
+            // const uwp_set = await uwp.getUSDBalances_All()
+            // console.log(uwp_set)
         })
     })
 })

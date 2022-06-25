@@ -42,4 +42,11 @@ describe('Price', () => {
             console.log(token_prices)
         })
     })
+
+    describe('#getPriceInfo', () => {
+        it('will return a valid response', async () => {
+            const res = await price.getPriceInfo()
+            console.log(res)
+        })
+    })
 })

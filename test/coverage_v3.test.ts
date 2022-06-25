@@ -1,11 +1,10 @@
 import { BigNumber as BN, Contract, providers } from "ethers"
-import { SOLACE_COVER_PRODUCT_V3_ADDRESS } from "../src"
+import { SOLACE_COVER_PRODUCT_V3_ADDRESS, SolaceCoverProductV3_ABI } from "../src"
 import { CoverageV3 } from "../src/contracts/coverage_v3"
-import SolaceCoverProductV3 from "../src/abis/SolaceCoverProductV3.json"
 
 describe("Coverage V3", () => {
     const provider = new providers.JsonRpcProvider("https://rpc.testnet.fantom.network/")
-    const solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V3_ADDRESS[4002], SolaceCoverProductV3, provider)
+    const solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V3_ADDRESS[4002], SolaceCoverProductV3_ABI, provider)
     let coverage = new CoverageV3(4002);
 
     const POLICYHOLDER_ADDRESS = "0xfb5cAAe76af8D3CE730f3D62c6442744853d43Ef" // Use first policy minted
@@ -53,12 +52,6 @@ describe("Coverage V3", () => {
         })
     })
 
-    describe("#calculateCancelFee", () => {
-        it("gets the same value as directly querying mainnet contract", async () => {
-            expect(await coverage.calculateCancelFee(POLICY_ID)).toEqual(await solaceCoverProduct.calculateCancelFee(POLICY_ID));
-        })
-    })
-
     // tokenURI call will revert with Solidity error string - "invalid policy"
     // describe("#tokenURI", () => {
     //     it("gets the same value as directly querying mainnet contract", async () => {
@@ -84,17 +77,11 @@ describe("Coverage V3", () => {
         })
     })
 
-    describe("#debtOf", () => {
-        it("gets the same value as directly querying mainnet contract", async () => {
-            expect(await coverage.debtOf(POLICYHOLDER_ADDRESS)).toEqual(await solaceCoverProduct.debtOf(POLICYHOLDER_ADDRESS));
-        })
-    })
-
-    describe("#policyCount", () => {
-        it("gets the same value as directly querying mainnet contract", async () => {
-            expect(await coverage.policyCount()).toEqual(await solaceCoverProduct.policyCount());
-        })
-    })
+    // describe("#totalSupply", () => {
+    //     it("gets the same value as directly querying mainnet contract", async () => {
+    //         expect(await coverage.totalSupply()).toEqual(await solaceCoverProduct.totalSupply());
+    //     })
+    // })
 
     describe("#chargeCycle", () => {
         it("gets the same value as directly querying mainnet contract", async () => {

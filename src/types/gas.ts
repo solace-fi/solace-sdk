@@ -7,7 +7,7 @@ export type GasConfiguration ={
 }
 
 export type GasArgs = {
-  connector?: string
+  txType?: number
   gasLimit?: number
   gasForTestnet?: boolean
 }

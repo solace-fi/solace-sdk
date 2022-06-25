@@ -13,7 +13,7 @@ export type SolaceRiskScore = {
     protocols: SolaceRiskProtocol[]
 }
 
-type Metadata = {
+export type Metadata = {
     seriesName: string
     version: string
     dateCreated: string
@@ -48,18 +48,18 @@ export type SolaceRiskSeries = {
     }
 }
 
-type ProtocolMap = {
+export type ProtocolMap = {
     appId: string
     category: string
     tier: number
 }
 
-type CorrelationValue = {
+export type CorrelationValue = {
     category: string,
     correlation: number
 }
 
-type CorrelationCategory = {
+export type CorrelationCategory = {
     category: string
     lending: number
     exchange: number
@@ -70,7 +70,7 @@ type CorrelationCategory = {
     other: number
 }
 
-type RateCard = {
+export type RateCard = {
     tier: number
     rol: number
     rrol: number

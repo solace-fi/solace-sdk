@@ -5,6 +5,7 @@ export enum MasterToken {
     dai = 'dai',
     usdc = 'usdc',
     usdt = 'usdt',
+    avax = 'avax',
     eth = 'eth',
     weth = 'weth',
     btc = 'btc',
@@ -158,6 +159,7 @@ const WNEAR_ADDRESS: { [chainID : number]: string } = {
 }
 
 const WFTM_ADDRESS: { [chainID : number]: string } = {
+    [1]: '0x4e15361fd6b4bb609fa63c81a2be19d873717870',
     [250]: '0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83',
     [4002]: '0x4701b4535CDcC6541292fCef468836486D871250'
 }

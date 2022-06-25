@@ -81,7 +81,7 @@ const BOND_TELLER_ETH_ADDRESS: BondTellerTokenData = {
 
 const BOND_TELLER_WETH_ADDRESS: BondTellerTokenData = {
     [137]: {addr: "0x501Ace367f1865DEa154236D5A8016B80a49e8a9", type: 'erc20'},
-    [250]: {addr: "0x501ACe95141F3eB59970dD64af0405f6056FB5d8", type: 'erc20'},
+    [250]: {addr: "0x501Ace367f1865DEa154236D5A8016B80a49e8a9", type: 'erc20'},
     [4002]: {addr: "0x501AcE1CaC9c5c5c5e8Ac61575c7928E0A3397e7", type: 'erc20'},
     [43113] : {addr: "", type: "erc20"}, // Avalanche Fuji Testnet
     [43114] : {addr: "", type: "erc20"}, // Avalanche C-chain
@@ -104,6 +104,7 @@ const BOND_TELLER_AURORA_ADDRESS: BondTellerTokenData = {
 }
 
 const BOND_TELLER_FTM_TELLER: BondTellerTokenData = {
+    [250]: { addr: "0x501ACE43A70b62744037c0ec78dD043BE35EF653", type: 'ftm' },
     [4002]: { addr: "0x501acEDb97de787b1A760AbD0e0FC1E5DfC033D8", type: 'ftm' },
 }
 

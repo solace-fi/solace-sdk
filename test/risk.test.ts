@@ -13,8 +13,9 @@ describe("Risk API call", () => {
 
     describe("#getSolaceRiskBalances - Single Chain", () => {
         it("will return a valid response", async () => {
-            positions_singlechain = await risk_fetcher.getSolaceRiskBalances(POLICYHOLDER_ADDRESS, 1)
-            console.log(positions_singlechain)
+            await risk_fetcher.getSolaceRiskBalances(POLICYHOLDER_ADDRESS, 1)
+            // positions_singlechain = await risk_fetcher.getSolaceRiskBalances(POLICYHOLDER_ADDRESS, 1)
+            // console.log(positions_singlechain)
         })
     })
 
@@ -23,22 +24,25 @@ describe("Risk API call", () => {
             expect(async () => {await risk_fetcher.getSolaceRiskBalances(POLICYHOLDER_ADDRESS, [1, 150])}).toThrowError
         })
         it("will return a valid response", async () => {
-            positions_multichain = await risk_fetcher.getSolaceRiskBalances(POLICYHOLDER_ADDRESS, [1, 137])
-            console.log(positions_multichain)
+            await risk_fetcher.getSolaceRiskBalances(POLICYHOLDER_ADDRESS, [1, 137])
+            // positions_multichain = await risk_fetcher.getSolaceRiskBalances(POLICYHOLDER_ADDRESS, [1, 137])
+            // console.log(positions_multichain)
         })
     })
 
     describe("#getSolaceRiskScores - Single Chain", () => {
         it("will return a valid response", async () => {
-            const scores_singlechain = await risk_fetcher.getSolaceRiskScores(POLICYHOLDER_ADDRESS, positions_singlechain)
-            console.log(scores_singlechain)
+            await risk_fetcher.getSolaceRiskScores(POLICYHOLDER_ADDRESS, positions_singlechain)
+            // const scores_singlechain = await risk_fetcher.getSolaceRiskScores(POLICYHOLDER_ADDRESS, positions_singlechain)
+            // console.log(scores_singlechain)
         })
     })
 
     describe("#getSolaceRiskScores - Multi Chain", () => {
         it("will return a valid response", async () => {
-            const scores_multichain = await risk_fetcher.getSolaceRiskScores(POLICYHOLDER_ADDRESS, positions_multichain)
-            console.log(scores_multichain)
+            await risk_fetcher.getSolaceRiskScores(POLICYHOLDER_ADDRESS, positions_multichain)
+            // const scores_multichain = await risk_fetcher.getSolaceRiskScores(POLICYHOLDER_ADDRESS, positions_multichain)
+            // console.log(scores_multichain)
         })
     })
 
@@ -47,15 +51,17 @@ describe("Risk API call", () => {
             expect(async () => {await risk_fetcher.getSolaceRiskPremium(POLICYHOLDER_ADDRESS, 150)}).toThrowError
         })
         it("will return a valid response", async () => {
-            positions_multichain = await risk_fetcher.getSolaceRiskPremium(POLICYHOLDER_ADDRESS, 1)
-            console.log(positions_multichain)
+            await risk_fetcher.getSolaceRiskPremium(POLICYHOLDER_ADDRESS, 1)
+            // positions_multichain = await risk_fetcher.getSolaceRiskPremium(POLICYHOLDER_ADDRESS, 1)
+            // console.log(positions_multichain)
         })
     })
 
     describe("#getSolaceRiskSeries", () => {
         it("will return a valid response", async () => {
-            const risk_series = await risk_fetcher.getSolaceRiskSeries()
-            console.log(risk_series)
+            await risk_fetcher.getSolaceRiskSeries()
+            // const risk_series = await risk_fetcher.getSolaceRiskSeries()
+            // console.log(risk_series)
         })
     })
 
@@ -64,8 +70,9 @@ describe("Risk API call", () => {
             expect(async () => {await risk_fetcher.getSolaceRiskTracks(POLICYHOLDER_ADDRESS, 150)}).toThrowError
         })
         it("will return a valid response", async () => {
-            const risk_tracks = await risk_fetcher.getSolaceRiskTracks(POLICYHOLDER_ADDRESS, 1)
-            console.log(risk_tracks)
+            await risk_fetcher.getSolaceRiskTracks(POLICYHOLDER_ADDRESS, 1)
+            // const risk_tracks = await risk_fetcher.getSolaceRiskTracks(POLICYHOLDER_ADDRESS, 1)
+            // console.log(risk_tracks)
         })
     })
 
@@ -74,8 +81,9 @@ describe("Risk API call", () => {
             expect(async () => {await risk_fetcher.getSolaceRiskBillings_All(150)}).toThrowError
         })
         it("will return a valid response", async () => {
-            const risk_billings = await risk_fetcher.getSolaceRiskBillings_All(1)
-            console.log(risk_billings)
+            await risk_fetcher.getSolaceRiskBillings_All(1)
+            // const risk_billings = await risk_fetcher.getSolaceRiskBillings_All(1)
+            // console.log(risk_billings)
         })
     })
 
@@ -84,8 +92,9 @@ describe("Risk API call", () => {
             expect(async () => {await risk_fetcher.getSolaceRiskBillings(POLICYHOLDER_ADDRESS, 150)}).toThrowError
         })
         it("will return a valid response", async () => {
-            const risk_billings = await risk_fetcher.getSolaceRiskBillings(POLICYHOLDER_ADDRESS, 1)
-            console.log(risk_billings)
+            await risk_fetcher.getSolaceRiskBillings(POLICYHOLDER_ADDRESS, 1)
+            // const risk_billings = await risk_fetcher.getSolaceRiskBillings(POLICYHOLDER_ADDRESS, 1)
+            // console.log(risk_billings)
         })
     })
 
@@ -94,8 +103,9 @@ describe("Risk API call", () => {
             expect(async () => {await risk_fetcher.getSolaceRiskBillings(POLICYHOLDER_ADDRESS, 150, 'paid')}).toThrowError
         })
         it("will return a valid response", async () => {
-            const risk_billings = await risk_fetcher.getSolaceRiskBillings(POLICYHOLDER_ADDRESS, 1, 'paid')
-            console.log(risk_billings)
+            await risk_fetcher.getSolaceRiskBillings(POLICYHOLDER_ADDRESS, 1, 'paid')
+            // const risk_billings = await risk_fetcher.getSolaceRiskBillings(POLICYHOLDER_ADDRESS, 1, 'paid')
+            // console.log(risk_billings)
         })
     })
 
@@ -104,8 +114,9 @@ describe("Risk API call", () => {
             expect(async () => {await risk_fetcher.getSolaceRiskBillings(POLICYHOLDER_ADDRESS, 150, 'unpaid')}).toThrowError
         })
         it("will return a valid response", async () => {
-            const risk_billings = await risk_fetcher.getSolaceRiskBillings(POLICYHOLDER_ADDRESS, 1, 'unpaid')
-            console.log(risk_billings)
+            await risk_fetcher.getSolaceRiskBillings(POLICYHOLDER_ADDRESS, 1, 'unpaid')
+            // const risk_billings = await risk_fetcher.getSolaceRiskBillings(POLICYHOLDER_ADDRESS, 1, 'unpaid')
+            // console.log(risk_billings)
         })
     })
 })

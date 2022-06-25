@@ -1,6 +1,6 @@
 import { Contract, providers, getDefaultProvider } from 'ethers'
 const { getNetwork } = providers
-import ERC20 from '../abis/ERC20.json'
+import {ERC20_ABI} from '../'
 import { DEFAULT_ENDPOINT, UWP_ADDRESS, WrappedTokenToMasterToken } from "../constants"
 import { fetchBalances, withBackoffRetries } from "../utils"
 import { getProvider } from '../utils/ethers'
@@ -28,7 +28,7 @@ export class UnderwritingPoolBalances {
     ]
 
     const activatedTokenList = tokenList.map((t) => {
-      const contract = new Contract(t.address, ERC20, provider)
+      const contract = new Contract(t.address, ERC20_ABI, provider)
       return {
         ...t,
         contract
@@ -63,7 +63,7 @@ export class UnderwritingPoolBalances {
     ]
 
     const activatedTokenList = tokenList.map((t) => {
-      const contract = new Contract(t.address, ERC20, provider)
+      const contract = new Contract(t.address, ERC20_ABI, provider)
       return {
         ...t,
         contract
@@ -99,7 +99,7 @@ export class UnderwritingPoolBalances {
     ]
 
     const activatedTokenList = tokenList.map((t) => {
-      const contract = new Contract(t.address, ERC20, provider)
+      const contract = new Contract(t.address, ERC20_ABI, provider)
       return {
         ...t,
         contract
@@ -131,7 +131,7 @@ export class UnderwritingPoolBalances {
     ]
     
     const activatedTokenList = tokenList.map((t) => {
-      const contract = new Contract(t.address, ERC20, provider)
+      const contract = new Contract(t.address, ERC20_ABI, provider)
       return {
         ...t,
         contract
@@ -183,9 +183,6 @@ export class UnderwritingPoolUSDBalances {
   public async getUSDBalances_Polygon(rpcUrl?: string) {
     const uwpbObj = new UnderwritingPoolBalances()
     const priceObj = new Price()
-    // const balances = await withBackoffRetries(async () => uwpbObj.getBalances_Polygon())
-    // const prices = await withBackoffRetries(async () => priceObj.getPolygonPrices())
-    // const tokenPrices = await withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices())
     
     const [balances, prices, tokenPrices] = await Promise.all([
       withBackoffRetries(async () => uwpbObj.getBalances_Polygon(rpcUrl)),
@@ -217,9 +214,6 @@ export class UnderwritingPoolUSDBalances {
   public async getUSDBalances_Aurora(rpcUrl?: string) {
     const uwpbObj = new UnderwritingPoolBalances()
     const priceObj = new Price()
-    // const balances = await withBackoffRetries(async () => uwpbObj.getBalances_Aurora())
-    // const prices = await withBackoffRetries(async () => priceObj.getAuroraPrices())
-    // const tokenPrices = await withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices())
     
     const [balances, prices, tokenPrices] = await Promise.all([
       withBackoffRetries(async () => uwpbObj.getBalances_Aurora(rpcUrl)),

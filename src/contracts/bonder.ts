@@ -1,10 +1,15 @@
 import { BigNumber as BN, Contract, providers, Wallet, utils, getDefaultProvider, BigNumberish } from 'ethers'
 const { getNetwork } = providers
-import BondTellerErc20 from "../abis/BondTellerErc20.json"
-import BondTellerEth from "../abis/BondTellerEth.json"
-import BondTellerMatic from "../abis/BondTellerMatic.json"
+
+import {
+    BondTellerErc20_ABI,
+    BondTellerEth_ABI,
+    BondTellerMatic_ABI,
+    BondTellerFtm_ABI,
+} from "../"
+
 import invariant from 'tiny-invariant'
-import { BOND_TELLER_ADDRESSES, ZERO_ADDRESS, isNetworkSupported, DEFAULT_ENDPOINT } from '../constants'
+import { BOND_TELLER_ADDRESSES, ZERO_ADDRESS, DEFAULT_ENDPOINT, foundNetwork } from '../constants'
 import { BondTellerType, GasConfiguration } from '../types';
 import { getProvider } from '../utils/ethers'
 
@@ -32,7 +37,7 @@ export class Bonder {
      * @param bondTellerContractAddress string
      */
      constructor(chainID: number, bondTellerContractAddress: string, walletOrProviderOrSigner?: Wallet | providers.JsonRpcSigner | providers.Provider) {
-        invariant(isNetworkSupported(chainID),"not a supported chainID")
+        invariant(foundNetwork(chainID)?.features.general.bondingV2,"not a supported chainID")
         let storedType: BondTellerType = 'erc20'
         let found = false
         Object.keys(BOND_TELLER_ADDRESSES).forEach((key) => {
@@ -59,15 +64,57 @@ export class Bonder {
         }
 
         if (String(storedType) === 'eth') {
-            this.bondTellerContract = new Contract(bondTellerContractAddress, BondTellerEth, walletOrProviderOrSigner)
+            this.bondTellerContract = new Contract(bondTellerContractAddress, BondTellerEth_ABI, walletOrProviderOrSigner)
         } else if (String(storedType) === 'matic') {
-            this.bondTellerContract = new Contract(bondTellerContractAddress, BondTellerMatic, walletOrProviderOrSigner)
+            this.bondTellerContract = new Contract(bondTellerContractAddress, BondTellerMatic_ABI, walletOrProviderOrSigner)
+        } else if (String(storedType) === 'ftm') {
+            this.bondTellerContract = new Contract(bondTellerContractAddress, BondTellerFtm_ABI, walletOrProviderOrSigner)
         } else {
-            this.bondTellerContract = new Contract(bondTellerContractAddress, BondTellerErc20, walletOrProviderOrSigner)
+            this.bondTellerContract = new Contract(bondTellerContractAddress, BondTellerErc20_ABI, walletOrProviderOrSigner)
         }
 
         this.chainID = chainID;
         this.bondTellerType = storedType
+    }
+
+    /**************
+    MUTATING HELPER FUNCTIONS
+    **************/
+
+    public async depositNative(
+        deposit: BigNumberish,
+        minAmountOut: BigNumberish,
+        depositor: string,
+        stake: boolean,
+        gasConfig?: GasConfiguration
+    ): Promise<providers.TransactionResponse> {
+        switch(this.bondTellerType) {
+            case 'matic':
+                return await this.depositMatic(deposit, minAmountOut, depositor, stake, gasConfig)
+            case 'ftm':
+                return await this.depositFtm(deposit, minAmountOut, depositor, stake, gasConfig)
+            case 'eth':
+                default:
+                return await this.depositEth(deposit, minAmountOut, depositor, stake, gasConfig)
+        }
+    }
+
+    public async depositWrappedNative(
+        deposit: BigNumberish,
+        minAmountOut: BigNumberish,
+        depositor: string,
+        stake: boolean,
+        gasConfig?: GasConfiguration
+    ): Promise<providers.TransactionResponse> {
+        switch(this.bondTellerType) {
+            case 'matic':
+                return await this.depositWmatic(deposit, minAmountOut, depositor, stake, gasConfig)
+            case 'ftm':
+                return await this.depositWftm(deposit, minAmountOut, depositor, stake, gasConfig)
+            case 'eth':
+                default:
+                return await this.depositWeth(deposit, minAmountOut, depositor, stake, gasConfig)
+        }
     }
 
     /********************************
@@ -142,8 +189,7 @@ export class Bonder {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(depositor), "not an Ethereum address")
         invariant(depositor != ZERO_ADDRESS, "cannot enter zero address policyholder")
-        invariant(this.bondTellerType !== "eth", "function does not exist on BondTellerEth")
-        invariant(this.bondTellerType !== "matic", "function does not exist on BondTellerMatic")
+        invariant(this.bondTellerType === 'erc20', "function only exists on BondTellerErc20")
 
         const tx: providers.TransactionResponse = await this.bondTellerContract.deposit(deposit, minAmountOut, depositor, stake, {...gasConfig})
         return tx
@@ -175,8 +221,7 @@ export class Bonder {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         invariant(utils.isAddress(depositor), "not an Ethereum address")
         invariant(depositor != ZERO_ADDRESS, "cannot enter zero address policyholder")
-        invariant(this.bondTellerType !== "eth", "function does not exist on BondTellerEth")
-        invariant(this.bondTellerType !== "matic", "function does not exist on BondTellerMatic")
+        invariant(this.bondTellerType === 'erc20', "function only exists on BondTellerErc20")
 
         const tx: providers.TransactionResponse = await this.bondTellerContract.depositSigned(deposit, minAmountOut, depositor, stake, deadline, v, r, s, {...gasConfig})
         return tx
@@ -345,6 +390,57 @@ export class Bonder {
         invariant(this.bondTellerType === "matic", "function only exists on BondTellerMatic")
 
         const tx: providers.TransactionResponse = await this.bondTellerContract.depositWmaticSigned(deposit, minAmountOut, depositor, stake, deadline, v, r, s, {...gasConfig})
+        return tx
+    }
+
+    /*********************************
+    BondTellerFtm Mutator Functions
+    *********************************/
+
+    /**
+     * @notice Create a bond by depositing FTM.
+     * @param deposit Amount of FTM to deposit.
+     * @param minAmountOut The minimum SOLACE out.
+     * @param depositor The bond recipient, default msg.sender.
+     * @param stake True to stake, false to not stake.
+     */
+     public async depositFtm(
+        deposit: BigNumberish,
+        minAmountOut: BigNumberish,
+        depositor: string,
+        stake: boolean,
+        gasConfig?: GasConfiguration
+    ): Promise<providers.TransactionResponse> {
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
+        invariant(utils.isAddress(depositor), "not an Ethereum address")
+        invariant(depositor != ZERO_ADDRESS, "cannot enter zero address policyholder")
+        invariant(this.bondTellerType === "ftm", "function only exists on BondTellerFtm")
+
+        const tx: providers.TransactionResponse = await this.bondTellerContract.depositFtm(minAmountOut, depositor, stake, {value: deposit, ...gasConfig})
+        return tx
+    }
+
+    /**
+     * @notice Create a bond by depositing amount wFTM. wFTM will be transferred from msg.sender using allowance.
+     * @param deposit Amount of WETH to deposit.
+     * @param minAmountOut The minimum SOLACE out.
+     * @param depositor The bond recipient, default msg.sender.
+     * @param stake True to stake, false to not stake.
+     */
+     public async depositWftm(
+        deposit: BigNumberish,
+        minAmountOut: BigNumberish,
+        depositor: string,
+        stake: boolean,
+        gasConfig?: GasConfiguration
+    ): Promise<providers.TransactionResponse> {
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
+        invariant(utils.isAddress(depositor), "not an Ethereum address")
+        invariant(depositor != ZERO_ADDRESS, "cannot enter zero address policyholder")
+        invariant(this.bondTellerType === "ftm", "function only exists on BondTellerFtm")
+
+
+        const tx: providers.TransactionResponse = await this.bondTellerContract.depositWftm(deposit, minAmountOut, depositor, stake, {...gasConfig})
         return tx
     }
 }

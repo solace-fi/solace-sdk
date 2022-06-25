@@ -1,7 +1,6 @@
 import { Contract, providers } from "ethers"
-import { COVERAGE_SCP_ADDRESS } from "../src" // COVER_PAYMENT_MANAGER_ADDRESS
+import { COVERAGE_SCP_ADDRESS, SCP_ABI } from "../src" // COVER_PAYMENT_MANAGER_ADDRESS
 import { SCP } from "../src/contracts"
-import SCP_ABI from "../src/abis/SCP.json"
 // import CoverPaymentManager from "../src/abis/CoverPaymentManager.json"
 
 describe("SCP", () => {

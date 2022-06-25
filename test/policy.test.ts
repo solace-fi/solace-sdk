@@ -22,10 +22,10 @@ describe('Policy', () => {
         })
     })
 
-    describe('#getExistingPolicy', () => {
+    describe('#getExistingPolicy_V2', () => {
         it('will return a valid response', async () => {
-            const res = await p.getExistingPolicy('0xfb5cAAe76af8D3CE730f3D62c6442744853d43Ef')
-            console.log("#getExistingPolicy - ", res)
+            const res = await p.getExistingPolicy_V2('0xfb5cAAe76af8D3CE730f3D62c6442744853d43Ef')
+            console.log("#getExistingPolicy_V2 - ", res)
         })
     })
 })

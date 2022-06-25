@@ -1,7 +1,7 @@
 import { Contract, providers, getDefaultProvider } from 'ethers'
 const { getNetwork } = providers
-import ERC20 from '../abis/ERC20.json'
-import { DEFAULT_ENDPOINT, UWP_ADDRESS } from "../constants"
+import {ERC20_ABI} from '../'
+import { DEFAULT_ENDPOINT, UWP_ADDRESS, WrappedTokenToMasterToken } from "../constants"
 import { fetchBalances, withBackoffRetries } from "../utils"
 import { getProvider } from '../utils/ethers'
 import { Price } from './price'
@@ -28,7 +28,7 @@ export class UnderwritingPoolBalances {
     ]
 
     const activatedTokenList = tokenList.map((t) => {
-      const contract = new Contract(t.address, ERC20, provider)
+      const contract = new Contract(t.address, ERC20_ABI, provider)
       return {
         ...t,
         contract
@@ -63,7 +63,7 @@ export class UnderwritingPoolBalances {
     ]
 
     const activatedTokenList = tokenList.map((t) => {
-      const contract = new Contract(t.address, ERC20, provider)
+      const contract = new Contract(t.address, ERC20_ABI, provider)
       return {
         ...t,
         contract
@@ -99,7 +99,7 @@ export class UnderwritingPoolBalances {
     ]
 
     const activatedTokenList = tokenList.map((t) => {
-      const contract = new Contract(t.address, ERC20, provider)
+      const contract = new Contract(t.address, ERC20_ABI, provider)
       return {
         ...t,
         contract
@@ -114,7 +114,38 @@ export class UnderwritingPoolBalances {
 
     return res
   }
+
+  public async getBalances_Fantom(rpcUrl?: string) {
+    const provider = getProvider(rpcUrl ?? DEFAULT_ENDPOINT[250])
+    const blockTag = await provider.getBlockNumber()
+    let res = []
+  
+    const tokenList = [
+      {address: '0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E', symbol: 'dai', decimals: 18},
+      {address: '0x04068DA6C83AFCFA0e13ba15A6696662335D5B75', symbol: 'usdc', decimals: 6},
+      {address: '0x049d68029688eAbF473097a2fC38ef61633A3C7A', symbol: 'fusdt', decimals: 6},
+      {address: '0x74b23882a30290451A17c44f4F05243b6b58C76d', symbol: 'eth', decimals: 18},
+      {address: '0x321162Cd933E2Be498Cd2267a90534A804051b11', symbol: 'btc', decimals: 8},
+      {address: '0xdc301622e621166BD8E82f2cA0A26c13Ad0BE355', symbol: 'frax', decimals: 18},
+      {address: '0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83', symbol: 'wftm', decimals: 18}
+    ]
+    
+    const activatedTokenList = tokenList.map((t) => {
+      const contract = new Contract(t.address, ERC20_ABI, provider)
+      return {
+        ...t,
+        contract
+      }
+    })
+    const balances = await fetchBalances(provider, activatedTokenList, UWP_ADDRESS[250], blockTag)
+    
+    for(let i = 0; i < balances.length; i++) {
+      res.push({ token: tokenList[i].symbol, amount: balances[i] })
+    }
+    return res
+  }
 }
+
 
 export class UnderwritingPoolUSDBalances {
 
@@ -152,9 +183,6 @@ export class UnderwritingPoolUSDBalances {
   public async getUSDBalances_Polygon(rpcUrl?: string) {
     const uwpbObj = new UnderwritingPoolBalances()
     const priceObj = new Price()
-    // const balances = await withBackoffRetries(async () => uwpbObj.getBalances_Polygon())
-    // const prices = await withBackoffRetries(async () => priceObj.getPolygonPrices())
-    // const tokenPrices = await withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices())
     
     const [balances, prices, tokenPrices] = await Promise.all([
       withBackoffRetries(async () => uwpbObj.getBalances_Polygon(rpcUrl)),
@@ -186,9 +214,6 @@ export class UnderwritingPoolUSDBalances {
   public async getUSDBalances_Aurora(rpcUrl?: string) {
     const uwpbObj = new UnderwritingPoolBalances()
     const priceObj = new Price()
-    // const balances = await withBackoffRetries(async () => uwpbObj.getBalances_Aurora())
-    // const prices = await withBackoffRetries(async () => priceObj.getAuroraPrices())
-    // const tokenPrices = await withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices())
     
     const [balances, prices, tokenPrices] = await Promise.all([
       withBackoffRetries(async () => uwpbObj.getBalances_Aurora(rpcUrl)),
@@ -202,7 +227,6 @@ export class UnderwritingPoolUSDBalances {
   }) => {
       const token = b.token
       if(prices[token] != undefined) {
-        console.log(token, prices[token], parseFloat(b.amount))
         return {
           token,
           usdBalance: parseFloat(b.amount) * prices[token]
@@ -243,9 +267,10 @@ export class UnderwritingPoolUSDBalances {
           usdBalance: parseFloat(b.amount) * mainnetPrices[token]
         }
       } else {
+        const adjustedToken = WrappedTokenToMasterToken[token.toLowerCase()] ?? token
         return {
           token,
-          usdBalance: parseFloat(b.amount) * tokenPrices[token]
+          usdBalance: parseFloat(b.amount) * tokenPrices[adjustedToken]
         }
       }
     })
@@ -261,9 +286,10 @@ export class UnderwritingPoolUSDBalances {
           usdBalance: parseFloat(b.amount) * polygonPrices[token]
         }
       } else {
+        const adjustedToken = WrappedTokenToMasterToken[token.toLowerCase()] ?? token
         return {
           token,
-          usdBalance: parseFloat(b.amount) * tokenPrices[token]
+          usdBalance: parseFloat(b.amount) * tokenPrices[adjustedToken]
         }
       }
     })
@@ -279,9 +305,10 @@ export class UnderwritingPoolUSDBalances {
           usdBalance: parseFloat(b.amount) * auroraPrices[token],
         }
       } else {
+        const adjustedToken = WrappedTokenToMasterToken[token.toLowerCase()] ?? token
         return {
           token,
-          usdBalance: parseFloat(b.amount) * tokenPrices[token],
+          usdBalance: parseFloat(b.amount) * tokenPrices[adjustedToken]
         }
       }
     })

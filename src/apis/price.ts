@@ -1,13 +1,17 @@
 import { Contract, providers, getDefaultProvider } from 'ethers'
 const { getNetwork } = providers
-import axios from "axios"
+import axios, { AxiosResponse } from "axios"
 import { fetchSupplyOrZero, fetchReservesOrZero, fetchUniswapV2PriceOrZero, fetchScpPpsOrZero, fetchUniswapV3PriceOrZero, fetchBalanceOrZero, withBackoffRetries } from '../utils'
 const ethers = require('ethers')
 const formatUnits = ethers.utils.formatUnits
-import vaultAbi from '../abis/vault.json'
-import uniV2PairAbi from '../abis/uniswapV2Pair.json'
-import uniV3PoolAbi from '../abis/uniswapV3Pool.json'
-import ERC20 from '../abis/ERC20.json'
+
+import {
+  Vault_ABI,
+  UniswapV2Pair_ABI,
+  UniswapV3Pool_ABI,
+  ERC20_ABI
+} from "../"
+
 import { TokenToPriceMapping } from '../types'
 import { fetchCoingeckoTokenPriceById, fetchCoingeckoTokenPricesByAddr } from '../utils/api'
 import { DEFAULT_ENDPOINT, TOKEN_ADDRESSES, UWP_ADDRESS } from '../constants'
@@ -38,6 +42,8 @@ export class Price {
             price_set.push({ chainId: 137, price: set137[set137.length - 1].polygon})
             const set1313161554 = reformatData(markets['1313161554'], "aurora")
             price_set.push({ chainId: 1313161554, price: set1313161554[set1313161554.length - 1].aurora})
+            const set250 = reformatData(markets['250'], "fantom")
+            price_set.push({ chainId: 250, price: set250[set250.length - 1].aurora})
         })
 
         return price_set
@@ -47,11 +53,11 @@ export class Price {
       const provider = rpcUrl ? getProvider(rpcUrl) : getDefaultProvider(getNetwork(1))
       const blockTag = await provider.getBlockNumber()
 
-      const scp = new Contract("0x501AcEe83a6f269B77c167c6701843D454E2EFA0", vaultAbi, provider)
+      const scp = new Contract("0x501AcEe83a6f269B77c167c6701843D454E2EFA0", Vault_ABI, provider)
       const pools = {
-        "USDC-WETH": new Contract("0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc", uniV2PairAbi, provider), // uni v2 usdc-eth
-        "WBTC-DAI": new Contract("0x231B7589426Ffe1b75405526fC32aC09D44364c4", uniV2PairAbi, provider), // uni v2 wbtc-dai
-        "SOLACE-USDC": new Contract("0x9C051F8A6648a51eF324D30C235da74D060153aC", uniV2PairAbi, provider), // sushi solace-usdc
+        "USDC-WETH": new Contract("0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc", UniswapV2Pair_ABI, provider), // uni v2 usdc-eth
+        "WBTC-DAI": new Contract("0x231B7589426Ffe1b75405526fC32aC09D44364c4", UniswapV2Pair_ABI, provider), // uni v2 wbtc-dai
+        "SOLACE-USDC": new Contract("0x9C051F8A6648a51eF324D30C235da74D060153aC", UniswapV2Pair_ABI, provider), // sushi solace-usdc
       }
 
       return new Promise(async (resolve, reject) => {
@@ -74,8 +80,8 @@ export class Price {
       async function fetchGuniPrice(provider: providers.JsonRpcProvider, blockTag: number): Promise<number> {
         const fraxSolacePool = "0x85Efec4ee18a06CE1685abF93e434751C3cb9bA9"
 
-        const guniContract = new Contract('0x38e7e05Dfd9fa3dE80dB0e7AC03AC57Fa832C78A', ERC20, provider)
-        const fraxContract = new Contract('0x45c32fA6DF82ead1e2EF74d17b76547EDdFaFF89', ERC20, provider)
+        const guniContract = new Contract('0x38e7e05Dfd9fa3dE80dB0e7AC03AC57Fa832C78A', ERC20_ABI, provider)
+        const fraxContract = new Contract('0x45c32fA6DF82ead1e2EF74d17b76547EDdFaFF89', ERC20_ABI, provider)
 
         return new Promise(async (resolve, reject) => {
           var [guniSupply, guniFraxBalance] = await Promise.all([
@@ -91,10 +97,10 @@ export class Price {
       const blockTag = await provider.getBlockNumber()
 
       const pools = {
-        "USDC-WETH": new Contract("0x853Ee4b2A13f8a742d64C8F088bE7bA2131f670d", uniV2PairAbi, provider), // quickswap usdc-eth
-        "WBTC-USDC": new Contract("0xF6a637525402643B0654a54bEAd2Cb9A83C8B498", uniV2PairAbi, provider), // quickswap wbtc-usdc
-        "WMATIC-USDC": new Contract("0xcd353F79d9FADe311fC3119B841e1f456b54e858", uniV2PairAbi, provider), // sushiswap wmatic-usdc
-        "FRAX-SOLACE": new Contract("0x85Efec4ee18a06CE1685abF93e434751C3cb9bA9", uniV3PoolAbi, provider), // uniswap v3 frax-solace
+        "USDC-WETH": new Contract("0x853Ee4b2A13f8a742d64C8F088bE7bA2131f670d", UniswapV2Pair_ABI, provider), // quickswap usdc-eth
+        "WBTC-USDC": new Contract("0xF6a637525402643B0654a54bEAd2Cb9A83C8B498", UniswapV2Pair_ABI, provider), // quickswap wbtc-usdc
+        "WMATIC-USDC": new Contract("0xcd353F79d9FADe311fC3119B841e1f456b54e858", UniswapV2Pair_ABI, provider), // sushiswap wmatic-usdc
+        "FRAX-SOLACE": new Contract("0x85Efec4ee18a06CE1685abF93e434751C3cb9bA9", UniswapV3Pool_ABI, provider), // uniswap v3 frax-solace
       }
 
       return new Promise(async (resolve, reject) => {
@@ -114,15 +120,15 @@ export class Price {
       const blockTag = await provider.getBlockNumber()
 
       const pools = {
-        "USDC-WNEAR": new ethers.Contract("0x20F8AeFB5697B77E0BB835A8518BE70775cdA1b0", uniV2PairAbi, provider), // trisolaris usdc-wnear
-        "WNEAR-WETH": new ethers.Contract("0x63da4DB6Ef4e7C62168aB03982399F9588fCd198", uniV2PairAbi, provider), // trisolaris wnear-weth
-        "WNEAR-WBTC": new ethers.Contract("0xbc8A244e8fb683ec1Fd6f88F3cc6E565082174Eb", uniV2PairAbi, provider), // trisolaris  wnear-wbtc
-        "AURORA-WETH": new ethers.Contract("0x5eeC60F348cB1D661E4A5122CF4638c7DB7A886e", uniV2PairAbi, provider), // trisolaris aurora-weth
-        "SOLACE-WNEAR": new ethers.Contract("0xdDAdf88b007B95fEb42DDbd110034C9a8e9746F2", uniV2PairAbi, provider), // trisolaris solace-wnear
+        "USDC-WNEAR": new ethers.Contract("0x20F8AeFB5697B77E0BB835A8518BE70775cdA1b0", UniswapV2Pair_ABI, provider), // trisolaris usdc-wnear
+        "WNEAR-WETH": new ethers.Contract("0x63da4DB6Ef4e7C62168aB03982399F9588fCd198", UniswapV2Pair_ABI, provider), // trisolaris wnear-weth
+        "WNEAR-WBTC": new ethers.Contract("0xbc8A244e8fb683ec1Fd6f88F3cc6E565082174Eb", UniswapV2Pair_ABI, provider), // trisolaris  wnear-wbtc
+        "AURORA-WETH": new ethers.Contract("0x5eeC60F348cB1D661E4A5122CF4638c7DB7A886e", UniswapV2Pair_ABI, provider), // trisolaris aurora-weth
+        "SOLACE-WNEAR": new ethers.Contract("0xdDAdf88b007B95fEb42DDbd110034C9a8e9746F2", UniswapV2Pair_ABI, provider), // trisolaris solace-wnear
       }
 
-      const wnearContract = new Contract('0xC42C30aC6Cc15faC9bD938618BcaA1a1FaE8501d', ERC20, provider)
-      const tlpContract = new Contract('0xdDAdf88b007B95fEb42DDbd110034C9a8e9746F2', ERC20, provider)
+      const wnearContract = new Contract('0xC42C30aC6Cc15faC9bD938618BcaA1a1FaE8501d', ERC20_ABI, provider)
+      const tlpContract = new Contract('0xdDAdf88b007B95fEb42DDbd110034C9a8e9746F2', ERC20_ABI, provider)
 
       return new Promise(async (resolve, reject) => {
         var [wnearPrice, wethWnearPrice, wbtcWnearPrice, auroraWethPrice, solaceWnearPrice, tlpRes, tlpWnearBal, tlpSupply] = await Promise.all([
@@ -172,12 +178,12 @@ export class Price {
         const prices = await withBackoffRetries(async () => fetchCoingeckoTokenPriceById(uniqueIds, 'usd'))
         const array: { id: string; price: number }[] = []
         uniqueIds.forEach((uniqueId) => {
-          if (!prices.find((p: any) => (p.id = uniqueId.toLowerCase()))) {
+          if (!prices.find((p: any) => (p.id == uniqueId.toLowerCase()))) {
             array.push({ id: uniqueId.toLowerCase(), price: -1 })
           } else {
             array.push({
               id: uniqueId.toLowerCase(),
-              price: prices.find((p: any) => (p.id = uniqueId.toLowerCase())).current_price,
+              price: prices.find((p: any) => (p.id == uniqueId.toLowerCase())).current_price,
             })
           }
         })
@@ -219,6 +225,9 @@ export class Price {
               case 'wmatic':
                 tokenId = 'matic-network'
                 break
+              case 'wftm':
+                tokenId = 'fantom'
+                break
               case 'eth':
               default:
                   tokenId = 'ethereum'
@@ -232,5 +241,39 @@ export class Price {
     const priceMapById = tokenids.length > 0 ? await getPricesById(tokenids) : {}
     const consolidatedPriceMapping = { ...priceMapByAddress, ...priceMapById }
     return consolidatedPriceMapping
+  }
+
+  public async getMirrorCoingeckoPrices (): Promise<{ [key: string]: number }> {
+    const prices = await axios({
+      url: 'https://price-feed.solace.fi/bondPrices.json', 
+      method: 'GET',
+      headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+      },
+    }).then((response: AxiosResponse<any, any>) => {return response.data})
+    .catch((error: AxiosResponse<any, any>) => {
+      console.error('Error getMirrorCoingeckoPrices', error)
+      return undefined
+    })
+
+    return prices
+  }
+
+  public async getPriceInfo () {
+    const info = await axios({
+      url: 'https://price-feed.solace.fi/solacePrice.json', 
+      method: 'GET',
+      headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+      },
+    }).then((response: AxiosResponse<any, any>) => {return response.data})
+    .catch((error: AxiosResponse<any, any>) => {
+      console.error('Error getPriceInfo', error)
+      return undefined
+    })
+
+     return info
   }
 }

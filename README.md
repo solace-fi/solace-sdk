@@ -17,7 +17,7 @@ Get active cover limit of Solace Cover Product on Ethereum mainnet
 ```
 import { Coverage } from "@solace-fi/sdk"
 
-// Create new Fetcher instance (contains blockchain read-only methods), connected to Ethereum mainnet (chainID = 1)
+// Create new Coverage instance, connected to Ethereum mainnet (chainID = 1)
 const coverage = new Coverage(1)
 
 // Makes read-only call to SolaceCoverProduct.sol smart contract

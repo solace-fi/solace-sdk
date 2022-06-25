@@ -1,9 +1,14 @@
 import { BigNumber as BN, Contract, providers, Wallet, utils, getDefaultProvider, BigNumberish } from 'ethers'
 const { getNetwork } = providers
-import xsLocker from "../abis/xsLocker.json"
-import StakingRewards from "../abis/StakingRewards.json"
+
+import {
+    xsLocker_ABI,
+    StakingRewards_ABI,
+    StakingRewardsV2_ABI,
+} from "../"
+
 import invariant from 'tiny-invariant'
-import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS, ZERO_ADDRESS, isNetworkSupported, DEFAULT_ENDPOINT } from '../constants'
+import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS, ZERO_ADDRESS, DEFAULT_ENDPOINT, STAKING_REWARDS_V2_ADDRESS, foundNetwork } from '../constants'
 import { GasConfiguration } from '../types';
 import { getProvider } from '../utils/ethers'
 
@@ -30,11 +35,14 @@ export class Staker {
      * @param walletOrProviderOrSigner walletOrProviderOrSigner object - a Wallet (https://docs.ethers.io/v5/api/signer/#Wallet) or a Provider (https://docs.ethers.io/v5/api/providers/) or Signer (https://docs.ethers.io/v5/api/signer/)
      */
     constructor(chainID: number, walletOrProviderOrSigner?: Wallet | providers.JsonRpcSigner | providers.Provider) {
-        invariant(isNetworkSupported(chainID),"not a supported chainID")
+        invariant(foundNetwork(chainID)?.features.general.stakingV2, 'stakingV2 not supported on this chain')
+        const xslAddr = XSLOCKER_ADDRESS[chainID]
+        const srAddr = foundNetwork(chainID)?.features.general.stakingRewardsV2 ? STAKING_REWARDS_V2_ADDRESS[chainID] : STAKING_REWARDS_ADDRESS[chainID]
+        invariant(xslAddr, `XSLOCKER_ADDRESS[${chainID}] not found`)
+        invariant(srAddr, `STAKING_REWARDS_V2_ADDRESS[${chainID}] or STAKING_REWARDS_ADDRESS[${chainID}] not found`)
+  
         this.chainID = chainID;
         if (typeof(walletOrProviderOrSigner) == 'undefined') {
-            // ethers.js getDefaultProvider method doesn't work for MATIC or Mumbai
-            // Use public RPC endpoints instead
             if (DEFAULT_ENDPOINT[chainID]) {
                 this.walletOrProviderOrSigner = getProvider(DEFAULT_ENDPOINT[chainID])
             } else {
@@ -44,8 +52,14 @@ export class Staker {
             this.walletOrProviderOrSigner = walletOrProviderOrSigner
         }
          
-        this.stakingRewards = new Contract(STAKING_REWARDS_ADDRESS[chainID], StakingRewards, walletOrProviderOrSigner)
-        this.xsLocker = new Contract(XSLOCKER_ADDRESS[chainID], xsLocker, walletOrProviderOrSigner)
+        if (foundNetwork(chainID)?.features.general.stakingRewardsV2) {
+            this.stakingRewards = new Contract(STAKING_REWARDS_V2_ADDRESS[chainID], StakingRewardsV2_ABI, walletOrProviderOrSigner)
+        }
+        else {
+            this.stakingRewards = new Contract(STAKING_REWARDS_ADDRESS[chainID], StakingRewards_ABI, walletOrProviderOrSigner)
+        }
+
+        this.xsLocker = new Contract(xslAddr, xsLocker_ABI, walletOrProviderOrSigner)
     }
 
     /**********************************
@@ -326,6 +340,65 @@ export class Staker {
     ): Promise<providers.TransactionResponse> {
         invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
         const tx: providers.TransactionResponse = await this.stakingRewards.compoundLocks(xsLockIDs, increasedLockID, {...gasConfig})
+        return tx
+    }
+
+    /**********************************
+    StakingRewardsV2 Mutator Functions
+    **********************************/
+
+	/**
+     * @notice Updates and sends a lock's rewards.
+     * @param xsLockID The ID of the lock to process rewards for.
+     * @param price The `SOLACE` price in wei(usd).
+     * @param priceDeadline Expiry timestamp for price quote.
+     * @param signature The `SOLACE` price signature.
+    */
+     public async harvestLockForScp(
+        xsLockID: BigNumberish,
+        price: BigNumberish,
+        priceDeadline: BigNumberish,
+        signature: utils.BytesLike,
+        gasConfig?: GasConfiguration
+    ): Promise<providers.TransactionResponse> {
+        invariant(STAKING_REWARDS_V2_ADDRESS[this.chainID], "StakingRewardsV2 not deployed on chain")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
+        const tx: providers.TransactionResponse = await this.stakingRewards.harvestLockForScp(xsLockID, price, priceDeadline, signature, {...gasConfig})
+        return tx
+    }
+
+	/**
+     * @notice Updates and sends multiple lock's rewards.
+     * @param xsLockIDs The IDs of the locks to process rewards for.
+     * @param price The `SOLACE` price in wei(usd).
+     * @param priceDeadline The `SOLACE` price in wei(usd).
+     * @param signature The `SOLACE` price signature.
+     */
+     public async harvestLocksForScp(
+        xsLockIDs: BigNumberish[],
+        price: BigNumberish,
+        priceDeadline: BigNumberish,
+        signature: utils.BytesLike,
+        gasConfig?: GasConfiguration
+    ): Promise<providers.TransactionResponse> {
+        invariant(STAKING_REWARDS_V2_ADDRESS[this.chainID], "StakingRewardsV2 not deployed on chain")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
+        const tx: providers.TransactionResponse = await this.stakingRewards.harvestLocksForScp(xsLockIDs, price, priceDeadline, signature, {...gasConfig})
+        return tx
+    }
+
+    /**
+     * @notice Adds a one time boost to rewards.
+     * Paid in [**SOLACE**](./../../SOLACE) by `msg.sender`.
+     * @param amount Amount of rewards to distribute.
+     */
+     public async postRewards(
+        amount: BigNumberish,
+        gasConfig?: GasConfiguration
+    ): Promise<providers.TransactionResponse> {
+        invariant(STAKING_REWARDS_V2_ADDRESS[this.chainID], "StakingRewardsV2 not deployed on chain")
+        invariant(providers.JsonRpcSigner.isSigner(this.walletOrProviderOrSigner), "cannot execute mutator function without a signer")
+        const tx: providers.TransactionResponse = await this.stakingRewards.postRewards(amount, {...gasConfig})
         return tx
     }
 

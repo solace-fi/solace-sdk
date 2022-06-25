@@ -1,9 +1,13 @@
 import { BigNumber as BN, providers, Wallet, Contract, getDefaultProvider, utils, BigNumberish } from 'ethers'
 const { getNetwork } = providers
 import invariant from 'tiny-invariant'
-import SolaceCoverProduct from "../abis/SolaceCoverProduct.json"
-import SolaceCoverProductV2 from "../abis/SolaceCoverProductV2.json"
-import { SOLACE_COVER_PRODUCT_ADDRESS, ZERO_ADDRESS, isNetworkSupported, DEFAULT_ENDPOINT } from '../constants'
+
+import {
+    SolaceCoverProduct_ABI,
+    SolaceCoverProductV2_ABI,
+} from "../"
+
+import { SOLACE_COVER_PRODUCT_ADDRESS, ZERO_ADDRESS, isNetworkSupported, DEFAULT_ENDPOINT, SOLACE_COVER_PRODUCT_V2_ADDRESS } from '../constants'
 import { GasConfiguration } from '../types';
 import { getProvider } from '../utils/ethers'
 
@@ -13,12 +17,12 @@ export class Coverage {
     solaceCoverProduct: Contract;
 
     constructor(chainID: number, walletOrProviderOrSigner?: Wallet | providers.JsonRpcSigner | providers.Provider) {
-        invariant(SOLACE_COVER_PRODUCT_ADDRESS[chainID],"not a supported chainID")
+        invariant(SOLACE_COVER_PRODUCT_ADDRESS[chainID] || SOLACE_COVER_PRODUCT_V2_ADDRESS[chainID],"not a supported chainID")
         this.chainID = chainID;
 
         if (typeof(walletOrProviderOrSigner) == 'undefined') {
             
-            if (chainID == (137 || 80001) ) {
+            if (DEFAULT_ENDPOINT[chainID]) {
                 this.walletOrProviderOrSigner = getProvider(DEFAULT_ENDPOINT[chainID])
             } else {
                 this.walletOrProviderOrSigner = getDefaultProvider(getNetwork(chainID))
@@ -27,11 +31,10 @@ export class Coverage {
             this.walletOrProviderOrSigner = walletOrProviderOrSigner
         }
 
-        if (chainID == 137 || 80001) {
-            // SolaceCoverProductV2 deployed on Polygon mainnet (137) and Mumbai (80001)
-            this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProductV2, this.walletOrProviderOrSigner)
+        if (SOLACE_COVER_PRODUCT_V2_ADDRESS[chainID]) {
+            this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V2_ADDRESS[chainID], SolaceCoverProductV2_ABI, this.walletOrProviderOrSigner)
         } else {
-            this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProduct, this.walletOrProviderOrSigner)
+            this.solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainID], SolaceCoverProduct_ABI, this.walletOrProviderOrSigner)
         }
     }
 
@@ -69,7 +72,7 @@ export class Coverage {
 
         let tx: providers.TransactionResponse
 
-        if (this.chainID == 137 || 80001) {
+        if (SOLACE_COVER_PRODUCT_V2_ADDRESS[this.chainID]) {
             tx = await this.solaceCoverProduct.activatePolicy(policyholder, coverLimit, amount, referralCode, chains, {...gasConfig})
         } else {
             tx = await this.solaceCoverProduct.activatePolicy(policyholder, coverLimit, amount, referralCode, {...gasConfig})
@@ -203,7 +206,7 @@ export class Coverage {
      * @returns The policy chain information
      */
     public async getPolicyChainInfo(policyID: BigNumberish): Promise<boolean> {
-        invariant(this.chainID == 137 || 80001, 'cannot call this function for chainId other than 137 or 80001')
+        invariant(SOLACE_COVER_PRODUCT_V2_ADDRESS[this.chainID], 'cannot call this function for this chainId')
         return (await this.solaceCoverProduct.getPolicyChainInfo(policyID))
     }
 
@@ -212,7 +215,7 @@ export class Coverage {
      * @returns The chain at the given index
      */
     public async getChain(chainIndex: BigNumberish): Promise<boolean> {
-        invariant(this.chainID == 137 || 80001, 'cannot call this function for chainId other than 137 or 80001')
+        invariant(SOLACE_COVER_PRODUCT_V2_ADDRESS[this.chainID], 'cannot call this function for this chainId')
         return (await this.solaceCoverProduct.getChain(chainIndex))
     }
 
@@ -221,7 +224,7 @@ export class Coverage {
      * @returns The number of supported chains
      */
     public async numSupportedChains(): Promise<boolean> {
-        invariant(this.chainID == 137 || 80001, 'cannot call this function for chainId other than 137 or 80001')
+        invariant(SOLACE_COVER_PRODUCT_V2_ADDRESS[this.chainID], 'cannot call this function for this chainId')
         return (await this.solaceCoverProduct.numSupportedChains())
     }
 
@@ -310,7 +313,7 @@ export class Coverage {
 
         // Wanted to use switch (chainId) but Typescript made the type of `chainId: 1` instead of `chainId: number`
         switch (true) {
-            case this.chainID === 1 || this.chainID === 4 : {
+            case SOLACE_COVER_PRODUCT_ADDRESS[this.chainID] != undefined : {
                 domain = {
                     name: "Solace.fi-SolaceCoverProduct",
                     version: "1",
@@ -325,27 +328,13 @@ export class Coverage {
                 break;
             }
 
-            case this.chainID === 137 || this.chainID === 80001: {
-                domain = {
-                    name: "Solace.fi-SolaceCoverProductV2",
-                    version: "2",
-                    chainId: this.chainID,
-                    verifyingContract: SOLACE_COVER_PRODUCT_ADDRESS[this.chainID]
-                };   
-
-                value = {
-                    version: 2
-                };   
-
-                break;
-            }
-
+            case SOLACE_COVER_PRODUCT_V2_ADDRESS[this.chainID] != undefined: 
             default: {
                 domain = {
                     name: "Solace.fi-SolaceCoverProductV2",
                     version: "2",
                     chainId: this.chainID,
-                    verifyingContract: SOLACE_COVER_PRODUCT_ADDRESS[this.chainID]
+                    verifyingContract: SOLACE_COVER_PRODUCT_V2_ADDRESS[this.chainID]
                 };   
 
                 value = {

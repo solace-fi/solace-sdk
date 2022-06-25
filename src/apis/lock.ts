@@ -2,9 +2,13 @@ import axios from "axios"
 import { BigNumber, Contract, providers, getDefaultProvider } from 'ethers'
 const { getNetwork } = providers
 import { formatUnits } from "ethers/lib/utils"
-import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS, ZERO_ADDRESS, DEFAULT_ENDPOINT } from "../constants"
-import xsLocker from '../abis/xsLocker.json'
-import stakingRewards from '../abis/StakingRewards.json'
+import { STAKING_REWARDS_ADDRESS, XSLOCKER_ADDRESS, ZERO_ADDRESS, DEFAULT_ENDPOINT, STAKING_REWARDS_V2_ADDRESS, foundNetwork } from "../constants"
+
+import {
+  xsLocker_ABI,
+  StakingRewards_ABI
+} from "../"
+
 import { withBackoffRetries } from "../utils"
 import { getProvider } from "../utils/ethers"
 import { LockData, UserLocksInfo, GlobalLockInfo, UserLocksData } from "../types/lock"
@@ -19,9 +23,9 @@ export class Lock {
 
     constructor(chainId: number, provider?: providers.Provider) {
       const xslAddr = XSLOCKER_ADDRESS[chainId]
-      const srAddr = STAKING_REWARDS_ADDRESS[chainId]
+      const srAddr = foundNetwork(chainId)?.features.general.stakingRewardsV2 ? STAKING_REWARDS_V2_ADDRESS[chainId] : STAKING_REWARDS_ADDRESS[chainId]
       invariant(xslAddr, `XSLOCKER_ADDRESS[${chainId}] not found`)
-      invariant(srAddr, `STAKING_REWARDS_ADDRESS[${chainId}] not found`)
+      invariant(srAddr, `STAKING_REWARDS_V2_ADDRESS[${chainId}] or STAKING_REWARDS_ADDRESS[${chainId}] not found`)
 
       this.xslAddr = xslAddr
       this.srAddr = srAddr
@@ -71,7 +75,6 @@ export class Lock {
             let now = Math.floor(Date.now()/1000)
             let owners: any = {}
             keys.forEach(chainID => {
-                console.log(chainID, typeof(chainID), xsLocker[chainID])
                 xsLocker[chainID].forEach((xslock: any) => {
                   if(!owners.hasOwnProperty(xslock.owner)) owners[xslock.owner] = BigNumber.from(0)
                   owners[xslock.owner] = owners[xslock.owner].add(votePowerOfLock(xslock, now))
@@ -87,8 +90,8 @@ export class Lock {
     }
 
     public async getGlobalLockStats (): Promise<GlobalLockInfo> {      
-      const xsl = new Contract(this.xslAddr, xsLocker, this.provider)
-      const sr = new Contract(this.srAddr, stakingRewards, this.provider)
+      const xsl = new Contract(this.xslAddr, xsLocker_ABI, this.provider)
+      const sr = new Contract(this.srAddr, StakingRewards_ABI, this.provider)
 
       if (!xsl || !sr) return {
         solaceStaked: '0',
@@ -158,8 +161,8 @@ export class Lock {
 
     public async getUserLocks (address: string): Promise<UserLocksData> {
 
-      const xsl = new Contract(this.xslAddr, xsLocker, this.provider)
-      const sr = new Contract(this.srAddr, stakingRewards, this.provider)
+      const xsl = new Contract(this.xslAddr, xsLocker_ABI, this.provider)
+      const sr = new Contract(this.srAddr, StakingRewards_ABI, this.provider)
 
       const filterLockCreated = xsl.filters.Transfer(ZERO_ADDRESS, address)
       const filterLockBurned = xsl.filters.Transfer(address, ZERO_ADDRESS)
@@ -258,7 +261,7 @@ export class Lock {
 
     public async getUserLockerBalances (account: string): Promise<{ stakedBalance: string, lockedBalance: string, unlockedBalance: string }> {
       const timestamp = Math.floor ( new Date().getTime() / 1000 )
-      const xsl = new Contract(this.xslAddr, xsLocker, this.provider)
+      const xsl = new Contract(this.xslAddr, xsLocker_ABI, this.provider)
 
       let stakedBalance = BigNumber.from(0) // staked = locked + unlocked
       let lockedBalance = BigNumber.from(0)

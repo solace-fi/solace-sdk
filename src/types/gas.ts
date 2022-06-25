@@ -1,5 +1,3 @@
-import { BigNumber } from "ethers"
-
 export type GasConfiguration ={
   gasPrice?: number
   maxFeePerGas?: number
@@ -9,13 +7,7 @@ export type GasConfiguration ={
 }
 
 export type GasArgs = {
-  connector?: string
+  txType?: number
   gasLimit?: number
   gasForTestnet?: boolean
-}
-
-export interface FeeData {
-  maxFeePerGas: null | BigNumber;
-  maxPriorityFeePerGas: null | BigNumber;
-  gasPrice: null | BigNumber;
 }

@@ -3,9 +3,11 @@ const { getNetwork } = providers
 import { Bonder, BOND_TELLER_ADDRESSES } from "../src"
 import { expectClose } from "../src/utils/test"
 
-import BondTellerErc20 from "../src/abis/BondTellerErc20.json"
-import BondTellerEth from "../src/abis/BondTellerEth.json"
-import BondTellerMatic from "../src/abis/BondTellerMatic.json"
+import {
+    BondTellerErc20_ABI,
+    BondTellerEth_ABI,
+    BondTellerMatic_ABI
+} from "../src"
 
 describe("Bonder", () => {
     const BOND_DEPOSIT = BN.from("1000")
@@ -29,7 +31,7 @@ describe("Bonder", () => {
     describe("Ethereum mainnet ETH-teller", () => {
         beforeEach(() => {
             provider = getDefaultProvider(getNetwork(1)) // Note using default provider gets rate-limit notification
-            bond_teller_dai_contract = new Contract(BOND_TELLER_ADDRESSES["eth"][1].addr, BondTellerEth, provider)
+            bond_teller_dai_contract = new Contract(BOND_TELLER_ADDRESSES["eth"][1].addr, BondTellerEth_ABI, provider)
             bonder = new Bonder(1, BOND_TELLER_ADDRESSES["eth"][1].addr, provider);
         })
 
@@ -54,7 +56,7 @@ describe("Bonder", () => {
     describe("Ethereum mainnet USDT-teller", () => {
         beforeEach(() => {
             provider = getDefaultProvider(getNetwork(1)) // Note using default provider gets rate-limit notification
-            bond_teller_usdt_contract = new Contract(BOND_TELLER_ADDRESSES["usdt"][1].addr, BondTellerEth, provider)
+            bond_teller_usdt_contract = new Contract(BOND_TELLER_ADDRESSES["usdt"][1].addr, BondTellerEth_ABI, provider)
             bonder = new Bonder(1, BOND_TELLER_ADDRESSES["usdt"][1].addr, provider);
         })
 
@@ -78,7 +80,7 @@ describe("Bonder", () => {
     describe("Matic mainnet MATIC-teller", () => {
         beforeEach(() => {
             provider = new providers.JsonRpcProvider("https://polygon-rpc.com")
-            bond_teller_matic_contract = new Contract(BOND_TELLER_ADDRESSES["matic"][137].addr, BondTellerMatic, provider)
+            bond_teller_matic_contract = new Contract(BOND_TELLER_ADDRESSES["matic"][137].addr, BondTellerMatic_ABI, provider)
             bonder = new Bonder(137, BOND_TELLER_ADDRESSES["matic"][137].addr, provider);
         })
 
@@ -94,7 +96,7 @@ describe("Bonder", () => {
             expect(await bond_teller_matic_contract.calculateAmountIn(BOND_DEPOSIT, false)).toEqual(await bonder.calculateAmountIn(BOND_DEPOSIT, false));
         })
     })
-
+ 
     /**********************************
     Aurora Mainnet View Functions
     **********************************/
@@ -102,7 +104,7 @@ describe("Bonder", () => {
     describe("Aurora mainnet WNEAR-teller", () => {
         beforeEach(() => {
             provider = new providers.JsonRpcProvider("https://mainnet.aurora.dev")
-            bond_teller_wnear_contract = new Contract(BOND_TELLER_ADDRESSES["wnear"][1313161554].addr, BondTellerErc20, provider)
+            bond_teller_wnear_contract = new Contract(BOND_TELLER_ADDRESSES["wnear"][1313161554].addr, BondTellerErc20_ABI, provider)
             bonder = new Bonder(1313161554, bond_teller_wnear_contract.address, provider);
         })
 

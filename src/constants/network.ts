@@ -1,43 +1,246 @@
 import { Network } from "../types";
+import { MasterToken } from "./token";
+
+const ethmainnet: Network = {
+    chainId: 1,
+    supportedTxTypes: [0, 2],
+    nativeCurrency: {
+        symbol: MasterToken.eth,
+        decimals: 18
+    },
+    features: {
+        general: {
+            bondingV2: true,
+            coverageV1: true,
+            coverageV3: true,
+            stakingRewardsV2: true,
+            stakingV2: true,
+        },
+        special: {}
+    },
+    underwritingPoolAddr: '0x5efc0d9ee3223229ce3b53e441016efc5ba83435',
+}
+
+const rinkeby: Network = {
+    chainId: 4,
+    supportedTxTypes: [0, 2],
+    isTestnet: true,
+    nativeCurrency: {
+        symbol: MasterToken.eth,
+        decimals: 18
+    },
+    features: {
+        general: {
+            bondingV2: true,
+            coverageV1: true,
+            coverageV3: true,
+            stakingRewardsV2: true,
+            stakingV2: true,
+        },
+        special: {}
+    },
+}
+
+const kovan: Network = {
+    chainId: 42,
+    supportedTxTypes: [0, 2],
+    isTestnet: true,
+    nativeCurrency: {
+        symbol: MasterToken.eth,
+        decimals: 18
+    },
+    features: {
+        general: {
+            bondingV2: true,
+            coverageV3: true,
+            stakingRewardsV2: true,
+            stakingV2: true,
+        },
+        special: {}
+    },
+}
+
+const polygon = {
+    chainId: 137,
+    supportedTxTypes: [0, 2],
+    nativeCurrency: {
+        symbol: MasterToken.matic,
+        decimals: 18
+    },
+    features: {
+        general: {
+            bondingV2: true,
+            coverageV2: true,
+            coverageV3: true,
+            stakingRewardsV2: true,
+            stakingV2: true,
+        },
+        special: {}
+    },
+    underwritingPoolAddr: '0xd1108a800363C262774B990e9DF75a4287d5c075',
+}
+
+const polygonTestnet = {
+    chainId: 80001,
+    supportedTxTypes: [0, 2],
+    isTestnet: true,
+    nativeCurrency: {
+        symbol: MasterToken.matic,
+        decimals: 18
+    },
+    features: {
+        general: {
+            bondingV2: true,
+            coverageV2: true,
+            coverageV3: true,
+            stakingRewardsV2: true,
+            stakingV2: true,
+        },
+        special: {}
+    },
+}
+
+
+const aurora = {
+    chainId: 1313161554,
+    supportedTxTypes: [0],
+    nativeCurrency: {
+        symbol: MasterToken.eth,
+        decimals: 18
+    },
+    features: {
+        general: {
+            bondingV2: true,
+            coverageV3: true,
+            stakingRewardsV2: true,
+            stakingV2: true,
+        },
+        special: {}
+    },
+    underwritingPoolAddr: '0x501ace27a074471f099fffec008bd1b151c7f7de',
+}
+
+const auroraTestnet = {
+    chainId: 1313161555,
+    supportedTxTypes: [0],
+    isTestnet: true,
+    nativeCurrency: {
+        symbol: MasterToken.eth,
+        decimals: 18
+    },
+    features: {
+        general: {
+            bondingV2: true,
+            coverageV3: true,
+            stakingRewardsV2: true,
+            stakingV2: true,
+        },
+        special: {}
+    },
+    underwritingPoolAddr: '0x501ace27a074471f099fffec008bd1b151c7f7de',
+}
+
+const fantom = {
+    chainId: 250,
+    supportedTxTypes: [0],
+    nativeCurrency: {
+        symbol: MasterToken.ftm,
+        decimals: 18
+    },
+    features: {
+        general: {
+            bondingV2: true,
+            coverageV2: true,
+            coverageV3: true,
+            stakingRewardsV2: true,
+            stakingV2: true,
+        },
+        special: {}
+    },
+    underwritingPoolAddr: '0x2971f45c0952437934B3F055C401241e5C339F93',
+}
+
+const fantomTestnet = {
+    chainId: 4002,
+    supportedTxTypes: [0],
+    isTestnet: true,
+    nativeCurrency: {
+        symbol: MasterToken.ftm,
+        decimals: 18
+    },
+    features: {
+        general: {
+            bondingV2: true,
+            coverageV2: true,
+            coverageV3: true,
+            stakingRewardsV2: true,
+            stakingV2: true,
+        },
+        special: {}
+    },
+    underwritingPoolAddr: '0x2971f45c0952437934B3F055C401241e5C339F93',
+}
+
+// const avalanche = {
+//     chainId: 43113,
+//     supportedTxTypes: [0, 2],
+//     nativeCurrency: {
+//         symbol: MasterToken.avax,
+//         decimals: 18
+//     },
+//     features: {
+//         general: {},
+//         special: {}
+//     },
+// }
+
+// const avalancheTestnet = {
+//     chainId: 43113,
+//     supportedTxTypes: [0, 2],
+//     nativeCurrency: {
+//         symbol: MasterToken.avax,
+//         decimals: 18
+//     },
+//     features: {
+//         general: {},
+//         special: {}
+//     },
+// }
 
 export const NETWORKS: Network[] = [
-    {
-        chainId: 1,
-        supportedTxTypes: [0, 2]
-    },{
-        chainId: 4,
-        supportedTxTypes: [0, 2],
-        isTestnet: true,
-    },{
-        chainId: 42,
-        supportedTxTypes: [0, 2],
-        isTestnet: true,
-    },{
-        chainId: 137,
-        supportedTxTypes: [0, 2]
-    },{
-        chainId: 80001,
-        supportedTxTypes: [0, 2],
-        isTestnet: true,
-    },{
-        chainId: 1313161554,
-        supportedTxTypes: [0],
-    },{
-        chainId: 1313161555,
-        supportedTxTypes: [0],
-        isTestnet: true,
-    }
+    ethmainnet,
+    rinkeby,
+    kovan, 
+    polygon,
+    polygonTestnet,
+    aurora,
+    auroraTestnet,
+    fantom,
+    fantomTestnet,
+    // avalanche,
+    // avalancheTestnet,
 ]
 
 export const isNetworkSupported = (chainID: number): boolean => {
     const supportedChainIds = NETWORKS.map((network) => network.chainId);
-    if ( supportedChainIds.includes(chainID) ) return true
-    else return false
+    return supportedChainIds.includes(chainID)
 }
 
+export const foundNetwork = (chainID: number): Network | undefined => {
+    const network = NETWORKS.find((network) => network.chainId === chainID);
+    if (!network) return undefined
+    return network
+}
+
+export const mainnetChains = NETWORKS.filter((n) => !n.isTestnet)
+
 export const DEFAULT_ENDPOINT: { [chainID : number]: string } = {
-    [137] : "https://polygon-rpc.com", // Polygon
-    [80001] : "https://matic-mumbai.chainstacklabs.com", // Polygon Testnet
-    [1313161554] : "https://mainnet.aurora.dev/", // Aurora
-    [1313161555] : "https://testnet.aurora.dev/", // Aurora Testnet
+    [137]: "https://polygon-rpc.com",
+    [250]: "https://rpcapi.fantom.network/",
+    [4002]: "https://rpc.testnet.fantom.network/",
+    [43113]: "https://api.avax-test.network/ext/bc/C/rpc",
+    [43114]: "https://api.avax.network/ext/bc/C/rpc",
+    [80001]: "https://matic-mumbai.chainstacklabs.com",
+    [1313161554]: "https://mainnet.aurora.dev",
+    [1313161555]: "https://testnet.aurora.dev/"
 } 

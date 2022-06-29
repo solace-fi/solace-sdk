@@ -76,12 +76,12 @@ export class Policy {
         }
     }
 
-    public async getExistingPolicy_V2(account: string, rpcUrlMapping?: {[chain: number] : string}, includeTestnets?: boolean): Promise<{ policyId: BigNumber, chainId: number, coverLimit: BigNumber }[]> {
+    public async getExistingPolicy(account: string, rpcUrlMapping?: {[chain: number] : string}, includeTestnets?: boolean): Promise<{ policyId: BigNumber, chainId: number, coverLimit: BigNumber }[]> {
         invariant(utils.isAddress(account),"not an Ethereum address")
 
         const supportedChains = NETWORKS.filter((n) => {
             const f = n.features.general
-            return f.coverageV1 || f.coverageV2
+            return f.coverageV1 || f.coverageV2 || f.coverageV3
         })
 
         const conditionedChains = includeTestnets ? supportedChains : supportedChains.filter((n) => !n.isTestnet)

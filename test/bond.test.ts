@@ -8,6 +8,7 @@ import { BigNumber } from "ethers";
 describe('Bond', () => {
     let bond1 = new Bond(1);
     let bond137 = new Bond(137);
+    let bond250 = new Bond(250);
     let bond4002 = new Bond(4002);
     let bond1313161554 = new Bond(1313161554);
 
@@ -86,6 +87,13 @@ describe('Bond', () => {
             const addr = BOND_TELLER_ADDRESSES['usdc'][137].addr
             await bond137.getUserBondData(addr, bonder)
             // const res = await bond137.getUserBondData(addr, bonder)
+            // console.log(res)
+        })
+
+        it('will return a valid response', async () => {
+            const addr = BOND_TELLER_ADDRESSES['usdc'][250].addr
+            await bond250.getUserBondData(addr, bonder)
+            // const res = await bond250.getUserBondData(addr, bonder)
             // console.log(res)
         })
 

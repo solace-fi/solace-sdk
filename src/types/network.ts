@@ -1,7 +1,7 @@
 import { MasterToken } from "../constants"
 
 export type Network = {
-  chainId: number,
+  chainId: number
   supportedTxTypes: number[]
   isTestnet?: boolean
   nativeCurrency: {
@@ -16,9 +16,6 @@ export type Network = {
       coverageV3?: boolean
       stakingRewardsV2?: boolean
       stakingV2?: boolean
-    },
-    special: {
-      unwrapBridgedSolace?: boolean
     }
   }
   underwritingPoolAddr?: string

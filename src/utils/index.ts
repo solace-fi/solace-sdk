@@ -1,8 +1,10 @@
-export * from './price'
-export * from './contract'
-export * from './api'
-export * from './gas'
-export * from './ethers'
+import { BigNumber } from "ethers"
+
+export * from "./price"
+export * from "./contract"
+export * from "./api"
+export * from "./gas"
+export * from "./ethers"
 
 export const withBackoffRetries = async (f: any, retryCount = 3, jitter = 250) => {
   let nextWaitTime = 1000
@@ -16,14 +18,13 @@ export const withBackoffRetries = async (f: any, retryCount = 3, jitter = 250) =
         throw error
       }
       await delay(nextWaitTime + Math.floor(Math.random() * jitter))
-      nextWaitTime =
-        nextWaitTime === 0 ? 1000 : Math.min(10000, 2 * nextWaitTime)
+      nextWaitTime = nextWaitTime === 0 ? 1000 : Math.min(10000, 2 * nextWaitTime)
     }
   }
 }
 
 export const delay = async (ms: number) => {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 export const rangeFrom0 = (stop: number): number[] => {
@@ -32,4 +33,10 @@ export const rangeFrom0 = (stop: number): number[] => {
     arr.push(i)
   }
   return arr
+}
+
+export const sortBNs = (a: BigNumber, b: BigNumber) => {
+  if (a.lt(b)) return -1
+  if (a.gt(b)) return 1
+  return 0
 }

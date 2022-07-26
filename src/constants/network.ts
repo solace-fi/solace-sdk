@@ -228,7 +228,7 @@ export const mainnetChains = NETWORKS.filter(n => !n.isTestnet)
 
 export const DEFAULT_ENDPOINT: { [chainID: number]: string } = {
   [137]: "https://polygon-rpc.com",
-  [250]: "https://rpc.ftm.tools/",
+  [250]: "https://rpcapi.fantom.network/",
   [4002]: "https://rpc.testnet.fantom.network/",
   [43113]: "https://api.avax-test.network/ext/bc/C/rpc",
   [43114]: "https://api.avax.network/ext/bc/C/rpc",

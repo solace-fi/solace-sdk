@@ -9,46 +9,50 @@ type Success = {
 
 export type ApplyPromoCodeResponse = Success | Failure
 
-export interface GetByUserResponse {
-  result: Result[]
-}
-
-export interface Result {
-  updated_time: string
-  policy_id: number
-  chain_id: number
-  referral_code: string
-  user: string
-  created_time: string
-  reward_amount: number
-}
-
 export interface InfoResponse {
-  result: Result
+  result: RewardsInfo
 }
 
 export interface InfoResponseArray {
   result: AppliedPromoCode[]
 }
 
-export interface Result {
-  referral_codes: AppliedPromoCode[]
-  applied_referral_codes: AppliedPromoCode[]
+export interface RewardsInfo {
+  referral_codes: ReferralCode[]
+  applied_referral_codes: AppliedReferralCode[]
   applied_promo_codes: AppliedPromoCode[]
   reward_accounting: RewardAccounting
-  referred_users: AppliedPromoCode[]
+  referred_users: AppliedReferralCode[]
+}
+
+export interface ReferralCode {
+  referral_code?: string
+  user: string
+  chain_id: number
+  policy_id: number
+  reward_amount: number
+  created_time: string
+  updated_time: string
+}
+
+export interface AppliedReferralCode {
+  id?: number
+  user: string
+  referral_code?: string
+  chain_id: number
+  policy_id: number
+  created_time: string
+  updated_time: string
 }
 
 export interface AppliedPromoCode {
-  updated_time: string
-  policy_id: number
+  id?: number
+  user: string
   promo_code?: string
   chain_id: number
-  user: string
-  id?: number
+  policy_id: number
   created_time: string
-  referral_code?: string
-  reward_amount?: number
+  updated_time: string
 }
 
 export interface RewardAccounting {

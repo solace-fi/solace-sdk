@@ -42,4 +42,11 @@ describe("PolicyReferral", () => {
       console.log(res)
     })
   })
+
+  describe("isReferralCodeUsable", () => {
+    it("will return a valid response", async () => {
+      const res = await policyReferral.isReferralCodeUsable("Z4C8G")
+      console.log(res)
+    })
+  })
 })

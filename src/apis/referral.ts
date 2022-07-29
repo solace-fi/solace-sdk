@@ -23,10 +23,13 @@ export class PolicyReferral {
         chain_id: chainId,
         policy_id: policyId.toNumber()
       }
-    }).then((response: AxiosResponse<any, any>) => {
-      return response.data
     })
-    console.log("postReferralCode", response)
+      .then((response: AxiosResponse<any, any>) => {
+        return response.data
+      })
+      .catch((error: any) => {
+        console.log("/referral-codes: ", error)
+      })
     const _referralCode = response.result?.referral_codes?.[0]?.referral_code
     return _referralCode
   }
@@ -56,9 +59,13 @@ export class PolicyReferral {
       params: {
         user: account
       }
-    }).then((response: AxiosResponse<any, any>) => {
-      return response.data
     })
+      .then((response: AxiosResponse<any, any>) => {
+        return response.data
+      })
+      .catch((error: any) => {
+        console.log("/rewards-info: ", error)
+      })
     let _referralCode = response.result?.referral_codes?.[0]?.referral_code
     if (!_referralCode) _referralCode = await this.postReferralCode(account, policyId, chainId)
     const _earnedAmount = response.result?.reward_accounting?.referred_earns ?? 0
@@ -87,7 +94,6 @@ export class PolicyReferral {
 
     let info = _info
     if (!info) info = await this.getInfo(account, policy_id, chain_id)
-    console.log("applyCode info", info)
     if (info.appliedCode) return { message: "Already applied", status: false }
     const response = await axios({
       url: `${this.baseApiUrl}referral-codes/apply`,
@@ -101,11 +107,13 @@ export class PolicyReferral {
         policy_id: policy_id.toNumber(),
         referral_code
       }
-    }).then((response: AxiosResponse<any, any>) => {
-      console.log("applyCode1", response)
-      return response.data
     })
-    console.log("applyCode2", response)
+      .then((response: AxiosResponse<any, any>) => {
+        return response.data
+      })
+      .catch((error: any) => {
+        console.log("/referral-codes/apply: ", error)
+      })
     const _appliedCode: string | undefined = response.result?.referral_code
     let message = _appliedCode ?? "not found"
     if (!_appliedCode) message = "failure"
@@ -117,9 +125,13 @@ export class PolicyReferral {
     const response = await axios({
       url: url,
       method: "GET"
-    }).then((response: AxiosResponse<any, any>) => {
-      return response.data
     })
+      .then((response: AxiosResponse<any, any>) => {
+        return response.data
+      })
+      .catch((error: any) => {
+        console.log("/referral-codes?referral_code: ", error)
+      })
     const canBeUsed = response.result?.length > 0
     return canBeUsed
   }

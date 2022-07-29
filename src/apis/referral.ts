@@ -91,8 +91,6 @@ export class PolicyReferral {
     if (!isAddress(SOLACE_COVER_PRODUCT_V3_ADDRESS[chain_id] ?? ""))
       return { message: "Invalid chain id", status: false }
 
-    const info = await this.getInfo(account, policy_id, chain_id)
-    if (info.appliedCode) return { message: "Already applied", status: false }
     const response = await axios({
       url: `${this.baseApiUrl}referral-codes/apply`,
       method: "POST",

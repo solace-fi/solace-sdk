@@ -8,9 +8,7 @@ import { PolicyReferral } from "../src/apis/referral"
 describe("PolicyReferral", () => {
   let policyReferral = new PolicyReferral()
   let rinkebyAccounts = [
-    { address: "0xe73bef17f3b54b0b5fb3795a1f0ac87a2702ec7d", policyId: 5, chainId: 4 },
-    { address: "0xc2ce57069dfd639fb0e6a783eb39bcb743fa2d3c", policyId: 7, chainId: 4 },
-    { address: "0x9ada9ae98457ad8a2d53de2b888cd1337d3438e8", policyId: 21, chainId: 4 }
+    { address: "0x9c9e609d5940b1eb6097dba837659dd39e3ed20d", policyId: 28, chainId: 4 },
   ]
 
   beforeEach(() => {
@@ -31,22 +29,22 @@ describe("PolicyReferral", () => {
     })
   })
 
-  describe("applyCode", () => {
-    it("will return a valid response", async () => {
-      const res = await policyReferral.applyCode(
-        "0xc2ce57069dfd639fb0e6a783eb39bcb743fa2d3c",
-        "Z4C8G",
-        BigNumber.from(7),
-        4
-      )
-      console.log(res)
-    })
-  })
+  // describe("applyCode", () => {
+  //   it("will return a valid response", async () => {
+  //     const res = await policyReferral.applyCode(
+  //       "0xc2ce57069dfd639fb0e6a783eb39bcb743fa2d3c",
+  //       "Z4C8G",
+  //       BigNumber.from(7),
+  //       4
+  //     )
+  //     console.log(res)
+  //   })
+  // })
 
-  describe("isReferralCodeUsable", () => {
-    it("will return a valid response", async () => {
-      const res = await policyReferral.isReferralCodeUsable("Z4C8G")
-      console.log(res)
-    })
-  })
+  // describe("isReferralCodeUsable", () => {
+  //   it("will return a valid response", async () => {
+  //     const res = await policyReferral.isReferralCodeUsable("Z4C8G")
+  //     console.log(res)
+  //   })
+  // })
 })

@@ -1,7 +1,7 @@
 import { BigNumber } from "ethers"
 import { isAddress } from "ethers/lib/utils"
 import { SOLACE_COVER_PRODUCT_V3_ADDRESS } from "../constants"
-import { InfoResponse } from "../types"
+import { InfoResponse, ReferralCode } from "../types"
 import axios, { AxiosResponse } from "axios"
 
 export class PolicyReferral {
@@ -119,7 +119,7 @@ export class PolicyReferral {
     return { message, status: true }
   }
 
-  public async isReferralCodeUsable(referral_code: string): Promise<boolean> {
+  public async isReferralCodeUsable(referral_code: string, chain_id: number): Promise<boolean> {
     const url = `${this.baseApiUrl}referral-codes?referral_code=${referral_code}`
     const response = await axios({
       url: url,
@@ -132,7 +132,8 @@ export class PolicyReferral {
         console.log("/referral-codes?referral_code: ", error)
         return { result: {} }
       })
-    const canBeUsed = response.result?.length > 0
+    const adjustedRes = response.result?.filter((r: ReferralCode) => r.chain_id == chain_id)
+    const canBeUsed = adjustedRes.length > 0
     return canBeUsed
   }
 }

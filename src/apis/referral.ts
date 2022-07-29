@@ -84,16 +84,14 @@ export class PolicyReferral {
     account: string,
     referral_code: string,
     policy_id: BigNumber,
-    chain_id: number,
-    _info?: { earnedAmount: number | undefined; referredCount: number | undefined; appliedCode: string | undefined }
+    chain_id: number
   ): Promise<{ message: string; status: boolean }> {
     if (!isAddress(account)) return { message: "Invalid account", status: false }
     if (policy_id.isZero()) return { message: "Invalid policy id", status: false }
     if (!isAddress(SOLACE_COVER_PRODUCT_V3_ADDRESS[chain_id] ?? ""))
       return { message: "Invalid chain id", status: false }
 
-    let info = _info
-    if (!info) info = await this.getInfo(account, policy_id, chain_id)
+    const info = await this.getInfo(account, policy_id, chain_id)
     if (info.appliedCode) return { message: "Already applied", status: false }
     const response = await axios({
       url: `${this.baseApiUrl}referral-codes/apply`,

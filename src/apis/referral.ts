@@ -29,6 +29,7 @@ export class PolicyReferral {
       })
       .catch((error: any) => {
         console.log("/referral-codes: ", error)
+        return { result: {} }
       })
     const _referralCode = response.result?.referral_codes?.[0]?.referral_code
     return _referralCode
@@ -65,6 +66,7 @@ export class PolicyReferral {
       })
       .catch((error: any) => {
         console.log("/rewards-info: ", error)
+        return { result: {} }
       })
     let _referralCode = response.result?.referral_codes?.[0]?.referral_code
     if (!_referralCode) _referralCode = await this.postReferralCode(account, policyId, chainId)
@@ -109,6 +111,7 @@ export class PolicyReferral {
       })
       .catch((error: any) => {
         console.log("/referral-codes/apply: ", error)
+        return { result: {} }
       })
     const _appliedCode: string | undefined = response.result?.referral_code
     let message = _appliedCode ?? "not found"
@@ -127,6 +130,7 @@ export class PolicyReferral {
       })
       .catch((error: any) => {
         console.log("/referral-codes?referral_code: ", error)
+        return { result: {} }
       })
     const canBeUsed = response.result?.length > 0
     return canBeUsed

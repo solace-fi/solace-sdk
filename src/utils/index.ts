@@ -5,6 +5,7 @@ export * from "./contract"
 export * from "./api"
 export * from "./gas"
 export * from "./ethers"
+export * from './multicall'
 
 export const withBackoffRetries = async (f: any, retryCount = 3, jitter = 250) => {
   let nextWaitTime = 1000

@@ -53,7 +53,7 @@ export class TotalSupply {
 }
 
 export class CirculatingSupply {
-    CHAIN_IDS = [1,137,1313161554] // mainnet, polygon, aurora
+    CHAIN_IDS = mainnetChains.map((n) => n.chainId)
     SOLACE_ADDRESS = "0x501acE9c35E60f03A2af4d484f49F9B1EFde9f40"
     XSOLACE_ADDRESS = "0x501ACe802447B1Ed4Aae36EA830BFBde19afbbF9"
     ERC20ABI = ERC20_ABI
@@ -73,6 +73,11 @@ export class CirculatingSupply {
             "0x37cd57c6C7243455aC66631cE37Bb7F977C71442": "premium pool",
             "0x501acE01AB2A6Cf9eCb54071038Dea19D2Aa5Ee3": "bridge wrapper"
         },
+        "250": {
+            "0x93F467AD42056fe34b27e658923bfae7AD26c5d7": "core multisig",
+            "0x2971f45c0952437934B3F055C401241e5C339F93": "underwriting pool",
+            "0xBfF26e5D913738d073C515Bee32035F2aff8C40C": "premium pool"
+        },
         "1313161554" : {
             "0x21afD3bCDa49c125a72ef123Af86d3133b6565Be": "core multisig",
             "0x4A6B0f90597e7429Ce8400fC0E2745Add343df78": "underwriting pool",
@@ -81,7 +86,7 @@ export class CirculatingSupply {
         }
     }
 
-    skipXSolaceAddrs: {[key: string]: any} = {"1":{},"137":{},"1313161554":{}}
+    skipXSolaceAddrs: {[key: string]: any} = {"1":{},"137":{},"250":{},"1313161554":{}}
 
     public async getCirculatingSupply(chainId: number, token: 'SOLACE' | 'XSOLACE', provider?: providers.Provider) {
         invariant(this.CHAIN_IDS.includes(chainId), `chainId must be one of ${this.CHAIN_IDS}`)

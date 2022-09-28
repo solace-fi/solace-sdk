@@ -17,6 +17,8 @@ import WETH9_ABI from "./WETH9.json"
 import WFTM_ABI from "./WFTM.json"
 import WMATIC_ABI from "./WMATIC.json"
 import xsLocker_ABI from "./xsLocker.json"
+import BalancerVault_ABI from './BalancerVault.json'
+import CToken_ABI from './/CToken.json'
 
 export {
     BondTellerErc20_ABI,
@@ -38,4 +40,6 @@ export {
     WFTM_ABI,
     WMATIC_ABI,
     xsLocker_ABI,
+    BalancerVault_ABI,
+    CToken_ABI
 }

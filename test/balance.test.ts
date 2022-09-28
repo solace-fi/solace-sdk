@@ -23,6 +23,11 @@ describe('SolaceBalance', () => {
             const res = await solace_balance.getSolaceBalanceOf(137)
             console.log(res)
         })
+
+        it('will return a valid response for fantom', async () => {
+            const res = await solace_balance.getSolaceBalanceOf(250)
+            console.log(res)
+        })
     })
 
     describe('#getSolaceBalanceSum', () => {
@@ -62,6 +67,11 @@ describe('xSolaceBalance', () => {
 
         it('will return a valid response for polygon', async () => {
             const res = await x_solace_balance.getXSolaceBalanceOf(137)
+            console.log(res)
+        })
+
+        it('will return a valid response for fantom', async () => {
+            const res = await x_solace_balance.getXSolaceBalanceOf(250)
             console.log(res)
         })
     })

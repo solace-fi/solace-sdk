@@ -1,7 +1,7 @@
 import { Contract, providers, getDefaultProvider } from 'ethers'
 const { getNetwork } = providers
 import axios, { AxiosResponse } from "axios"
-import { fetchSupplyOrZero, fetchReservesOrZero, fetchUniswapV2PriceOrZero, fetchScpPpsOrZero, fetchUniswapV3PriceOrZero, fetchBalanceOrZero, withBackoffRetries } from '../utils'
+import { fetchSupplyOrZero, fetchReservesOrZero, fetchUniswapV2PriceOrZero, fetchScpPpsOrZero, fetchUniswapV3PriceOrZero, fetchBalanceOrZero, withBackoffRetries, fetchBalancerPoolTokenInfo } from '../utils'
 const ethers = require('ethers')
 const formatUnits = ethers.utils.formatUnits
 
@@ -9,7 +9,8 @@ import {
   Vault_ABI,
   UniswapV2Pair_ABI,
   UniswapV3Pool_ABI,
-  ERC20_ABI
+  ERC20_ABI, 
+  BalancerVault_ABI,
 } from "../"
 
 import { TokenToPriceMapping } from '../types'
@@ -43,7 +44,7 @@ export class Price {
             const set1313161554 = reformatData(markets['1313161554'], "aurora")
             price_set.push({ chainId: 1313161554, price: set1313161554[set1313161554.length - 1].aurora})
             const set250 = reformatData(markets['250'], "fantom")
-            price_set.push({ chainId: 250, price: set250[set250.length - 1].aurora})
+            price_set.push({ chainId: 250, price: set250[set250.length - 1].fantom})
         })
 
         return price_set
@@ -71,7 +72,7 @@ export class Price {
         ])
         var slpPriceWoSolace = (slpSupply.eq(0) || solaceRes._reserve0.eq(0) || solaceRes._reserve1.eq(0)) ? 0.0 : ((formatUnits(solaceRes._reserve1, 6) - 0) / (formatUnits(slpSupply, 18) - 0))
         var scpPrice = scpPPS.eq(0) ? 0.0 : ((formatUnits(scpPPS, 18) - 0) * wethPrice)
-        resolve({'eth': wethPrice, 'wbtc': wbtcPrice, 'solace': solacePrice, 'scp': scpPrice, 'slp': slpPriceWoSolace})
+        resolve({'weth': wethPrice, 'wbtc': wbtcPrice, 'solace': solacePrice, 'scp': scpPrice, 'slp': slpPriceWoSolace})
       })
   }
 
@@ -93,6 +94,25 @@ export class Price {
         })
       }
 
+      async function fetchBptPrice(blockTag: number) {
+
+        const bptContract = new Contract('0x72bE617C114CC5960666BD2FB3e1d5529b99CC18', ERC20_ABI, provider)
+
+        var [bals, supply, ethPrice] = await Promise.all([
+          fetchBalancerPoolTokenInfo(pools["balancer"], BALANCER_POOL_ID, blockTag),
+          fetchSupplyOrZero(bptContract, blockTag),
+          fetchUniswapV2PriceOrZero(pools["USDC-WETH"], true, 6, 18, blockTag),
+        ])
+        var priceBalancer = 0.0
+        try {
+          // var sResBalancer = parseFloat(formatUnits(bals.balances[0]))
+          var eResBalancer = parseFloat(formatUnits(bals.balances[1]))
+          var eValue = eResBalancer * ethPrice
+          priceBalancer = eValue / parseFloat(formatUnits(supply))
+        } catch(e) {}
+        return priceBalancer
+      }
+
       const provider = getProvider(rpcUrl ?? DEFAULT_ENDPOINT[137])
       const blockTag = await provider.getBlockNumber()
 
@@ -101,17 +121,22 @@ export class Price {
         "WBTC-USDC": new Contract("0xF6a637525402643B0654a54bEAd2Cb9A83C8B498", UniswapV2Pair_ABI, provider), // quickswap wbtc-usdc
         "WMATIC-USDC": new Contract("0xcd353F79d9FADe311fC3119B841e1f456b54e858", UniswapV2Pair_ABI, provider), // sushiswap wmatic-usdc
         "FRAX-SOLACE": new Contract("0x85Efec4ee18a06CE1685abF93e434751C3cb9bA9", UniswapV3Pool_ABI, provider), // uniswap v3 frax-solace
+        "balancer": new Contract("0xBA12222222228d8Ba445958a75a0704d566BF2C8", BalancerVault_ABI, provider), // balancer vault
       }
+      
+      const BALANCER_POOL_ID = "0x72be617c114cc5960666bd2fb3e1d5529b99cc180002000000000000000005df";
 
       return new Promise(async (resolve, reject) => {
-        var [wethPrice, wbtcPrice, wmaticPrice, solacePrice, guniPriceWoSolace] = await Promise.all([
+        var [wethPrice, wbtcPrice, wmaticPrice, solacePrice, guniPriceWoSolace, balancerPriceWoSolace] = await Promise.all([
           fetchUniswapV2PriceOrZero(pools["USDC-WETH"], true, 6, 18, blockTag),
           fetchUniswapV2PriceOrZero(pools["WBTC-USDC"], false, 8, 6, blockTag),
           fetchUniswapV2PriceOrZero(pools["WMATIC-USDC"], false, 18, 6, blockTag),
           fetchUniswapV3PriceOrZero(pools["FRAX-SOLACE"], false, 18, 18, blockTag),
-          fetchGuniPrice(provider, blockTag)
+          fetchGuniPrice(provider, blockTag),
+          fetchBptPrice(blockTag),
+
         ])
-        resolve({'eth': wethPrice, 'wbtc': wbtcPrice, 'matic': wmaticPrice, 'solace': solacePrice, 'guni': guniPriceWoSolace})
+        resolve({'weth': wethPrice, 'wbtc': wbtcPrice, 'wmatic': wmaticPrice, 'solace': solacePrice, 'guni': guniPriceWoSolace, 'bpt': balancerPriceWoSolace})
       })
   }
 
@@ -150,6 +175,43 @@ export class Price {
         resolve({'eth': wethPrice, 'wbtc': wbtcPrice, 'wnear': wnearPrice, 'aurora': auroraPrice ,'solace': solacePrice, 'tlp': tlpPrice})
       })
   }
+
+  public async getFantomPrices(rpcUrl?: string): Promise<{ [key: string]: number }> {
+      const provider = getProvider(rpcUrl ?? DEFAULT_ENDPOINT[250])
+      const blockTag = await provider.getBlockNumber()
+
+      const pools = {
+        "USDC-WFTM": new ethers.Contract("0x2b4C76d0dc16BE1C31D4C1DC53bF9B45987Fc75c", UniswapV2Pair_ABI, provider), // spookyswap usdc-wftm
+        "WFTM-WETH": new ethers.Contract("0xf0702249F4D3A25cD3DED7859a165693685Ab577", UniswapV2Pair_ABI, provider), // spookyswap wftm-weth
+        "WFTM-WBTC": new ethers.Contract("0xFdb9Ab8B9513Ad9E419Cf19530feE49d412C3Ee3", UniswapV2Pair_ABI, provider), // spookyswap wftm-wbtc
+        "balancer": new ethers.Contract("0x20dd72Ed959b6147912C2e529F0a0C651c33c9ce", BalancerVault_ABI, provider), // beethoven vault
+      }
+
+      const BALANCER_POOL_ID = '0x8D827C4F1C88141BC8F75AC1FFE1C201E09B07BB0002000000000000000004CC'
+
+      const bptContract = new Contract('0x8D827C4f1c88141BC8f75aC1Ffe1C201E09b07BB', ERC20_ABI, provider)
+
+      return new Promise(async (resolve, reject) => {
+        var [wftmPrice, wethWftmPrice, wbtcWftmPrice, bals, supply] = await Promise.all([
+          fetchUniswapV2PriceOrZero(pools["USDC-WFTM"], true, 6, 18, blockTag),
+          fetchUniswapV2PriceOrZero(pools["WFTM-WETH"], true, 18, 18, blockTag),
+          fetchUniswapV2PriceOrZero(pools["WFTM-WBTC"], true, 18, 8, blockTag),
+          fetchBalancerPoolTokenInfo(pools["balancer"], BALANCER_POOL_ID, blockTag),
+          fetchSupplyOrZero(bptContract, blockTag),
+        ])
+        var wethPrice = wethWftmPrice * wftmPrice
+        var wbtcPrice = wbtcWftmPrice * wftmPrice
+        var [solacePrice, priceBalancer, sResBalancer, eResBalancer, eValue] = [0.0, 0.0, 0.0, 0.0, 0.0]
+        try {
+          sResBalancer = parseFloat(formatUnits(bals.balances[0]))
+          eResBalancer = parseFloat(formatUnits(bals.balances[1]))
+          eValue = eResBalancer * wethPrice
+          solacePrice = eValue * (80 / 20) / sResBalancer
+          priceBalancer = eValue / parseFloat(formatUnits(supply))
+        } catch(e) {}
+        resolve({'weth': wethPrice, 'wbtc': wbtcPrice, 'ftm': wftmPrice, 'solace': solacePrice, 'bpt': priceBalancer})
+      })
+    }
 
   public async getCoinGeckoTokenPrices () {
       const getPricesByAddress = async (tokenObjs: { symbol: string, addr: string}[]): Promise<TokenToPriceMapping> => {

@@ -8,7 +8,7 @@ describe('TotalSupply', () => {
         jest.setTimeout(20000);
     })
 
-    describe('#getTotalSupply', () => {
+    describe('#getTotalSupply - Mainnet', () => {
         it('will return a valid response for solace', async () => {
             const res = await totalSupply.getTotalSupply(1, 'SOLACE')
             console.log('getTotalSupply(1, SOLACE)', res)
@@ -17,6 +17,42 @@ describe('TotalSupply', () => {
         it('will return a valid response for xsolace', async () => {
             const res = await totalSupply.getTotalSupply(1, 'XSOLACE')
             console.log('getTotalSupply(1, XSOLACE)', res)
+        })
+    })
+
+    describe('#getTotalSupply - Polygon', () => {
+        it('will return a valid response for solace', async () => {
+            const res = await totalSupply.getTotalSupply(137, 'SOLACE')
+            console.log('getTotalSupply(137, SOLACE)', res)
+        })
+
+        it('will return a valid response for xsolace', async () => {
+            const res = await totalSupply.getTotalSupply(137, 'XSOLACE')
+            console.log('getTotalSupply(137, XSOLACE)', res)
+        })
+    })
+
+    describe('#getTotalSupply - Aurora', () => {
+        it('will return a valid response for solace', async () => {
+            const res = await totalSupply.getTotalSupply(1313161554, 'SOLACE')
+            console.log('getTotalSupply(1313161554, SOLACE)', res)
+        })
+
+        it('will return a valid response for xsolace', async () => {
+            const res = await totalSupply.getTotalSupply(1313161554, 'XSOLACE')
+            console.log('getTotalSupply(1313161554, XSOLACE)', res)
+        })
+    })
+
+    describe('#getTotalSupply - Fantom', () => {
+        it('will return a valid response for solace', async () => {
+            const res = await totalSupply.getTotalSupply(250, 'SOLACE')
+            console.log('getTotalSupply(250, SOLACE)', res)
+        })
+
+        it('will return a valid response for xsolace', async () => {
+            const res = await totalSupply.getTotalSupply(250, 'XSOLACE')
+            console.log('getTotalSupply(250, XSOLACE)', res)
         })
     })
 
@@ -86,6 +122,18 @@ describe('CirculatingSupply', () => {
         it('will return a valid response for xsolace', async () => {
             const res = await circulatingSupply.getCirculatingSupply(1313161554, 'XSOLACE')
             console.log('getCirculatingSupply(1313161554, XSOLACE)', res)
+        })
+    })
+
+    describe('#getCirculatingSupply - Fantom', () => {
+        it('will return a valid response for solace', async () => {
+            const res = await circulatingSupply.getCirculatingSupply(250, 'SOLACE')
+            console.log('getCirculatingSupply(250, SOLACE)', res)
+        })
+
+        it('will return a valid response for xsolace', async () => {
+            const res = await circulatingSupply.getCirculatingSupply(250, 'XSOLACE')
+            console.log('getCirculatingSupply(250, XSOLACE)', res)
         })
     })
 

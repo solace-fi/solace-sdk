@@ -114,3 +114,11 @@ function decimalsToAmount(decimals: number) {
   for(var i = 0; i < decimals; ++i) s += '0'
   return BigNumber.from(s)
 }
+
+export async function fetchBalancerPoolTokenInfo(vault: Contract, balancerPoolID: string, blockTag: number): Promise<{tokens: BigNumber[], balances: BigNumber[]}> {
+  return new Promise((resolve, reject) => {
+    withBackoffRetries(() => vault.getPoolTokens(balancerPoolID, {blockTag:blockTag})).then(res => {
+      resolve(res)
+    }).catch((e)=>{resolve({tokens:[], balances: []})})
+  })
+}

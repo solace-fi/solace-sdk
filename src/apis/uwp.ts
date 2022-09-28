@@ -1,6 +1,7 @@
 import { Contract, providers, getDefaultProvider } from 'ethers'
+import { formatUnits } from 'ethers/lib/utils'
 const { getNetwork } = providers
-import {ERC20_ABI} from '../'
+import {ERC20_ABI, CToken_ABI} from '../'
 import { DEFAULT_ENDPOINT, UWP_ADDRESS, WrappedTokenToMasterToken } from "../constants"
 import { fetchBalances, withBackoffRetries } from "../utils"
 import { getProvider } from '../utils/ethers'
@@ -27,6 +28,14 @@ export class UnderwritingPoolBalances {
       {address: "0x501acE9c35E60f03A2af4d484f49F9B1EFde9f40", symbol: "solace", decimals: 18}
     ]
 
+    const cTokenList: {
+      address: string;
+      symbol: string;
+      underlyingAssetSymbol: string;
+      cdecimals: number;
+      udecimals: number;
+  }[] = []
+
     const activatedTokenList = tokenList.map((t) => {
       const contract = new Contract(t.address, ERC20_ABI, provider)
       return {
@@ -39,6 +48,16 @@ export class UnderwritingPoolBalances {
     
     for(let i = 0; i < balances.length; i++) {
       res.push({ token: tokenList[i].symbol, amount: balances[i] })
+    }
+
+    for (let i = 0; i < cTokenList.length; i++) {
+      const contract = new Contract(cTokenList[i].address, CToken_ABI, provider)
+      const balance = await contract.balanceOf(UWP_ADDRESS[1])
+      const formattedBalance = formatUnits(balance, cTokenList[i].cdecimals)
+      const foundUnderlying = res.findIndex((b) => b.token.toLowerCase() === cTokenList[i].underlyingAssetSymbol.toLowerCase())
+      if (foundUnderlying > -1) {
+        res[foundUnderlying].amount = (parseFloat(formattedBalance) + parseFloat(res[foundUnderlying].amount)).toString()
+      }
     }
 
     return res
@@ -59,8 +78,18 @@ export class UnderwritingPoolBalances {
       {address: "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619", symbol: "weth", decimals: 18},
       {address: "0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6", symbol: "wbtc", decimals: 8},
       {address: "0x38e7e05Dfd9fa3dE80dB0e7AC03AC57Fa832C78A", symbol: "guni", decimals: 18},
-      {address: "0x501acE9c35E60f03A2af4d484f49F9B1EFde9f40", symbol: "solace", decimals: 18}
+      {address: "0x501acE9c35E60f03A2af4d484f49F9B1EFde9f40", symbol: "solace", decimals: 18},
+      {address: "0x72bE617C114CC5960666BD2FB3e1d5529b99CC18", symbol: "bpt", decimals: 18}
+
     ]
+    
+    const cTokenList: {
+      address: string;
+      symbol: string;
+      underlyingAssetSymbol: string;
+      cdecimals: number;
+      udecimals: number;
+  }[] = []
 
     const activatedTokenList = tokenList.map((t) => {
       const contract = new Contract(t.address, ERC20_ABI, provider)
@@ -74,6 +103,16 @@ export class UnderwritingPoolBalances {
     
     for(let i = 0; i < balances.length; i++) {
       res.push({ token: tokenList[i].symbol, amount: balances[i] })
+    }
+
+    for (let i = 0; i < cTokenList.length; i++) {
+      const contract = new Contract(cTokenList[i].address, CToken_ABI, provider)
+      const balance = await contract.balanceOf(UWP_ADDRESS[137])
+      const formattedBalance = formatUnits(balance, cTokenList[i].cdecimals)
+      const foundUnderlying = res.findIndex((b) => b.token.toLowerCase() === cTokenList[i].underlyingAssetSymbol.toLowerCase())
+      if (foundUnderlying > -1) {
+        res[foundUnderlying].amount = (parseFloat(formattedBalance) + parseFloat(res[foundUnderlying].amount)).toString()
+      }
     }
 
     return res
@@ -98,6 +137,16 @@ export class UnderwritingPoolBalances {
       {address: "0x501acE9c35E60f03A2af4d484f49F9B1EFde9f40", symbol: "solace", decimals: 18}
     ]
 
+    const cTokenList: {
+      address: string;
+      symbol: string;
+      underlyingAssetSymbol: string;
+      cdecimals: number;
+      udecimals: number;
+  }[] = [
+      {address: "0x94FA9979751a74e6b133Eb95Aeca8565c0809BaB", symbol: "cAURORA", underlyingAssetSymbol: 'aurora', cdecimals: 8, udecimals: 18}
+    ]
+
     const activatedTokenList = tokenList.map((t) => {
       const contract = new Contract(t.address, ERC20_ABI, provider)
       return {
@@ -112,6 +161,16 @@ export class UnderwritingPoolBalances {
       res.push({ token: tokenList[i].symbol, amount: balances[i] })
     }
 
+    for (let i = 0; i < cTokenList.length; i++) {
+      const contract = new Contract(cTokenList[i].address, CToken_ABI, provider)
+      const balance = await contract.balanceOf(UWP_ADDRESS[1313161554])
+      const formattedBalance = formatUnits(balance, cTokenList[i].cdecimals)
+      const foundUnderlying = res.findIndex((b) => b.token.toLowerCase() === cTokenList[i].underlyingAssetSymbol.toLowerCase())
+      if (foundUnderlying > -1) {
+        res[foundUnderlying].amount = (parseFloat(formattedBalance) + parseFloat(res[foundUnderlying].amount)).toString()
+      }
+    }
+
     return res
   }
 
@@ -123,12 +182,14 @@ export class UnderwritingPoolBalances {
     const tokenList = [
       {address: '0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E', symbol: 'dai', decimals: 18},
       {address: '0x04068DA6C83AFCFA0e13ba15A6696662335D5B75', symbol: 'usdc', decimals: 6},
-      {address: '0x049d68029688eAbF473097a2fC38ef61633A3C7A', symbol: 'fusdt', decimals: 6},
+      {address: '0x049d68029688eAbF473097a2fC38ef61633A3C7A', symbol: 'usdt', decimals: 6},
       {address: '0x74b23882a30290451A17c44f4F05243b6b58C76d', symbol: 'eth', decimals: 18},
-      {address: '0x321162Cd933E2Be498Cd2267a90534A804051b11', symbol: 'btc', decimals: 8},
+      {address: '0x321162Cd933E2Be498Cd2267a90534A804051b11', symbol: 'wbtc', decimals: 8},
       {address: '0xdc301622e621166BD8E82f2cA0A26c13Ad0BE355', symbol: 'frax', decimals: 18},
-      {address: '0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83', symbol: 'wftm', decimals: 18}
-    ]
+      {address: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", symbol: "ftm", decimals: 18},
+      {address: "0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83", symbol: "wftm", decimals: 18},
+      {address: "0x501acE9c35E60f03A2af4d484f49F9B1EFde9f40", symbol: "solace", decimals: 18},
+      {address: "0x8D827C4f1c88141BC8f75aC1Ffe1C201E09b07BB", symbol: "bpt", decimals: 18}]
     
     const activatedTokenList = tokenList.map((t) => {
       const contract = new Contract(t.address, ERC20_ABI, provider)
@@ -137,11 +198,31 @@ export class UnderwritingPoolBalances {
         contract
       }
     })
+
+    const cTokenList: {
+      address: string;
+      symbol: string;
+      underlyingAssetSymbol: string;
+      cdecimals: number;
+      udecimals: number;
+  }[] = []
+
     const balances = await fetchBalances(provider, activatedTokenList, UWP_ADDRESS[250], blockTag)
     
     for(let i = 0; i < balances.length; i++) {
       res.push({ token: tokenList[i].symbol, amount: balances[i] })
     }
+
+    for (let i = 0; i < cTokenList.length; i++) {
+      const contract = new Contract(cTokenList[i].address, CToken_ABI, provider)
+      const balance = await contract.balanceOf(UWP_ADDRESS[250])
+      const formattedBalance = formatUnits(balance, cTokenList[i].cdecimals)
+      const foundUnderlying = res.findIndex((b) => b.token.toLowerCase() === cTokenList[i].underlyingAssetSymbol.toLowerCase())
+      if (foundUnderlying > -1) {
+        res[foundUnderlying].amount = (parseFloat(formattedBalance) + parseFloat(res[foundUnderlying].amount)).toString()
+      }
+    }
+
     return res
   }
 }
@@ -164,15 +245,16 @@ export class UnderwritingPoolUSDBalances {
       amount: string;
   }) => {
       const token = b.token
-      if(prices[token]) {
+      if(prices[token] != undefined) {
         return {
           token,
           usdBalance: parseFloat(b.amount) * prices[token]
         }
       } else {
+        const adjustedToken = WrappedTokenToMasterToken[token.toLowerCase()] ?? token
         return {
           token,
-          usdBalance: parseFloat(b.amount) * tokenPrices[token]
+          usdBalance: parseFloat(b.amount) * tokenPrices[adjustedToken]
         }
       }
     })
@@ -195,15 +277,16 @@ export class UnderwritingPoolUSDBalances {
       amount: string;
   }) => {
       const token = b.token
-      if(prices[token]) {
+      if(prices[token] != undefined) {
         return {
           token,
           usdBalance: parseFloat(b.amount) * prices[token]
         }
       } else {
+        const adjustedToken = WrappedTokenToMasterToken[token.toLowerCase()] ?? token
         return {
           token,
-          usdBalance: parseFloat(b.amount) * tokenPrices[token]
+          usdBalance: parseFloat(b.amount) * tokenPrices[adjustedToken]
         }
       }
     })
@@ -232,9 +315,42 @@ export class UnderwritingPoolUSDBalances {
           usdBalance: parseFloat(b.amount) * prices[token]
         }
       } else {
+        const adjustedToken = WrappedTokenToMasterToken[token.toLowerCase()] ?? token
         return {
           token,
-          usdBalance: parseFloat(b.amount) * tokenPrices[token]
+          usdBalance: parseFloat(b.amount) * tokenPrices[adjustedToken]
+        }
+      }
+    })
+
+    return USDBalances
+  }
+
+  public async getUSDBalances_Fantom(rpcUrl?: string) {
+    const uwpbObj = new UnderwritingPoolBalances()
+    const priceObj = new Price()
+    
+    const [balances, prices, tokenPrices] = await Promise.all([
+      withBackoffRetries(async () => uwpbObj.getBalances_Fantom(rpcUrl)),
+      withBackoffRetries(async () => priceObj.getFantomPrices(rpcUrl)),
+      withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices())
+    ])
+
+    const USDBalances = balances.map((b: {
+      token: string;
+      amount: string;
+  }) => {
+      const token = b.token
+      if(prices[token] != undefined) {
+        return {
+          token,
+          usdBalance: parseFloat(b.amount) * prices[token]
+        }
+      } else {
+        const adjustedToken = WrappedTokenToMasterToken[token.toLowerCase()] ?? token
+        return {
+          token,
+          usdBalance: parseFloat(b.amount) * tokenPrices[adjustedToken]
         }
       }
     })
@@ -246,12 +362,14 @@ export class UnderwritingPoolUSDBalances {
     const uwpbObj = new UnderwritingPoolBalances()
     const priceObj = new Price()
 
-    const [tokenPrices, mainnetPrices, mainnetBalances, polygonPrices, polygonBalances, auroraPrices, auroraBalances] = await Promise.all([
+    const [tokenPrices, mainnetPrices, mainnetBalances, polygonPrices, polygonBalances, fantomPrices, fantomBalances, auroraPrices, auroraBalances] = await Promise.all([
       withBackoffRetries(async () => priceObj.getCoinGeckoTokenPrices()),
       withBackoffRetries(async () => priceObj.getMainnetPrices(rpcUrlMapping ? rpcUrlMapping[1] : undefined)),
       withBackoffRetries(async () => uwpbObj.getBalances_Mainnet(rpcUrlMapping ? rpcUrlMapping[1] : undefined)),
       withBackoffRetries(async () => priceObj.getPolygonPrices(rpcUrlMapping ? rpcUrlMapping[137] : undefined)),
       withBackoffRetries(async () => uwpbObj.getBalances_Polygon(rpcUrlMapping ? rpcUrlMapping[137] : undefined)),
+      withBackoffRetries(async () => priceObj.getFantomPrices(rpcUrlMapping ? rpcUrlMapping[250] : undefined)),
+      withBackoffRetries(async () => uwpbObj.getBalances_Fantom(rpcUrlMapping ? rpcUrlMapping[250] : undefined)),
       withBackoffRetries(async () => priceObj.getAuroraPrices(rpcUrlMapping ? rpcUrlMapping[1313161554] : undefined)),
       withBackoffRetries(async () => uwpbObj.getBalances_Aurora(rpcUrlMapping ? rpcUrlMapping[1313161554] : undefined))
     ])
@@ -261,7 +379,7 @@ export class UnderwritingPoolUSDBalances {
       amount: string;
     }) => {
       const token = b.token
-      if(mainnetPrices[token]) {
+      if(mainnetPrices[token] != undefined) {
         return {
           token,
           usdBalance: parseFloat(b.amount) * mainnetPrices[token]
@@ -280,7 +398,7 @@ export class UnderwritingPoolUSDBalances {
       amount: string;
     }) => {
       const token = b.token
-      if(polygonPrices[token]) {
+      if(polygonPrices[token] != undefined) {
         return {
           token,
           usdBalance: parseFloat(b.amount) * polygonPrices[token]
@@ -299,7 +417,7 @@ export class UnderwritingPoolUSDBalances {
       amount: string;
     }) => {
       const token = b.token
-      if(auroraPrices[token]) {
+      if(auroraPrices[token] != undefined) {
         return {
           token,
           usdBalance: parseFloat(b.amount) * auroraPrices[token],
@@ -313,12 +431,32 @@ export class UnderwritingPoolUSDBalances {
       }
     })
 
-    const consolidatedUSDBalances = [...USDBalances_Mainnet, ...USDBalances_Polygon, ...USDBalances_Aurora]
+    const USDBalances_Fantom = fantomBalances.map((b: {
+      token: string;
+      amount: string;
+    }) => {
+      const token = b.token
+      if(fantomPrices[token] != undefined) {
+        return {
+          token,
+          usdBalance: parseFloat(b.amount) * fantomPrices[token],
+        }
+      } else {
+        const adjustedToken = WrappedTokenToMasterToken[token.toLowerCase()] ?? token
+        return {
+          token,
+          usdBalance: parseFloat(b.amount) * tokenPrices[adjustedToken]
+        }
+      }
+    })
+
+    const consolidatedUSDBalances = [...USDBalances_Mainnet, ...USDBalances_Polygon, ...USDBalances_Aurora, ...USDBalances_Fantom]
     const totalUSDBalance = consolidatedUSDBalances.reduce((acc, curr) => acc + curr.usdBalance, 0)
 
     return {
       ['1']: USDBalances_Mainnet,
       ['137']: USDBalances_Polygon,
+      ['250']: USDBalances_Fantom,
       ['1313161554']: USDBalances_Aurora,
       total: totalUSDBalance
     }

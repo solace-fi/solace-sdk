@@ -27,11 +27,10 @@ export class Policy {
             provider = getProvider(rpcUrl)
         }
 
-        if (SOLACE_COVER_PRODUCT_V2_ADDRESS[chainId]) {
-            solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V2_ADDRESS[chainId], SolaceCoverProductV2_ABI, provider)
-        }
-        else if (SOLACE_COVER_PRODUCT_V3_ADDRESS[chainId]) {
+        if (SOLACE_COVER_PRODUCT_V3_ADDRESS[chainId]) {
             solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V3_ADDRESS[chainId], SolaceCoverProductV3_ABI, provider)
+        } else if (SOLACE_COVER_PRODUCT_V2_ADDRESS[chainId]) {
+            solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V2_ADDRESS[chainId], SolaceCoverProductV2_ABI, provider)
         } else {
             solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainId], SolaceCoverProduct_ABI, provider)
         }
@@ -39,15 +38,15 @@ export class Policy {
         let policyCount;
         let coverLimit;
 
-        if (SOLACE_COVER_PRODUCT_V2_ADDRESS[chainId]) {
+        if (SOLACE_COVER_PRODUCT_V3_ADDRESS[chainId]) {
             [policyCount, coverLimit] = await Promise.all([
-                solaceCoverProduct.policyCount(),
+                solaceCoverProduct.totalSupply(),
                 solaceCoverProduct.activeCoverLimit()
             ])
         }
-        else if (SOLACE_COVER_PRODUCT_V3_ADDRESS[chainId]) {
+        else if (SOLACE_COVER_PRODUCT_V2_ADDRESS[chainId]) {
             [policyCount, coverLimit] = await Promise.all([
-                solaceCoverProduct.totalSupply(),
+                solaceCoverProduct.policyCount(),
                 solaceCoverProduct.activeCoverLimit()
             ])
         } else {
@@ -64,24 +63,25 @@ export class Policy {
     }
 
     public async getTotalActivePolicies_All(rpcUrlMapping?: {[chain: number] : string}): Promise<{ totalPolicies: BigNumber; totalActiveCoverLimit: BigNumber }> {
-        const [res1, res137, res250] = await Promise.all([
+        const [res1, res137, res250, res1313161554] = await Promise.all([
             this.getTotalActivePolicies(1, rpcUrlMapping ? rpcUrlMapping[1] : undefined),
             this.getTotalActivePolicies(137, rpcUrlMapping ? rpcUrlMapping[137] : undefined),
             this.getTotalActivePolicies(250, rpcUrlMapping ? rpcUrlMapping[250] : undefined),
+            this.getTotalActivePolicies(1313161554, rpcUrlMapping ? rpcUrlMapping[1313161554] : undefined),
         ])
 
         return {
-            totalPolicies: res1.totalPolicies.add(res137.totalPolicies).add(res250.totalPolicies),
-            totalActiveCoverLimit: res1.totalActiveCoverLimit.add(res137.totalActiveCoverLimit).add(res250.totalActiveCoverLimit)
+            totalPolicies: res1.totalPolicies.add(res137.totalPolicies).add(res250.totalPolicies).add(res1313161554.totalPolicies),
+            totalActiveCoverLimit: res1.totalActiveCoverLimit.add(res137.totalActiveCoverLimit).add(res250.totalActiveCoverLimit).add(res1313161554.totalActiveCoverLimit)
         }
     }
 
-    public async getExistingPolicy_V2(account: string, rpcUrlMapping?: {[chain: number] : string}, includeTestnets?: boolean): Promise<{ policyId: BigNumber, chainId: number, coverLimit: BigNumber }[]> {
+    public async getExistingPolicy(account: string, rpcUrlMapping?: {[chain: number] : string}, includeTestnets?: boolean): Promise<{ policyId: BigNumber, chainId: number, coverLimit: BigNumber }[]> {
         invariant(utils.isAddress(account),"not an Ethereum address")
 
         const supportedChains = NETWORKS.filter((n) => {
             const f = n.features.general
-            return f.coverageV1 || f.coverageV2
+            return f.coverageV1 || f.coverageV2 || f.coverageV3
         })
 
         const conditionedChains = includeTestnets ? supportedChains : supportedChains.filter((n) => !n.isTestnet)
@@ -101,10 +101,10 @@ export class Policy {
                 }
             }
              
-            if (SOLACE_COVER_PRODUCT_V2_ADDRESS[chainId]) {
-                solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V2_ADDRESS[chainId], SolaceCoverProductV2_ABI, provider)
-            } else if (SOLACE_COVER_PRODUCT_V3_ADDRESS[chainId]) {
+            if (SOLACE_COVER_PRODUCT_V3_ADDRESS[chainId]) {
                 solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V3_ADDRESS[chainId], SolaceCoverProductV3_ABI, provider)
+            } else if (SOLACE_COVER_PRODUCT_V2_ADDRESS[chainId]) {
+                solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_V2_ADDRESS[chainId], SolaceCoverProductV2_ABI, provider)
             } else {
                 solaceCoverProduct = new Contract(SOLACE_COVER_PRODUCT_ADDRESS[chainId], SolaceCoverProduct_ABI, provider)
             }

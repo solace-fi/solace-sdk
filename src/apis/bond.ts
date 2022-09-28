@@ -16,16 +16,6 @@ import {
     WFTM_ABI,
 } from "../"
 
-// import bondTellerEth from '../abis/BondTellerEth.json'
-// import bondTellerMatic from '../abis/BondTellerMatic.json'
-// import bondTellerErc20 from '../abis/BondTellerErc20.json'
-// import bondTellerFtm from '../abis/BondTellerFtm.json'
-
-// import ERC20 from '../abis/ERC20.json'
-// import WETH9 from '../abis/WETH9.json'
-// import WMATIC from '../abis/WMATIC.json'
-// import WFTM from '../abis/WFTM.json'
-
 import { withBackoffRetries } from "../utils";
 import { BondTellerDetails, BondToken, BondTellerType } from "../types/bond";
 import { getProvider } from "../utils/ethers";

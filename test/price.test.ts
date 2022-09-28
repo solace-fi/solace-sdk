@@ -36,6 +36,13 @@ describe('Price', () => {
         })
     })
 
+    describe('#getFantomPrices', () => {
+        it('will return a valid response', async () => {
+            const token_prices = await price.getFantomPrices()
+            console.log(token_prices)
+        })
+    })
+
     describe('#getCoinGeckoTokenPrices', () => {
         it('will return a valid response', async () => {
             const token_prices = await price.getCoinGeckoTokenPrices()

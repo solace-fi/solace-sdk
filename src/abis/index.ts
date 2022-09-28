@@ -18,7 +18,16 @@ import WFTM_ABI from "./WFTM.json"
 import WMATIC_ABI from "./WMATIC.json"
 import xsLocker_ABI from "./xsLocker.json"
 import BalancerVault_ABI from './BalancerVault.json'
-import CToken_ABI from './/CToken.json'
+import CToken_ABI from './CToken.json'
+import BribeController_ABI from './BribeController.json'
+import DepositHelper_ABI from './DepositHelper.json'
+import FluxMegaOracle_ABI from './FluxMegaOracle.json'
+import GaugeController_ABI from './GaugeController.json'
+import SolaceMegaOracle_ABI from './SolaceMegaOracle.json'
+import UnderwritingEquity_ABI from './UnderwritingEquity.json'
+import UnderwritingLocker_ABI from './UnderwritingLocker.json'
+import UnderwritingLockVoting_ABI from './UnderwritingLockVoting.json'
+import UnderwritingPool_ABI from './UnderwritingPool.json'
 
 export {
     BondTellerErc20_ABI,
@@ -41,5 +50,14 @@ export {
     WMATIC_ABI,
     xsLocker_ABI,
     BalancerVault_ABI,
-    CToken_ABI
+    CToken_ABI,
+    BribeController_ABI,
+    DepositHelper_ABI,
+    FluxMegaOracle_ABI, 
+    GaugeController_ABI,
+    SolaceMegaOracle_ABI,
+    UnderwritingEquity_ABI,
+    UnderwritingLocker_ABI,
+    UnderwritingLockVoting_ABI,
+    UnderwritingPool_ABI,
 }

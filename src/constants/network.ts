@@ -39,6 +39,24 @@ const rinkeby: Network = {
   }
 }
 
+const goerli: Network = {
+  chainId: 5,
+  supportedTxTypes: [0, 2],
+  isTestnet: true,
+  nativeCurrency: {
+    symbol: MasterToken.eth,
+    decimals: 18
+  },
+  features: {
+    general: {
+      bondingV2: true,
+      coverageV3: true,
+      stakingRewardsV2: true,
+      stakingV2: true
+    }
+  }
+}
+
 const kovan: Network = {
   chainId: 42,
   supportedTxTypes: [0, 2],
@@ -200,6 +218,7 @@ const fantomTestnet = {
 export const NETWORKS: Network[] = [
   ethmainnet,
   rinkeby,
+  goerli,
   kovan,
   polygon,
   polygonTestnet,

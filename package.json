@@ -1,6 +1,6 @@
 {
   "name": "@solace-fi/sdk-nightly",
-  "version": "0.5.66",
+  "version": "0.5.67",
   "license": "MIT",
   "repository": "https://github.com/solace-fi/solace-sdk/tree/dev/nightly",
   "keywords": [

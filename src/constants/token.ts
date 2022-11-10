@@ -246,7 +246,8 @@ const GoerliTokenList: { [token: string]: { name: string; symbol: string; decima
   [MasterToken.usdt]: { name: "USD Token", symbol: "USDT", decimals: 6 },
   [MasterToken.eth]: { name: "Wrapped Ether", symbol: "WETH", decimals: 18 },
   [MasterToken.btc]: { name: "Wrapped Bitcoin", symbol: "WBTC", decimals: 8 },
-  [MasterToken.frax]: { name: "Frax", symbol: "FRAX", decimals: 18 }
+  [MasterToken.frax]: { name: "Frax", symbol: "FRAX", decimals: 18 },
+  [MasterToken.scp]: { name: "Solace CP Token", symbol: "SCP", decimals: 18 }
 }
 
 const PolygonTokenList: { [token: string]: { name: string; symbol: string; decimals: number } } = {

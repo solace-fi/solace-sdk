@@ -59,9 +59,9 @@ describe("Risk API call", () => {
 
     describe("#getSolaceRiskSeries", () => {
         it("will return a valid response", async () => {
-            await risk_fetcher.getSolaceRiskSeries()
-            // const risk_series = await risk_fetcher.getSolaceRiskSeries()
-            // console.log(risk_series)
+            //await risk_fetcher.getSolaceRiskSeries()
+            const risk_series = await risk_fetcher.getSolaceRiskSeries()
+            console.log(risk_series)
         })
     })
 

@@ -1,0 +1,1385 @@
+{
+  "metadata": {
+    "seriesName": "Series 2.0",
+    "version": "0.0.1",
+    "dateCreated": "2022-08-02",
+    "provenance": "ipfs://cid0000001"
+  },
+  "function": {
+    "name": "getScores",
+    "description": "rating engine for swc",
+    "provenance": "ipfs://cid0000001"
+  },
+  "data": {
+    "protocolMap": [
+      {
+        "appId": "aave-amm",
+        "category": "lending",
+        "tier": 1
+      },
+      {
+        "appId": "aave-safety-module",
+        "category": "liquidity-pool",
+        "tier": 1
+      },
+      {
+        "appId": "aave-v1",
+        "category": "lending",
+        "tier": 2
+      },
+      {
+        "appId": "aave-v2",
+        "category": "lending",
+        "tier": 1
+      },
+      {
+        "appId": "aave-v3",
+        "category": "lending",
+        "tier": 1
+      },
+      {
+        "appId": "aavegotchi",
+        "category": "yield-aggregator",
+        "tier": 3
+      },
+      {
+        "appId": "abracadabra",
+        "category": "lending",
+        "tier": 2
+      },
+      {
+        "appId": "across",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "aelin",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "agave",
+        "category": "lending",
+        "tier": 3
+      },
+      {
+        "appId": "alchemix",
+        "category": "lending",
+        "tier": 2
+      },
+      {
+        "appId": "alchemix-v2",
+        "category": "lending",
+        "tier": 2
+      },
+      {
+        "appId": "alkemi",
+        "category": "lending",
+        "tier": 3
+      },
+      {
+        "appId": "alpha-tokenomics",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "alpha-v1",
+        "category": "lending",
+        "tier": 2
+      },
+      {
+        "appId": "alpha-v2",
+        "category": "lending",
+        "tier": 2
+      },
+      {
+        "appId": "angle",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "apeswap",
+        "category": "liquidity-pool",
+        "tier": 2
+      },
+      {
+        "appId": "apy",
+        "category": "yield-aggregator",
+        "tier": 3
+      },
+      {
+        "appId": "arcx",
+        "category": "yield-aggregator",
+        "tier": 3
+      },
+      {
+        "appId": "argo-finance",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "armor",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "arrakis",
+        "category": "liquidity-pool",
+        "tier": 1
+      },
+      {
+        "appId": "atlendis-v1",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "augur",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "aura",
+        "category": "liquidity-pool",
+        "tier": 2
+      },
+      {
+        "appId": "aurigami",
+        "category": "lending",
+        "tier": 2
+      },
+      {
+        "appId": "autofarm",
+        "category": "yield-aggregator",
+        "tier": 2
+      },
+      {
+        "appId": "b-protocol",
+        "category": "lending",
+        "tier": 3
+      },
+      {
+        "appId": "badger",
+        "category": "yield-aggregator",
+        "tier": 2
+      },
+      {
+        "appId": "balancer-v1",
+        "category": "liquidity-pool",
+        "tier": 1
+      },
+      {
+        "appId": "balancer-v2",
+        "category": "liquidity-pool",
+        "tier": 1
+      },
+      {
+        "appId": "banano",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "bancor",
+        "category": "liquidity-pool",
+        "tier": 2
+      },
+      {
+        "appId": "bancor-v3",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "bao",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "barnbridge",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "barnbridge-smart-yield",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "basket-dao",
+        "category": "asset-management",
+        "tier": 3
+      },
+      {
+        "appId": "bastion-protocol",
+        "category": "lending",
+        "tier": 2
+      },
+      {
+        "appId": "beefy",
+        "category": "yield-aggregator",
+        "tier": 2
+      },
+      {
+        "appId": "beethoven-x",
+        "category": "yield-aggregator",
+        "tier": 2
+      },
+      {
+        "appId": "belt",
+        "category": "liquidity-pool",
+        "tier": 2
+      },
+      {
+        "appId": "benqi",
+        "category": "lending",
+        "tier": 2
+      },
+      {
+        "appId": "bent",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "biswap",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "bluebit",
+        "category": "yield-aggregator",
+        "tier": 3
+      },
+      {
+        "appId": "compound",
+        "category": "lending",
+        "tier": 1
+      },
+      {
+        "appId": "concentrator",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "convex",
+        "category": "yield-aggregator",
+        "tier": 1
+      },
+      {
+        "appId": "coslend",
+        "category": "lending",
+        "tier": 3
+      },
+      {
+        "appId": "cozy-finance",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "cream",
+        "category": "lending",
+        "tier": 2
+      },
+      {
+        "appId": "cryptex",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "curve",
+        "category": "liquidity-pool",
+        "tier": 1
+      },
+      {
+        "appId": "defi-swap",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "defisaver",
+        "category": "lending",
+        "tier": 2
+      },
+      {
+        "appId": "derivadex",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "dforce",
+        "category": "yield-aggregator",
+        "tier": 2
+      },
+      {
+        "appId": "dfx",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "dfyn",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "dhedge",
+        "category": "asset-management",
+        "tier": 3
+      },
+      {
+        "appId": "dhedge-v2",
+        "category": "asset-management",
+        "tier": 3
+      },
+      {
+        "appId": "diffusion",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "dinoswap",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "dodo",
+        "category": "liquidity-pool",
+        "tier": 2
+      },
+      {
+        "appId": "dydx",
+        "category": "other",
+        "tier": 1
+      },
+      {
+        "appId": "88mph",
+        "category": "lending",
+        "tier": 3
+      },
+      {
+        "appId": "eighty-eight-mph-v3",
+        "category": "lending",
+        "tier": 3
+      },
+      {
+        "appId": "element",
+        "category": "lending",
+        "tier": 2
+      },
+      {
+        "appId": "ellipsis",
+        "category": "liquidity-pool",
+        "tier": 2
+      },
+      {
+        "appId": "enzyme-finance",
+        "category": "asset-management",
+        "tier": 2
+      },
+      {
+        "appId": "epns",
+        "category": "yield-aggregator",
+        "tier": 3
+      },
+      {
+        "appId": "euler",
+        "category": "lending",
+        "tier": 2
+      },
+      {
+        "appId": "evmoswap",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "fei",
+        "category": "asset-management",
+        "tier": 2
+      },
+      {
+        "appId": "float-capital",
+        "category": "unknown",
+        "tier": 3
+      },
+      {
+        "appId": "float-protocol",
+        "category": "asset-management",
+        "tier": 3
+      },
+      {
+        "appId": "floor-dao",
+        "category": "unknown",
+        "tier": 3
+      },
+      {
+        "appId": "frax",
+        "category": "asset-management",
+        "tier": 1
+      },
+      {
+        "appId": "gamma-strategies",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "geist",
+        "category": "lending",
+        "tier": 2
+      },
+      {
+        "appId": "gmx",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "good-ghosting",
+        "category": "asset-management",
+        "tier": 3
+      },
+      {
+        "appId": "governor-dao",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "grim",
+        "category": "yield-aggregator",
+        "tier": 3
+      },
+      {
+        "appId": "gro",
+        "category": "yield-aggregator",
+        "tier": 3
+      },
+      {
+        "appId": "harvest",
+        "category": "yield-aggregator",
+        "tier": 2
+      },
+      {
+        "appId": "hector-dao",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "hegic",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "honeyswap",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "hop",
+        "category": "unknown",
+        "tier": 2
+      },
+      {
+        "appId": "hundred-finance",
+        "category": "lending",
+        "tier": 3
+      },
+      {
+        "appId": "idle",
+        "category": "yield-aggregator",
+        "tier": 2
+      },
+      {
+        "appId": "illuvium",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "impermax",
+        "category": "lending",
+        "tier": 3
+      },
+      {
+        "appId": "index-coop",
+        "category": "asset-management",
+        "tier": 2
+      },
+      {
+        "appId": "indexed",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "instadapp",
+        "category": "asset-management",
+        "tier": 1
+      },
+      {
+        "appId": "inverse",
+        "category": "yield-aggregator",
+        "tier": 3
+      },
+      {
+        "appId": "iron",
+        "category": "other",
+        "tier": 1
+      },
+      {
+        "appId": "iron-bank",
+        "category": "lending",
+        "tier": 1
+      },
+      {
+        "appId": "jones-dao",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "jpegd",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "keep-network",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "keeper-dao",
+        "category": "yield-aggregator",
+        "tier": 3
+      },
+      {
+        "appId": "kinesis-labs",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "klima",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "kogefarm",
+        "category": "yield-aggregator",
+        "tier": 3
+      },
+      {
+        "appId": "kyber-dmm",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "lido",
+        "category": "other",
+        "tier": 1
+      },
+      {
+        "appId": "liquiddriver",
+        "category": "yield-aggregator",
+        "tier": 2
+      },
+      {
+        "appId": "liquity",
+        "category": "other",
+        "tier": 1
+      },
+      {
+        "appId": "llama-airforce",
+        "category": "yield-aggregator",
+        "tier": 3
+      },
+      {
+        "appId": "looks-rare",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "loopring",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "lydia",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "lyra",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "lyra-avalon",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "maker",
+        "category": "other",
+        "tier": 1
+      },
+      {
+        "appId": "maple",
+        "category": "lending",
+        "tier": 3
+      },
+      {
+        "appId": "market-xyz",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "mean-finance",
+        "category": "asset-management",
+        "tier": 3
+      },
+      {
+        "appId": "meshswap",
+        "category": "lending",
+        "tier": 2
+      },
+      {
+        "appId": "mirror",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "mm-finance",
+        "category": "liquidity-pool",
+        "tier": 2
+      },
+      {
+        "appId": "mooniswap",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "morpheus-swap",
+        "category": "yield-aggregator",
+        "tier": 3
+      },
+      {
+        "appId": "mstable",
+        "category": "asset-management",
+        "tier": 2
+      },
+      {
+        "appId": "naos",
+        "category": "lending",
+        "tier": 3
+      },
+      {
+        "appId": "nexus-mutual",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "nft20",
+        "category": "unknown",
+        "tier": 3
+      },
+      {
+        "appId": "nftx",
+        "category": "unknown",
+        "tier": 3
+      },
+      {
+        "appId": "notional-finance",
+        "category": "lending",
+        "tier": 2
+      },
+      {
+        "appId": "nsure-network",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "olympus",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "ondo",
+        "category": "yield-aggregator",
+        "tier": 3
+      },
+      {
+        "appId": "1inch",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "onx",
+        "category": "lending",
+        "tier": 3
+      },
+      {
+        "appId": "opium-network",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "opyn",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "origin",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "origin-dollar",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "origin-story",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "orion-protocol",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "pancakeswap",
+        "category": "liquidity-pool",
+        "tier": 1
+      },
+      {
+        "appId": "pangolin",
+        "category": "liquidity-pool",
+        "tier": 2
+      },
+      {
+        "appId": "penguin",
+        "category": "yield-aggregator",
+        "tier": 3
+      },
+      {
+        "appId": "perpetual-protocol",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "phuture",
+        "category": "asset-management",
+        "tier": 3
+      },
+      {
+        "appId": "pickle",
+        "category": "yield-aggregator",
+        "tier": 3
+      },
+      {
+        "appId": "pie-dao",
+        "category": "asset-management",
+        "tier": 3
+      },
+      {
+        "appId": "pika-protocol",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "platypus-finance",
+        "category": "unknown",
+        "tier": 2
+      },
+      {
+        "appId": "polygon",
+        "category": "other",
+        "tier": 1
+      },
+      {
+        "appId": "polynomial",
+        "category": "asset-management",
+        "tier": 3
+      },
+      {
+        "appId": "polywhale",
+        "category": "yield-aggregator",
+        "tier": 3
+      },
+      {
+        "appId": "popsicle",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "powerpool",
+        "category": "asset-management",
+        "tier": 3
+      },
+      {
+        "appId": "premia",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "qi-dao",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "quickswap",
+        "category": "liquidity-pool",
+        "tier": 2
+      },
+      {
+        "appId": "r-u-generous",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "railgun",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "rari",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "rari-fuse",
+        "category": "liquidity-pool",
+        "tier": 2
+      },
+      {
+        "appId": "realt",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "reaper",
+        "category": "yield-aggregator",
+        "tier": 3
+      },
+      {
+        "appId": "redacted-cartel",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "reflexer",
+        "category": "lending",
+        "tier": 2
+      },
+      {
+        "appId": "rhino-fi",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "ribbon",
+        "category": "yield-aggregator",
+        "tier": 2
+      },
+      {
+        "appId": "ribbon-v2",
+        "category": "yield-aggregator",
+        "tier": 2
+      },
+      {
+        "appId": "rocket-pool",
+        "category": "other",
+        "tier": 1
+      },
+      {
+        "appId": "rubicon",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "sablier",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "saddle",
+        "category": "liquidity-pool",
+        "tier": 2
+      },
+      {
+        "appId": "scarecrow",
+        "category": "yield-aggregator",
+        "tier": 3
+      },
+      {
+        "appId": "scream",
+        "category": "lending",
+        "tier": 3
+      },
+      {
+        "appId": "scream-v2",
+        "category": "lending",
+        "tier": 3
+      },
+      {
+        "appId": "shapeshift",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "shell",
+        "category": "liquidity-pool",
+        "tier": 0
+      },
+      {
+        "appId": "single",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "smoothy",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "snowball",
+        "category": "yield-aggregator",
+        "tier": 3
+      },
+      {
+        "appId": "snowbank",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "snowdog",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "snowswap",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "solace",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "solarbeam",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "solidex",
+        "category": "yield-aggregator",
+        "tier": 3
+      },
+      {
+        "appId": "solidly",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "spartacus",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "spiritswap",
+        "category": "liquidity-pool",
+        "tier": 2
+      },
+      {
+        "appId": "spookyswap",
+        "category": "liquidity-pool",
+        "tier": 2
+      },
+      {
+        "appId": "squid",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "stake-dao",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "stargate",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "steak-hut",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "stormswap",
+        "category": "yield-aggregator",
+        "tier": 3
+      },
+      {
+        "appId": "sturdy",
+        "category": "lending",
+        "tier": 3
+      },
+      {
+        "appId": "superfluid",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "sushiswap",
+        "category": "liquidity-pool",
+        "tier": 1
+      },
+      {
+        "appId": "sushiswap-bentobox",
+        "category": "yield-aggregator",
+        "tier": 1
+      },
+      {
+        "appId": "sushiswap-kashi",
+        "category": "lending",
+        "tier": 2
+      },
+      {
+        "appId": "swapr",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "swerve",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "synapse",
+        "category": "liquidity-pool",
+        "tier": 2
+      },
+      {
+        "appId": "synlev",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "synthetix",
+        "category": "other",
+        "tier": 1
+      },
+      {
+        "appId": "tectonic",
+        "category": "lending",
+        "tier": 2
+      },
+      {
+        "appId": "teddy-cash",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "tempus",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "tenderize",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "thales",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "the-graph",
+        "category": "liquidity-pool",
+        "tier": 0
+      },
+      {
+        "appId": "tokemak",
+        "category": "liquidity-pool",
+        "tier": 2
+      },
+      {
+        "appId": "tokenlon",
+        "category": "asset-management",
+        "tier": 3
+      },
+      {
+        "appId": "tokensets",
+        "category": "asset-management",
+        "tier": 2
+      },
+      {
+        "appId": "tomb",
+        "category": "asset-management",
+        "tier": 2
+      },
+      {
+        "appId": "tornado-cash",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "trader-joe",
+        "category": "liquidity-pool",
+        "tier": 2
+      },
+      {
+        "appId": "trisolaris",
+        "category": "liquidity-pool",
+        "tier": 2
+      },
+      {
+        "appId": "truefi",
+        "category": "lending",
+        "tier": 3
+      },
+      {
+        "appId": "ubeswap",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "umami-finance",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "unagii",
+        "category": "yield-aggregator",
+        "tier": 3
+      },
+      {
+        "appId": "uniswap-v1",
+        "category": "other",
+        "tier": 1
+      },
+      {
+        "appId": "uniswap-v2",
+        "category": "liquidity-pool",
+        "tier": 1
+      },
+      {
+        "appId": "uniswap-v3",
+        "category": "liquidity-pool",
+        "tier": 1
+      },
+      {
+        "appId": "unit",
+        "category": "lending",
+        "tier": 3
+      },
+      {
+        "appId": "universe",
+        "category": "unknown",
+        "tier": 3
+      },
+      {
+        "appId": "velodrome",
+        "category": "other",
+        "tier": 2
+      },
+      {
+        "appId": "venus",
+        "category": "lending",
+        "tier": 1
+      },
+      {
+        "appId": "vesper",
+        "category": "yield-aggregator",
+        "tier": 2
+      },
+      {
+        "appId": "vesta-finance",
+        "category": "lending",
+        "tier": 3
+      },
+      {
+        "appId": "vvs-finance",
+        "category": "other",
+        "tier": 1
+      },
+      {
+        "appId": "waultswap",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "wepiggy",
+        "category": "lending",
+        "tier": 3
+      },
+      {
+        "appId": "wonderland",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "xsigma",
+        "category": "liquidity-pool",
+        "tier": 3
+      },
+      {
+        "appId": "yam",
+        "category": "asset-management",
+        "tier": 3
+      },
+      {
+        "appId": "yaxis",
+        "category": "yield-aggregator",
+        "tier": 3
+      },
+      {
+        "appId": "yearn",
+        "category": "yield-aggregator",
+        "tier": 1
+      },
+      {
+        "appId": "yield-protocol",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "yieldyak",
+        "category": "yield-aggregator",
+        "tier": 2
+      },
+      {
+        "appId": "zero-x",
+        "category": "other",
+        "tier": 3
+      },
+      {
+        "appId": "zlot",
+        "category": "yield-aggregator",
+        "tier": 3
+      }
+    ],
+    "corrValue": [
+      {
+        "category": "lending",
+        "correlation": 0.15
+      },
+      {
+        "category": "exchange",
+        "correlation": 0.15
+      },
+      {
+        "category": "liquidity-pool",
+        "correlation": 0.15
+      },
+      {
+        "category": "unknown",
+        "correlation": 0.5
+      },
+      {
+        "category": "yield-aggregator",
+        "correlation": 0.5
+      },
+      {
+        "category": "asset-management",
+        "correlation": 0.3
+      },
+      {
+        "category": "other",
+        "correlation": 0.15
+      }
+    ],
+    "correlCat": [
+      {
+        "category": "lending",
+        "lending": 1.0,
+        "exchange": 0.3,
+        "liquidity-pool": 0.3,
+        "unknown": 0.3,
+        "yield-aggregator": 0.3,
+        "asset-management": 0.3,
+        "other": 0.3
+      },
+      {
+        "category": "exchange",
+        "lending": 0.3,
+        "exchange": 1.0,
+        "liquidity-pool": 0.3,
+        "unknown": 0.3,
+        "yield-aggregator": 0.3,
+        "asset-management": 0.2,
+        "other": 0.3
+      },
+      {
+        "category": "liquidity-pool",
+        "lending": 0.3,
+        "exchange": 0.3,
+        "liquidity-pool": 1.0,
+        "unknown": 0.3,
+        "yield-aggregator": 0.3,
+        "asset-management": 0.3,
+        "other": 0.3
+      },
+      {
+        "category": "unknown",
+        "lending": 0.3,
+        "exchange": 0.3,
+        "liquidity-pool": 0.3,
+        "unknown": 1.0,
+        "yield-aggregator": 0.3,
+        "asset-management": 0.1,
+        "other": 0.3
+      },
+      {
+        "category": "yield-aggregator",
+        "lending": 0.3,
+        "exchange": 0.3,
+        "liquidity-pool": 0.3,
+        "unknown": 0.3,
+        "yield-aggregator": 1.0,
+        "asset-management": 0.3,
+        "other": 0.3
+      },
+      {
+        "category": "asset-management",
+        "lending": 0.3,
+        "exchange": 0.3,
+        "liquidity-pool": 0.3,
+        "unknown": 0.3,
+        "yield-aggregator": 0.3,
+        "asset-management": 1.0,
+        "other": 0.3
+      },
+      {
+        "category": "other",
+        "lending": 0.3,
+        "exchange": 0.3,
+        "liquidity-pool": 0.3,
+        "unknown": 0.3,
+        "yield-aggregator": 0.3,
+        "asset-management": 0.3,
+        "other": 1.0
+      }
+    ],
+    "rateCard": [
+      {
+        "tier": 0,
+        "rol": 0.2,
+        "rrol": 0.1333,
+        "riskLoad": 0.5
+      },
+      {
+        "tier": 1,
+        "rol": 0.02,
+        "rrol": 0.0167,
+        "riskLoad": 0.2
+      },
+      {
+        "tier": 2,
+        "rol": 0.025,
+        "rrol": 0.0192,
+        "riskLoad": 0.3
+      },
+      {
+        "tier": 3,
+        "rol": 0.0799,
+        "rrol": 0.0571,
+        "riskLoad": 0.4
+      }
+    ]
+  }
+}

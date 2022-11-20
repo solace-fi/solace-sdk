@@ -2,6 +2,7 @@ import invariant from 'tiny-invariant'
 import axios, { AxiosResponse } from "axios"
 import { isNetworkSupported } from '../constants'
 import { SolaceRiskBalance, SolaceRiskScore, SolaceRiskSeries } from '../types'
+import series from '../data/series.json';
 
 export class Risk {
 
@@ -13,19 +14,20 @@ export class Risk {
      * @returns Get Solace risk series data.
      */
      public async getSolaceRiskSeries(): Promise<SolaceRiskSeries | undefined > {
-        return await axios({
-            url: 'https://risk-data.solace.fi/series', 
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-            },
-        })
-        .then((response: AxiosResponse<any, any>) => {return response.data})
-        .catch((error: AxiosResponse<any, any>) => {
-            console.error('Error getSolaceRiskSeries', error)
-            return undefined
-        })
+        // return await axios({
+        //     url: 'https://risk-data.solace.fi/series', 
+        //     method: 'GET',
+        //     headers: {
+        //         Accept: 'application/json',
+        //         'Content-Type': 'application/json',
+        //     },
+        // })
+        // .then((response: AxiosResponse<any, any>) => {return response.data})
+        // .catch((error: AxiosResponse<any, any>) => {
+        //     console.error('Error getSolaceRiskSeries', error)
+        //     return undefined
+        // })
+        return series;
     }
 
     /*************************************************************
